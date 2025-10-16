@@ -1,0 +1,38 @@
+# --- Python / FastAPI / Django / Flask ---
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+*.db
+*.sqlite3
+*.log
+.env
+venv/
+instance/
+.mypy_cache/
+.pytest_cache/
+.coverage
+htmlcov/
+dist/
+build/
+*.egg-info/
+
+# --- Node / React / Frontend ---
+node_modules/
+dist/
+build/
+*.lock
+*.log
+
+# --- OS / IDE files ---
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- Environment and secret files ---
+.env
+*.env
+.env.*
