@@ -37,3 +37,4 @@ async def root():
         "docs_url": "/docs",
         "redoc_url": "/redoc"
     }
+

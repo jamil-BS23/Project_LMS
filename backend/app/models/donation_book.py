@@ -1,21 +1,20 @@
-# from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, TIMESTAMP
-# from sqlalchemy.sql import func
-# from app.database import Base
+from sqlalchemy import Column, Integer, String, Boolean, ForeignKey, DateTime,Text,Float
+from sqlalchemy.orm import relationship
+from app.database import Base
 
-# class DonationBook(Base):
-#     __tablename__ = "donation_books"
+class DonationBook(Base):
+    __tablename__ = "donation_books"
 
-#     d_book_id = Column(Integer, primary_key=True, autoincrement=True)
-#     book_title = Column(String(200), nullable=False)
-#     category_id = Column(Integer, ForeignKey("categories.category_id", ondelete="CASCADE"))
-#     category_title = Column(String(200), nullable=False)
-#     book_author = Column(String(150), nullable=False)
-#     BS_mail = Column(String(150), nullable=False)
-#     BS_ID = Column(String(100), nullable=False)   # <-- just a normal String now
-#     book_detail = Column(String)
-#     book_photo = Column(String)
-#     book_pdf = Column(String)
-#     book_audio = Column(String)
-#     book_count = Column(Integer)
-#     book_approve = Column(String(100), default="pending")
-#     created_at = Column(TIMESTAMP, server_default=func.now())
+    donation_book_id = Column(Integer, primary_key=True, index=True)
+    book_title = Column(String, index=True, nullable=False)
+    book_author = Column(String, index=True, nullable=False)
+    donor_name = Column(String, index=True, nullable=False)
+    book_category = Column(String, index=True, nullable=False)
+    book_description = Column(Text, nullable=True)
+    BS_email = Column(String, index=True, nullable=False)
+    BS_ID = Column(String, index=True, nullable=False)
+    book_image = Column(String, nullable=True)
+    book_audio = Column(String, nullable=True)
+    book_pdf = Column(String, nullable=True)
+    donation_status = Column(String, default="Pending")
+    book_copies = Column(Integer, default=1)
