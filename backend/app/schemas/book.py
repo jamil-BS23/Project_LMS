@@ -1,4 +1,4 @@
-from pydentic import BaseModel
+from pydantic import BaseModel
 from typing import Optional
 from pydantic import Field, HttpUrl
 from datetime import datetime

@@ -1,11 +1,18 @@
+import asyncio
 from fastapi import FastAPI
+from app.api import books
+from fastapi.staticfiles import StaticFiles
+
 
 app = FastAPI()
+app.mount("/media", StaticFiles(directory="media"), name="media")
+app.include_router(books.router, prefix="/books", tags=["Books"])
+
 
 @app.get("/")
-def read_root():
-    return {"message": "Welcome to Library Management System API"}
-
-@app.get("/hello/{name}")
-def greet(name: str):
-    return {"message": f"Hello, {name}! Welcome to FastAPI."}
+async def root():
+    return {
+        "message": "📚 Library Backend API is running 🚀",
+        "docs_url": "/docs",
+        "redoc_url": "/redoc"
+    }
