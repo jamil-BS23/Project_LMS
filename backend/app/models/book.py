@@ -18,6 +18,5 @@ class Book(Base):
     book_image = Column(String, nullable=True)
     book_audio = Column(String, nullable=True)
     book_pdf = Column(String, nullable=True)
-    book_reviews = relationship("Review", back_populates="book")
-    book_borrows = relationship("Borrow", back_populates="book")
+  
 
