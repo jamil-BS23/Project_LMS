@@ -1,22 +1,36 @@
-# app/schemas/borrow.py
-from pydantic import BaseModel, Field
-from typing import Optional, List
-from datetime import date, datetime
+from pydantic import BaseModel
+from typing import List, Optional
+from datetime import date, datetime, timedelta
 
-# Input schema for creating a borrow
-class BorrowCreate(BaseModel):
-    user_id: int = Field(..., description="ID of the user borrowing the book")
-    book_id: int = Field(..., description="ID of the book to borrow")
-    due_date: Optional[date] = Field(None, description="Optional due date for returning the book")
+class BorrowBase(BaseModel):
+    user_id: int
+    book_id: int
+    borrow_date: datetime
+    status: str = "pending"
 
-# Response schema for a single borrow record
+    @property
+    def due_date(self) -> date:
+        return (self.borrow_date + timedelta(days=10)).date()
+
+
+class BorrowCreate(BorrowBase):
+    pass
+
+class BorrowUpdate(BaseModel):
+    status: Optional[str] = None
+    return_date: Optional[datetime] = None
+
+    class Config:
+        orm_mode = True
+
 class BorrowResponse(BaseModel):
     id: int
     user_id: int
     book_id: int
-    borrowed_at: datetime
+    borrow_date: datetime
     due_date: date
-    returned_at: Optional[datetime] = None
+    return_date: Optional[datetime] = None
+    status: str
 
     class Config:
         orm_mode = True
@@ -24,7 +38,7 @@ class BorrowResponse(BaseModel):
 class BorrowLimit(BaseModel):
     user_id: int
     borrowed_count: int
-    max_limit: int = 5 
+    max_limit: int = 5
 
 class BorrowListResponse(BaseModel):
     borrows: List[BorrowResponse]
