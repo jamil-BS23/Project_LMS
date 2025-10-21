@@ -1,55 +1,21 @@
-import asyncio
 from fastapi import FastAPI
-<<<<<<< HEAD
-from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book
-from fastapi.middleware.cors import CORSMiddleware
-=======
-from app.api import books
-from fastapi.staticfiles import StaticFiles
->>>>>>> primary_push
+from app.api.borrow import router as borrow_router
+from app.database import Base, engine
+import asyncio
 
+app = FastAPI(title="Library API", version="1.0")
 
-app = FastAPI()
-app.mount("/media", StaticFiles(directory="media"), name="media")
-app.include_router(books.router, prefix="/books", tags=["Books"])
+# Include your router
+app.include_router(borrow_router)
 
-
-<<<<<<< HEAD
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://lmsbs23v01-1.onrender.com"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-
-
-app.include_router(auth.router, prefix="/auth", tags=["Auth"])
-app.include_router(users.router, prefix="/users", tags=["Users"])
-app.include_router(books.router, prefix="/books", tags=["Books"])
-app.include_router(uploads.router, prefix="/files")
-app.include_router(categories.router, prefix="/categories", tags=["Categories"])
-app.include_router(borrow.router, prefix="/borrow", tags=["Borrow"])
-app.include_router(admin.router, prefix="/admin", tags=["Admin"])
-app.include_router(settings.router, prefix="/settings", tags=["Settings"])
-app.include_router(settings.router) 
-app.include_router(donation_book.router, prefix="/donation", tags="Donation Book")
-
-
-=======
->>>>>>> primary_push
 @app.get("/")
-async def root():
-    return {
-        "message": "📚 Library Backend API is running 🚀",
-        "docs_url": "/docs",
-        "redoc_url": "/redoc"
-<<<<<<< HEAD
-    }
+def root():
+    return {"message": "Library API running!"}
 
-=======
-    }
->>>>>>> primary_push
+# Async table creation
+async def init_models():
+    async with engine.begin() as conn:
+        await conn.run_sync(Base.metadata.create_all)
+
+# Run table creation before app starts
+asyncio.run(init_models())

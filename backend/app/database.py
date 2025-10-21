@@ -1,25 +1,20 @@
-
-
-import os
+# app/database.py
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlalchemy.orm import sessionmaker, declarative_base
-from dotenv import load_dotenv
 
-load_dotenv()
-
-DATABASE_URL = os.getenv("DATABASE_URL")
-
-if not DATABASE_URL:
-    raise ValueError("DATABASE_URL is not set in the .env file")
+DATABASE_URL = "postgresql+asyncpg://library:tanzil1234@localhost/library_db"
 
 engine = create_async_engine(DATABASE_URL, echo=True)
-
-async_session = sessionmaker(
-    bind=engine, class_=AsyncSession, expire_on_commit=False
-)
-
 Base = declarative_base()
 
-async def get_db():
+# Async session factory
+async_session = sessionmaker(
+    bind=engine,
+    class_=AsyncSession,
+    expire_on_commit=False
+)
+
+# Dependency for FastAPI
+async def get_db() -> AsyncSession:
     async with async_session() as session:
         yield session
