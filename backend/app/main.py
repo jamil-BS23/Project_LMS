@@ -1,12 +1,7 @@
 import asyncio
 from fastapi import FastAPI
-<<<<<<< HEAD
 from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book
 from fastapi.middleware.cors import CORSMiddleware
-=======
-from app.api import books
-from fastapi.staticfiles import StaticFiles
->>>>>>> primary_push
 
 
 app = FastAPI()
@@ -14,7 +9,6 @@ app.mount("/media", StaticFiles(directory="media"), name="media")
 app.include_router(books.router, prefix="/books", tags=["Books"])
 
 
-<<<<<<< HEAD
 
 app.add_middleware(
     CORSMiddleware,
@@ -39,17 +33,11 @@ app.include_router(settings.router)
 app.include_router(donation_book.router, prefix="/donation", tags="Donation Book")
 
 
-=======
->>>>>>> primary_push
 @app.get("/")
 async def root():
     return {
         "message": "📚 Library Backend API is running 🚀",
         "docs_url": "/docs",
         "redoc_url": "/redoc"
-<<<<<<< HEAD
     }
 
-=======
-    }
->>>>>>> primary_push

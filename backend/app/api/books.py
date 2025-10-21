@@ -4,12 +4,10 @@ from typing import List, Optional
 from app.crud.book import BookCRUD
 from app.database import get_db
 from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, UpoadateFeatures
-# from app.routers.auth import get_current_user, admin_required
 
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
 
-# ------------------ Public / Filtered ------------------
 @router.get("/", response_model=List[BookDetail])
 async def get_books(
     db: AsyncSession = Depends(get_db),
@@ -17,7 +15,6 @@ async def get_books(
     category: str | None = Query(None),
     skip: int = Query(0, ge=0),
     limit: int = Query(20, ge=1),
-    # current_user=Depends(get_current_user)
 ):
     books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
     return books
@@ -48,7 +45,6 @@ async def get_book(book_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-# ------------------ Admin ------------------
 MEDIA_DIR = "media/uploads"
 @router.post("/", response_model=BookDetail)
 async def create_book(
