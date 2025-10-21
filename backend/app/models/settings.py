@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, TIMESTAMP
+from sqlalchemy import Column, Integer
 from sqlalchemy.sql import func
 from app.database import Base
 
@@ -9,4 +9,5 @@ class Settings(Base):
     borrow_day_limit = Column(Integer, nullable=False)
     borrow_day_extension_limit = Column(Integer, nullable=False)
     borrow_max_limit = Column(Integer, nullable=False)
-    updated_at = Column(TIMESTAMP, server_default=func.now(), onupdate=func.now())
+    booking_duration= Column(Integer, nullable=False)
+    booking_days_limit = Column(Integer, nullable=False)
