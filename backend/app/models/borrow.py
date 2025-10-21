@@ -8,9 +8,9 @@ class BorrowRecord(Base):
     user_id = Column(String(50), ForeignKey("users.user_id", ondelete="CASCADE"))
     book_id = Column(Integer, ForeignKey("books.book_id", ondelete="CASCADE"))
     borrow_date = Column(Date)
-    return_date = Column(Date)
-    borrow_status = Column(String(50), default="borrowed")    # borrowed / returned / overdue
-    request_status = Column(String(50), default="pending")    # pending / accepted / rejected
+    return_date = Column(Date, nullable=True)
+    returned_at = Column(Date, nullable=True)
+    borrow_status = Column(String(50), default="pending")
 
 
 

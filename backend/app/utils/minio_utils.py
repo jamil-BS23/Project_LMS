@@ -67,3 +67,4 @@ def delete_file(object_name: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"MinIO delete failed: {str(e)}")
 
+

@@ -5,19 +5,7 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-
-
-app.add_middleware(
-    CORSMiddleware,
-    allow_origins=["http://localhost:5173", "http://127.0.0.1:5173", "https://lmsbs23v01-1.onrender.com"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
-)
-
-
-
-
+app.mount("/media", StaticFiles(directory="media"), name="media")
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(books.router, prefix="/books", tags=["Books"])
@@ -37,3 +25,4 @@ async def root():
         "docs_url": "/docs",
         "redoc_url": "/redoc"
     }
+
