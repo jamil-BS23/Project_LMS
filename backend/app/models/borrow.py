@@ -1,5 +1,4 @@
-from sqlalchemy import Column, String, ForeignKey, Date, DateTime, Integer, Enum
-from sqlalchemy.orm import relationship
+from sqlalchemy import Column, Integer, Date, DateTime, Enum
 from sqlalchemy.sql import func
 from app.database import Base
 import enum
@@ -16,10 +15,8 @@ class Borrow(Base):
     __tablename__ = "borrows"
 
     id = Column(Integer, primary_key=True, autoincrement=True)
-    user_id = Column(String(50), ForeignKey("users.user_id"), nullable=False)
-    user = relationship("User", backref="borrows")  
-    book_id = Column(Integer, ForeignKey("books.id"), nullable=False)
-    book = relationship("Book", backref="borrows")
+    user_id = Column(Integer, nullable=False) 
+    book_id = Column(Integer, nullable=False) 
     borrow_date = Column(Date, nullable=False)
     due_date = Column(Date, nullable=False)
     return_date = Column(Date, nullable=True)
