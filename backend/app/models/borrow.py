@@ -10,7 +10,7 @@ class BorrowRecord(Base):
     borrow_date = Column(Date)
     return_date = Column(Date, nullable=True)
     returned_at = Column(Date, nullable=True)
-    borrow_status = Column(String(50), default="borrowed") 
+    borrow_status = Column(String(50), default="pending")
 
 
 
