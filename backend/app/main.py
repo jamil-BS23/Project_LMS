@@ -5,7 +5,6 @@ from fastapi.middleware.cors import CORSMiddleware
 
 
 app = FastAPI()
-app.mount("/media", StaticFiles(directory="media"), name="media")
 app.include_router(auth.router, prefix="/auth", tags=["Auth"])
 app.include_router(users.router, prefix="/users", tags=["Users"])
 app.include_router(books.router, prefix="/books", tags=["Books"])
@@ -15,7 +14,7 @@ app.include_router(borrow.router, prefix="/borrow", tags=["Borrow"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 app.include_router(settings.router) 
-app.include_router(donation_book.router, prefix="/donation", tags="Donation Book")
+app.include_router(donation_book.router, prefix="/donation", tags=["Donation Book"])
 
 
 @app.get("/")

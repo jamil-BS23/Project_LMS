@@ -18,7 +18,7 @@ class DonationBookCRUD:
     @staticmethod
     async def create_request(db: AsyncSession, data: dict):
         # ensure category exists
-        category = await db.get(Category, data["category_id"])
+        category = await db.get(Category, data["category"])
         if not category:
             raise HTTPException(status_code=404, detail="Category not found")
 
@@ -35,61 +35,31 @@ class DonationBookCRUD:
         return result.scalars().all()
 
     @staticmethod
-    async def approve_request(db: AsyncSession, d_book_id: int):
-        result = await db.execute(select(DonationBook).where(DonationBook.d_book_id == d_book_id))
+    async def update_donation_status(db: AsyncSession, d_book_id: int, new_status: str):
+        # Fetch the donation request
+        result = await db.execute(select(DonationBook).where(DonationBook.donation_book_id == d_book_id))
         donation = result.scalar_one_or_none()
         if not donation:
             raise HTTPException(status_code=404, detail="Donation request not found")
+        
 
-        if donation.book_approve == "approved":
-            raise HTTPException(status_code=400, detail="Already approved")
+        # Update the status
+        donation.donation_status = new_status
 
-        donation.book_approve = "approved"
+        # If status is 'approved', insert into books table
+        if new_status == "approved":
+            new_book = Book(
+                book_title=donation.book_title,
+                book_author=donation.book_author,
+                book_category=donation.category_id,
+                book_photo=donation.book_photo,
+                book_pdf=donation.book_pdf,
+                book_audio=donation.book_audio,
+                book_description=donation.book_description,
+                book_copies=donation.available_copies,
+            )
+            db.add(new_book)
 
-        # Insert into books table
-        new_book = Book(
-            book_title=donation.book_title,
-            book_author=donation.book_author,
-            book_category_id=donation.category_id,
-            book_photo=donation.book_photo,
-            book_pdf=donation.book_pdf,
-            book_audio=donation.book_audio,
-            book_details=donation.book_detail,
-            book_count=donation.book_count,
-        )
-        db.add(new_book)
         await db.commit()
         await db.refresh(donation)
         return donation
-
-
-
-
-    @staticmethod
-    async def reject_request(db: AsyncSession, d_book_id: int):
-        result = await db.execute(select(DonationBook).where(DonationBook.d_book_id == d_book_id))
-        donation = result.scalar_one_or_none()
-        if not donation:
-            raise HTTPException(status_code=404, detail="Donation request not found")
-
-        if donation.book_approve == "rejected":
-            raise HTTPException(status_code=400, detail="Already rejected")
-
-        donation.book_approve = "rejected"
-
-        # Insert into books table
-        new_book = Book(
-            book_title=donation.book_title,
-            book_author=donation.book_author,
-            book_category_id=donation.category_id,
-            book_photo=donation.book_photo,
-            book_pdf=donation.book_pdf,
-            book_audio=donation.book_audio,
-            book_details=donation.book_detail,
-            book_count=donation.book_count,
-        )
-        db.add(new_book)
-        await db.commit()
-        await db.refresh(donation)
-        return donation
-
