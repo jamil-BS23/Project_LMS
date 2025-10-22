@@ -1,4 +1,4 @@
-from pydantic import BaseModel, httpUrl
+from pydantic import BaseModel, HttpUrl
 from typing import Optional
 
 class DonationBookBase(BaseModel):
@@ -8,9 +8,9 @@ class DonationBookBase(BaseModel):
     book_description: Optional[str] = None
     BS_email: str
     BS_ID: str
-    book_image: Optional[httpUrl] = None
-    book_audio: Optional[httpUrl] = None
-    book_pdf: Optional[httpUrl] = None
+    book_image: Optional[HttpUrl] = None
+    book_audio: Optional[HttpUrl] = None
+    book_pdf: Optional[HttpUrl] = None
     available_copies: int = 1
 
 class DonationBookCreate(DonationBookBase):

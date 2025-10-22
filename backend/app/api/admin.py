@@ -6,7 +6,7 @@ from app.dependencies import get_db
 from app.core.security import create_access_token, get_current_user
 from typing import Optional, List
 from app.models.user import User
-from app.schemas.auth import CreateUserRequest, CreateUserResponse
+from app.schemas.admin import CreateUserRequest, CreateUserResponse
 
 
 
