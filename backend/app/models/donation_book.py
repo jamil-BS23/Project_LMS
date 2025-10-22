@@ -16,5 +16,5 @@ class DonationBook(Base):
     book_image = Column(String, nullable=True)
     book_audio = Column(String, nullable=True)
     book_pdf = Column(String, nullable=True)
-    donation_status = Column(String, default="Pending")
+    donation_status = Column(String, default="pending")
     book_copies = Column(Integer, default=1)

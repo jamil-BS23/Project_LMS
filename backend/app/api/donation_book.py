@@ -14,7 +14,7 @@ router = APIRouter()
 
 
 @router.get("/", response_model=List[DonationBookResponse])
-async def get_all_donation_books(db: AsyncSession = Depends(get_db)):
+async def get_all_donation_books(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_admin)):
     """
     Fetch all donation book requests for admin review.
     """
@@ -23,7 +23,6 @@ async def get_all_donation_books(db: AsyncSession = Depends(get_db)):
 @router.put("/", response_model=DonationBookPublic)
 async def create_donation_book(
     book_title: str = Form(...),
-    category_id: int = Form(...),
     category_title: str = Form(...),
     book_author: str = Form(...),
     BS_mail: str = Form(...),
@@ -42,13 +41,13 @@ async def create_donation_book(
 
     payload = {
         "book_title": book_title,
-        "category_id": category_id,
-        "category_title": category_title,
+        "donor_name": current_user.user_name,
+        "book_category": category_title,
         "book_author": book_author,
-        "BS_mail": BS_mail,
+        "BS_email": BS_mail,
         "BS_ID": BS_ID,           # Not linked to user_id
-        "book_detail": book_detail,
-        "book_photo": photo_url,  # stored MinIO URL
+        "book_description": book_detail,
+        "book_image": photo_url,  # stored MinIO URL
         "book_pdf": pdf_url,
         "book_audio": audio_url,
         "book_copies": book_copies,
@@ -68,7 +67,7 @@ async def get_donation_books_by_status(
     Fetch donation books filtered by book_approve status.
     """
     book_approve = book_approve.lower()
-    if book_approve not in {"pending", "approved", "rejected"}:
+    if book_approve not in {"pending", "accepted", "rejected"}:
         raise HTTPException(status_code=400, detail="Invalid status. Must be pending, accepted, or rejected.")
 
     return await DonationBookCRUD.get_by_status(db, book_approve)

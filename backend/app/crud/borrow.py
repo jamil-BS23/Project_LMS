@@ -38,7 +38,7 @@ class BorrowCRUD:
         Count number of borrows by borrow_status.
         """
         result = await db.execute(
-            select(func.count()).select_from(BorrowRecord).where(BorrowRecord.borrow_status == "borrowed")
+            select(func.count()).select_from(BorrowRecord).where(BorrowRecord.borrow_status == status)
         )
         return result.scalar_one()
 
@@ -78,7 +78,7 @@ class BorrowCRUD:
             raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
 
         # Validate availability
-        if not book.book_availability:
+        if not book.book_availabity:
             raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
 
         borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
@@ -106,14 +106,14 @@ class BorrowCRUD:
 
 # --- Update book availability based on count ---
 # Decrease the count of available copies
-        if book.book_copies is not None and book.book_copies > 0:
-            book.book_copies -= 1
+        if book.book_availabity is not None and book.available_copies > 0:
+            book.available_copies -= 1
 
 # If no copies left, mark as unavailable
-        if book.book_copies == 0:
-            book.book_availability = False
+        if book.available_copies == 0:
+            book.book_availabity = False
         else:
-            book.book_availability = True  # remains available if count > 0
+            book.book_availabity = True  # remains available if count > 0
 
         db.add(book)
 
@@ -262,8 +262,7 @@ class BorrowCRUD:
         if status == "returned":
             book = await db.get(Book, db_borrow.book_id)
             if book:
-                book.book_availability = True
-                book.book_copies = (book.book_copies or 0) + 1
+                book.available_copies = (book.available_copies or 0) + 1
                 db.add(book)
 
         db.add(db_borrow)
