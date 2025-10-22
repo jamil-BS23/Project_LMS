@@ -6,7 +6,7 @@ from app.dependencies import get_db
 from app.core.security import create_access_token, get_current_user
 from typing import Optional, List
 from app.models.user import User
-from app.schemas.auth import CreateUserRequest, CreateUserResponse
+from app.schemas.admin import CreateUserRequest, CreateUserResponse
 
 
 
@@ -17,7 +17,7 @@ router = APIRouter(tags=["Admin"])
 async def create_user(
     payload: CreateUserRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user), 
+    current_user: User = Depends(get_current_user),
 ):
     
     if current_user.role != "admin":

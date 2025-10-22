@@ -60,8 +60,7 @@ class BorrowCRUD:
             book_id=book.book_id,
             borrow_date=today,
             return_date=today,
-            borrow_status="pdf-borrow",
-            request_status="accepted",
+            borrow_status="pdf-viewed",
         )
         db.add(db_borrow)
         await db.commit()
@@ -97,8 +96,8 @@ class BorrowCRUD:
             #book_title=book.book_title,      
             borrow_date=borrow_date,
             return_date=return_date,
-            borrow_status="borrowed",
-            request_status="pending",
+            borrow_status="pending",
+
         )
 
         print("all info: ", db_borrow)
@@ -107,11 +106,11 @@ class BorrowCRUD:
 
 # --- Update book availability based on count ---
 # Decrease the count of available copies
-        if book.book_count is not None and book.book_count > 0:
-            book.book_count -= 1
+        if book.book_copies is not None and book.book_copies > 0:
+            book.book_copies -= 1
 
 # If no copies left, mark as unavailable
-        if book.book_count == 0:
+        if book.book_copies == 0:
             book.book_availability = False
         else:
             book.book_availability = True  # remains available if count > 0
@@ -248,10 +247,6 @@ class BorrowCRUD:
 
 
 
-
-
-
-
     @staticmethod
     async def update_borrow_status(db: AsyncSession, borrow_id: int, status: str):
 
@@ -268,7 +263,7 @@ class BorrowCRUD:
             book = await db.get(Book, db_borrow.book_id)
             if book:
                 book.book_availability = True
-                book.book_count = (book.book_count or 0) + 1
+                book.book_copies = (book.book_copies or 0) + 1
                 db.add(book)
 
         db.add(db_borrow)
@@ -287,8 +282,7 @@ class BorrowCRUD:
             book_title=book.book_title if book else None,
             borrow_date=db_borrow.borrow_date,
             return_date=db_borrow.return_date,
-            borrow_status=db_borrow.borrow_status,
-            request_status=db_borrow.request_status,
+            borrow_status=db_borrow.borrow_status
         )
     
 
@@ -312,7 +306,7 @@ class BorrowCRUD:
             book = await db.get(Book, db_borrow.book_id)
             if book:
                 book.book_availability = True
-                book.book_count = (book.book_count or 0) - 1
+                book.book_copies = (book.book_copies or 0) - 1
                 db.add(book)
 
         db.add(db_borrow)
