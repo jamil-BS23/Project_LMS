@@ -1,7 +1,7 @@
 from pydantic import BaseModel, HttpUrl
 from typing import Optional
 
-class DonationBookBase(BaseModel):
+class DonationBookPublic(BaseModel):
     book_title: str
     book_author: str
     book_category: str
@@ -13,12 +13,17 @@ class DonationBookBase(BaseModel):
     book_pdf: Optional[HttpUrl] = None
     available_copies: int = 1
 
-class DonationBookCreate(DonationBookBase):
+class DonationBookCreate(DonationBookPublic):
     pass
 
-class DonationBookResponse(DonationBookBase):
+class DonationBookResponse(DonationBookPublic):
     donation_book_id: int
     donation_status: str
 
     class Config:
         orm_mode = True
+class DonationStatusUpdate(BaseModel):
+    status: str
+
+    class Config:
+        orm_mode = True 

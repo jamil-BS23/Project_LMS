@@ -1,10 +1,13 @@
 from fastapi import APIRouter, Depends, HTTPException, UploadFile, File, Form, Query
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import Optional, List
-from app.dependencies import get_db, get_current_user, get_current_admin
+from app.core.security import get_current_user, get_current_admin
 from app.utils.minio_utils import upload_file
 from app.crud.donation_book import DonationBookCRUD
-from app.schemas.donation_book import DonationBookPublic, DonationBookResponse
+from app.schemas.donation_book import DonationBookPublic, DonationBookResponse, DonationStatusUpdate
+from app.database import get_db
+from app.models.user import User
+
 
 router = APIRouter()
 
@@ -26,12 +29,12 @@ async def create_donation_book(
     BS_mail: str = Form(...),
     BS_ID: str = Form(...),
     book_detail: Optional[str] = Form(None),
-    book_count: int = Form(1),
+    book_copies: int = Form(1),
     book_photo: UploadFile = File(...),      
     book_pdf: UploadFile = File(None),
     book_audio: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
-    current_user: dict = Depends(get_current_user)
+    current_user: User = Depends(get_current_user)
 ):
     photo_url = upload_file(book_photo, folder="books")
     pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
@@ -48,7 +51,7 @@ async def create_donation_book(
         "book_photo": photo_url,  # stored MinIO URL
         "book_pdf": pdf_url,
         "book_audio": audio_url,
-        "book_count": book_count,
+        "book_copies": book_copies,
     }
 
     # ➤ 3. Insert into donation_books table
@@ -74,13 +77,14 @@ async def get_donation_books_by_status(
 
 
 # ➤ PATCH: admin approves donation (moves to books table)
-@router.patch("/{d_book_id}/approve", response_model=DonationBookPublic)
-async def approve_donation_book(
+@router.patch("/{d_book_id}/status", response_model=DonationBookPublic)
+async def update_donation_status(
     d_book_id: int,
+    status_update: DonationStatusUpdate,
     db: AsyncSession = Depends(get_db),
-    admin: dict = Depends(get_current_admin)
+    admin: User = Depends(get_current_admin)
 ):
-    return await DonationBookCRUD.approve_request(db, d_book_id)
+    return await DonationBookCRUD.update_donation_status(db, d_book_id, status_update.status)
 
 
 
@@ -91,6 +95,6 @@ async def approve_donation_book(
 async def approve_donation_book(
     d_book_id: int,
     db: AsyncSession = Depends(get_db),
-    admin: dict = Depends(get_current_admin)
+    admin: User = Depends(get_current_admin)
 ):
     return await DonationBookCRUD.approve_request(db, d_book_id)

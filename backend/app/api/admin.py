@@ -17,7 +17,7 @@ router = APIRouter(tags=["Admin"])
 async def create_user(
     payload: CreateUserRequest,
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user), 
+    current_user: User = Depends(get_current_user),
 ):
     
     if current_user.role != "admin":
