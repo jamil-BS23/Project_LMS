@@ -22,7 +22,7 @@ from app.schemas.borrow import (
 
 
 
-from app.core.security import get_current_user
+from app.core.security import get_current_user, get_current_admin
 from app.database import get_db
 
 
@@ -73,7 +73,6 @@ async def borrow_pdf(
     - borrow_date = today
     - return_date = today
     - borrow_status = 'pdf-borrow'
-    - request_status = 'accepted'
     """
     return await BorrowCRUD.create_pdf_borrow(db=db, user=current_user, book_id=book_id)
 
@@ -99,7 +98,7 @@ async def update_borrow_status(
     borrow_id: int,
     status: str,
     db: AsyncSession = Depends(get_db),
-    current_user: models.user.User = Depends(get_current_active_user),
+    current_user: models.user.User = Depends(get_current_admin),
 ):
     # if current_user.role == "user":
     #     raise HTTPException(status_code=403, detail="Not authorized")

@@ -18,9 +18,6 @@ class DonationBookCRUD:
     @staticmethod
     async def create_request(db: AsyncSession, data: dict):
         # ensure category exists
-        category = await db.get(Category, data["category"])
-        if not category:
-            raise HTTPException(status_code=404, detail="Category not found")
 
         db_obj = DonationBook(**data)
         db.add(db_obj)
@@ -31,7 +28,7 @@ class DonationBookCRUD:
 
     @staticmethod
     async def get_by_status(db: AsyncSession, status: str):
-        result = await db.execute(select(DonationBook).where(DonationBook.book_approve == status))
+        result = await db.execute(select(DonationBook).where(DonationBook.donation_status == status))
         return result.scalars().all()
 
     @staticmethod
@@ -47,16 +44,16 @@ class DonationBookCRUD:
         donation.donation_status = new_status
 
         # If status is 'approved', insert into books table
-        if new_status == "approved":
+        if new_status == "accepted":
             new_book = Book(
                 book_title=donation.book_title,
                 book_author=donation.book_author,
-                book_category=donation.category_id,
-                book_photo=donation.book_photo,
+                book_category=donation.book_category,
+                book_image=donation.book_image,
                 book_pdf=donation.book_pdf,
                 book_audio=donation.book_audio,
                 book_description=donation.book_description,
-                book_copies=donation.available_copies,
+                available_copies=donation.book_copies,
             )
             db.add(new_book)
 
