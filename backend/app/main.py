@@ -3,11 +3,15 @@ from fastapi import FastAPI
 from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book
 from fastapi.middleware.cors import CORSMiddleware
  
- 
+from fastapi_pagination import add_pagination
+
  
  
  
 app = FastAPI()
+
+add_pagination(app)
+
  
 app.add_middleware(
     CORSMiddleware,

@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, 
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from app.crud.book import BookCRUD
+from fastapi_pagination import Page, paginate
 from app.database import get_db
 from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, UpoadateFeatures
 from app.core.security import get_current_user, get_current_admin
@@ -11,16 +12,27 @@ from app.utils.minio_utils import upload_file
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
 
-@router.get("/", response_model=List[BookDetail])
+# @router.get("/", response_model=List[BookDetail])
+# async def get_books(
+#     db: AsyncSession = Depends(get_db),
+#     search: str | None = Query(None),
+#     category: str | None = Query(None),
+#     skip: int = Query(0, ge=0),
+#     limit: int = Query(20, ge=1),
+# ):
+#     books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
+#     return books
+
+@router.get("/", response_model=Page[BookDetail])
 async def get_books(
     db: AsyncSession = Depends(get_db),
-    search: str | None = Query(None),
-    category: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1),
+    search: Optional[str] = Query(None, description="Search by title, author, or description"),
+    category: Optional[str] = Query(None, description="Filter by category"),
 ):
-    books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
-    return books
+    books = await book_crud.get_all(db, search=search, category=category)
+    return paginate(books)
+
+
 
 
 @router.get("/featured", response_model=List[BookDetail])
