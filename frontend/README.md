@@ -1,79 +1,132 @@
-# React + Vite
+# 📚 Library Management System – Frontend
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+## 🔹 Table of Contents
+1. [Project Overview](#project-overview)
+2. [Features](#features)
+3. [User Roles](#user-roles)
+4. [Getting Started](#getting-started)
+5. [Project Structure](#project-structure)
+6. [Technical Stack](#technical-stack)
+7. [Routing & State Management](#routing--state-management)
+8. [API Integration](#api-integration)
+9. [Developer Commands](#developer-commands)
+10. [Contributing](#contributing)
+11. [License](#license)
+12. [Contact](#contact)
 
-## Development Setup
+---
+
+## 🔹 Project Overview
+
+The frontend of the **Library Management System (LMS)** is a **Single-Page Application (SPA)** built with **React + Vite + Tailwind/DaisyUI**. It provides a responsive interface for both **library patrons** and **administrators**.
+
+**Goals:**
+- Enable users to search, browse, borrow/return books, and submit reviews.
+- Provide admins the ability to manage books, categories, loans, and track user activity.
+- Implement role-based access control (RBAC) for secure operations.
+
+**Screenshots (Placeholder):**
+![Home Page](./screenshots/home.png)
+![Admin Dashboard](./screenshots/admin_dashboard.png)
+
+---
+
+## 🔹 Features
+- Browse and search books by **title, author, ISBN, or category**
+- Borrow and return books
+- Submit ratings and reviews
+- Admin dashboard: Add, edit, delete books and manage loans
+- Role-based route protection
+- Fully responsive design (desktop & mobile)
+
+---
+
+## 🔹 User Roles
+
+### Standard User (Patron)
+- Browse and search books  
+- Borrow/return books  
+- View borrowing history  
+- Submit ratings and reviews  
+
+### Administrator (Librarian/Staff)
+- All standard user permissions  
+- Add, edit, delete books  
+- Manage book categories and digital assets  
+- View all active and historical loans  
+
+---
+
+## 🔹 Getting Started
 
 ### Prerequisites
-- Node.js (v16 or higher)
-- Python (v3.8 or higher)
-- PostgreSQL (optional, can use SQLite for development)
+- Node.js v18+  
+- npm or yarn  
+- Backend API running (FastAPI recommended)
 
-### Frontend Setup
-1. Install dependencies:
-   ```bash
-   npm install
-   ```
-
-2. Start the frontend development server:
-   ```bash
-   npm run dev
-   ```
-
-### Backend Setup
-1. Copy your existing `library_backend` folder to this project root and rename it to `backend`
-
-2. Create a virtual environment:
-   ```bash
-   cd backend
-   python -m venv venv
-   
-   # On Windows:
-   venv\Scripts\activate
-   
-   # On macOS/Linux:
-   source venv/bin/activate
-   ```
-
-3. Install Python dependencies:
-   ```bash
-   pip install -r requirements.txt
-   ```
-
-4. Set up environment variables:
-   ```bash
-   cp .env.example .env
-   # Edit .env with your database credentials and other settings
-   ```
-
-5. Run database migrations:
-   ```bash
-   alembic upgrade head
-   ```
-
-6. Start the backend server:
-   ```bash
-   python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
-   ```
-
-### Running Both Together
-To run both frontend and backend simultaneously:
+### Installation
+1. Clone the repository:
 ```bash
-npm run dev:full
-```
+git clone https://github.com/<your-username>/library-management-frontend.git
+cd library-management-frontend
+Install dependencies:
 
-### API Integration
-The frontend is configured to connect to the backend at `http://localhost:8000/api`. Make sure your FastAPI backend is running on port 8000.
+bash
+Copy code
+npm install
+# or
+yarn install
+Configure environment variables:
 
-### Environment Variables
-- Frontend: Uses `.env` in project root
-- Backend: Uses `.env` in `backend/` folder
+env
+Copy code
+# Create a .env file in the project root
+VITE_API_BASE_URL=http://localhost:8000
+Start the development server:
 
-Currently, two official plugins are available:
+bash
+Copy code
+npm run dev
+# or
+yarn dev
+App runs at http://localhost:5173
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+🔹 Project Structure
+text
+Copy code
+frontend/
+├── public/           # Static assets (images, fonts)
+├── src/
+│   ├── api/          # Axios instance & HTTP utilities
+│   ├── components/   # Reusable UI components
+│   ├── context/      # AuthProvider & global state
+│   ├── pages/        # Views / pages (Home, BookDetails, Admin)
+│   ├── routes/       # Role-based routing & protected routes
+│   ├── styles/       # Tailwind/DaisyUI custom styles
+│   └── main.jsx      # App entry point
+├── index.html
+├── package.json
+└── vite.config.js
+🔹 Technical Stack
+Component	Technology	Purpose
+Framework	React (Functional Hooks)	UI rendering
+Build Tool	Vite	Fast dev & HMR
+Routing	React Router DOM v6	SPA navigation
+Styling	Tailwind CSS & DaisyUI	Responsive UI & prebuilt components
+State Management	React Context API	Global auth & role state
+HTTP Client	Axios	API integration with backend
 
-## Expanding the ESLint configuration
+🔹 Developer Commands
+Action	Command
+Run frontend	npm run dev 
+Build production	npm run build
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+🔹 Contributing
+Fork the repository
+
+Create a feature/bugfix branch
+
+Commit your changes
+
+Push and submit a pull request
+
