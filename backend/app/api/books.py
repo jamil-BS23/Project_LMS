@@ -4,6 +4,9 @@ from typing import List, Optional
 from app.crud.book import BookCRUD
 from app.database import get_db
 from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, UpoadateFeatures
+from app.core.security import get_current_user, get_current_admin
+from app.models.user import User
+from app.utils.minio_utils import upload_file
 
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
@@ -29,7 +32,9 @@ async def get_featured_books(
 
 
 @router.get("/popular", response_model=List[BookDetail])
-async def get_popular_books(db: AsyncSession = Depends(get_db), skip: int = 0, limit: int = 20):
+async def get_popular_books(db: AsyncSession = Depends(get_db),
+                            current_user: User = Depends(get_current_user),
+                             skip: int = 0, limit: int = 20):
     return await book_crud.get_popular(db, skip=skip, limit=limit)
 
 
@@ -45,7 +50,7 @@ async def get_book(book_id: int, db: AsyncSession = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Book not found")
     return book
 
-MEDIA_DIR = "media/uploads"
+
 @router.post("/", response_model=BookDetail)
 async def create_book(
     book_title: str = Form(...),
@@ -60,7 +65,12 @@ async def create_book(
     book_pdf: UploadFile = File(None),
     book_audio: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
+    
 ):
+    
+    photo_url = upload_file(book_image, folder="books")
+    pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
+    audio_url = upload_file(book_audio, folder="book_audios") if book_audio else None
     # Convert form to Pydantic model
     payload = BookCreate(
         book_title=book_title,
@@ -70,28 +80,13 @@ async def create_book(
         available_copies=available_copies,
         featured=featured,
         book_availabity=book_availabity,
-        book_rating=book_rating
+        book_rating=book_rating,
+        book_image=photo_url,
+        book_pdf=pdf_url,
+        book_audio=audio_url
     )
 
     # Save files if uploaded
-    import os, shutil
-    from pathlib import Path
-    from uuid import uuid4
-    os.makedirs(MEDIA_DIR, exist_ok=True)
-
-    def save_file(file: UploadFile):
-        if not file:
-            return None
-        suffix = Path(file.filename).suffix
-        filename = f"{uuid4().hex}{suffix}"
-        file_path = os.path.join(MEDIA_DIR, filename)
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return f"/{file_path}"
-
-    payload.book_image = save_file(book_image)
-    payload.book_pdf = save_file(book_pdf)
-    payload.book_audio = save_file(book_audio)
 
     return await book_crud.create(db, payload)
 
@@ -112,6 +107,9 @@ async def update_book(
     book_audio: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
 ):
+    photo_url = upload_file(book_image, folder="books")
+    pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
+    audio_url = upload_file(book_audio, folder="book_audios") if book_audio else None
     payload = BookUpdate(
         book_title=book_title,
         book_category=book_category,
@@ -120,31 +118,12 @@ async def update_book(
         available_copies=available_copies,
         featured=featured,
         book_availabity=book_availabity,
-        book_rating=book_rating
+        book_rating=book_rating,
+        book_image=photo_url,
+        book_pdf=pdf_url,
+        book_audio=audio_url
     )
 
-    # Save files if uploaded
-    import os, shutil
-    from pathlib import Path
-    from uuid import uuid4
-    os.makedirs(MEDIA_DIR, exist_ok=True)
-
-    def save_file(file: UploadFile):
-        if not file:
-            return None
-        suffix = Path(file.filename).suffix
-        filename = f"{uuid4().hex}{suffix}"
-        file_path = os.path.join(MEDIA_DIR, filename)
-        with open(file_path, "wb") as buffer:
-            shutil.copyfileobj(file.file, buffer)
-        return f"/{file_path}"
-
-    if book_image:
-        payload.book_image = save_file(book_image)
-    if book_pdf:
-        payload.book_pdf = save_file(book_pdf)
-    if book_audio:
-        payload.book_audio = save_file(book_audio)
 
     book = await book_crud.update(db, book_id, payload)
     if not book:
@@ -160,12 +139,6 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
     return {"message": "Book deleted successfully"}
 
 
-@router.patch("/rate", response_model=BookDetail)
-async def rate_book(payload: RateBook, db: AsyncSession = Depends(get_db)):
-    book = await book_crud.rate_book(db, payload.book_id, payload.book_rating)
-    if not book:
-        raise HTTPException(status_code=404, detail="Book not found")
-    return book
 
 
 @router.patch("/{book_id}/feature", response_model=BookDetail)

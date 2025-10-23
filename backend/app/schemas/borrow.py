@@ -19,7 +19,6 @@ class BorrowRequestRecord(BaseModel):
     borrow_date: date
     return_date: date
     borrow_status: str
-    request_status: str
 
     class Config:
         orm_mode = True
@@ -35,7 +34,6 @@ class BorrowRecord(BaseModel):
     borrow_date: date
     return_date: date
     borrow_status: str
-    request_status: str
 
     class Config:
         orm_mode = True
@@ -93,7 +91,6 @@ class BorrowDetailResponse(BaseModel):
     borrow_date: date
     return_date: date
     borrow_status: str
-    request_status: str
 
     class Config:
         orm_mode = True
