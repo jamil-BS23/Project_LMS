@@ -9,11 +9,7 @@ class BookReviewCRUD:
         review = BookReview(user_id=user_id, book_id=book_id, review_text=review_text)
         db.add(review)
 
-        # Optionally increment book review count
-        book = await db.get(Book, book_id)
-        if book:
-            book.book_review_count = (book.book_review_count or 0) + 1
-            db.add(book)
+        # Optionally increment book review coun        
 
         await db.commit()
         await db.refresh(review)

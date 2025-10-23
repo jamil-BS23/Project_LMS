@@ -10,10 +10,7 @@ from app.models.user import User
 from app.models.settings import Settings
 from app.schemas.settings import SettingsResponse, SettingsUpdate
 
-router = APIRouter(
-    prefix="/settings",
-    tags=["Settings"]
-)
+router = APIRouter()
 
 # ------ Admin Routes (Protected) ---------
 

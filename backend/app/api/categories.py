@@ -10,7 +10,7 @@ from app.models.user import User
 from app.core.exceptions import not_found_error, conflict_error
 
 router = APIRouter(
-    prefix="/books/category",
+    prefix="",
     tags=["Categories"]
 )
 
