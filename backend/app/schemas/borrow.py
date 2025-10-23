@@ -1,43 +1,96 @@
-from pydantic import BaseModel
-from typing import Optional
-from datetime import datetime, date
-from app.models.borrow import BorrowStatus
+from pydantic import BaseModel, Field, validator
+from datetime import date
+from typing import Optional, List
 
-class UserResponse(BaseModel):
-    id: int
-    name: str
-    email: Optional[str] = None
+# Enums for validation
+BORROW_STATUS = {"borrowed", "returned", "overdue"}
+REQUEST_STATUS = {"accept", "pending", "reject"}
 
-    model_config = {"from_attributes": True}
 
-class BookResponse(BaseModel):
-    id: int
-    title: str
-    author: Optional[str] = None
 
-    model_config = {"from_attributes": True}
+
+
+class BorrowRequestRecord(BaseModel):
+    borrow_id: int
+    user_id: str
+    user_name: Optional[str]
+    book_id: int
+    book_title: Optional[str]
+    borrow_date: date
+    return_date: date
+    borrow_status: str
+
+    class Config:
+        orm_mode = True
+        
+
+
+class BorrowRecord(BaseModel):
+    borrow_id: int
+    user_id: str
+   # user_name: Optional[str]
+    book_id: int
+   # book_title: Optional[str]
+    borrow_date: date
+    return_date: date
+    borrow_status: str
+
+    class Config:
+        orm_mode = True
+
 
 class BorrowCreate(BaseModel):
-    user_id: int
+    # user_name: str
+    # borrow_date: date
+    # return_date: date
     book_id: int
-    days: Optional[int] = 14
 
-class BorrowResponse(BaseModel):
-    id: int
-    user: UserResponse
-    book: BookResponse
+    # @validator("return_date")
+    # def check_date_range(cls, v, values):
+    #     borrow_date = values.get("borrow_date")
+    #     if borrow_date and v < borrow_date:
+    #         raise ValueError("return_date cannot be before borrow_date")
+    #     return v
+
+
+class BorrowStatusUpdate(BaseModel):
+    borrow_status: Optional[str] = None  # borrowed / returned / overdue
+    request_status: Optional[str] = None  # accept / pending / reject
+
+    @validator("borrow_status")
+    def validate_borrow_status(cls, v):
+        if v and v not in BORROW_STATUS:
+            raise ValueError(f"Invalid borrow_status, must be one of {BORROW_STATUS}")
+        return v
+
+    @validator("request_status")
+    def validate_request_status(cls, v):
+        if v and v not in REQUEST_STATUS:
+            raise ValueError(f"Invalid request_status, must be one of {REQUEST_STATUS}")
+        return v
+
+
+class BorrowListResponse(BaseModel):
+    data: List[BorrowRecord]
+    meta: dict = Field(..., example={"total": 100, "page": 1, "page_size": 20})
+
+
+class BorrowCountResponse(BaseModel):
+    count: int
+
+
+
+
+class BorrowDetailResponse(BaseModel):
+
+    borrow_id: int
+    user_id: str
+    user_name: Optional[str]=None
+    book_id: int
+    book_title: Optional[str]=None
     borrow_date: date
-    due_date: date
-    return_date: Optional[date] = None
-    status: BorrowStatus
-    extension_count: int
-    created_at: datetime
-    updated_at: Optional[datetime] = None
+    return_date: date
+    borrow_status: str
 
-    model_config = {"from_attributes": True}
-
-class BorrowStatsResponse(BaseModel):
-    totalBorrows: int
-    activeBorrows: int
-    returnedBorrows: int
-    overdueBorrows: int
+    class Config:
+        orm_mode = True
