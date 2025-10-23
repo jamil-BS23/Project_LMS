@@ -11,6 +11,7 @@ from typing import Optional, List
 from app.models.book import Book
 from app.models.user_rating import UserRating
 from app.schemas.book import BookCreate, BookUpdate
+
 class BookCRUD:
     """CRUD operations for Book"""
 

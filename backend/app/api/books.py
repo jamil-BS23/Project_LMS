@@ -139,24 +139,6 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
     return {"message": "Book deleted successfully"}
 
 
-@router.patch("/rate/{book_id}", response_model=BookDetail)
-async def rate_book(
-    payload: RateBook,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    book = await book_crud.rate_book(
-        db,
-        book_id=payload.book_id,
-        rating=payload.book_rating,
-        user_id=current_user.user_id
-    )
-
-    if not book:
-        raise HTTPException(status_code=404, detail="Book not found")
-
-    return book
-
 
 
 @router.patch("/{book_id}/feature", response_model=BookDetail)
