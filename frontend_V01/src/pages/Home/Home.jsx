@@ -33,11 +33,9 @@ export default function Home() {
       const [booksRes, popularRes, categoriesRes] = await Promise.all([
         axios.get("http://localhost:8000/books"),
         axios.get("http://localhost:8000/books/popular"),
-        axios.get("http://127.0.0.1:8000/categories/books/category/all")
+        axios.get("http://localhost:8000/categories/all")
       ]);
-      console.log("Books response:", booksRes);
-      console.log("Popular books response:", popularRes);
-      console.log("Categories response:", categoriesRes);
+
       const categories = categoriesRes.data;
       const allData = booksRes.data;
       const popularData = popularRes.data;
@@ -45,7 +43,7 @@ export default function Home() {
       // Normalize both book lists
       const normalize = (data) =>
         data.map((b) => {
-          const category = categories.find(c => c.id === b.category_id)?.name || "Unknown";
+          const category = categories.find(c => c.category_title === b.book_category)?.category_title || "Unknown";
           return {
             ...b,
             category,
