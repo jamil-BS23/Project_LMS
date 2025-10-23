@@ -7,23 +7,23 @@ from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, Upoad
 from app.core.security import get_current_user, get_current_admin
 from app.models.user import User
 from app.utils.minio_utils import upload_file
+from fastapi_pagination import Page, paginate 
 
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
 
-@router.get("/", response_model=List[BookDetail])
+@router.get("/", response_model=Page[BookDetail])
 async def get_books(
     db: AsyncSession = Depends(get_db),
-    search: str | None = Query(None),
-    category: str | None = Query(None),
-    skip: int = Query(0, ge=0),
-    limit: int = Query(20, ge=1),
+    search: Optional[str] = Query(None, description="Search by title, author, or description"),
+    category: Optional[str] = Query(None, description="Filter by category"),
 ):
-    books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
-    return books
+    books = await book_crud.get_all(db, search=search, category=category)
+    return paginate(books)
 
 
-@router.get("/featured", response_model=List[BookDetail])
+
+@router.get("/featured_book", response_model=List[BookDetail])
 async def get_featured_books(
     db: AsyncSession = Depends(get_db),
     skip: int = 0, limit: int = 20
@@ -122,26 +122,6 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db), current_
     if not deleted:
         raise HTTPException(status_code=404, detail="Book not found")
     return {"message": "Book deleted successfully"}
-
-
-@router.patch("/rate/{book_id}", response_model=BookDetail)
-async def rate_book(
-    payload: RateBook,
-    db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user),
-):
-    book = await book_crud.rate_book(
-        db,
-        book_id=payload.book_id,
-        rating=payload.book_rating,
-        user_id=current_user.user_id
-    )
-
-    if not book:
-        raise HTTPException(status_code=404, detail="Book not found")
-
-    return book
-
 
 
 @router.patch("/{book_id}/feature", response_model=BookDetail)

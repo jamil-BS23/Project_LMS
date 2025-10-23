@@ -25,9 +25,9 @@ class BookCRUD:
         if search:
             query = query.filter(
                 or_(
-                    Book.book_title.ilike(f"%{search}%"),
-                    Book.book_author.ilike(f"%{search}%"),
-                    Book.book_description.ilike(f"%{search}%")
+                    Book.book_title.ilike(f"%{search.lower()}%"),
+                    Book.book_author.ilike(f"%{search.lower()}%"),
+                    Book.book_description.ilike(f"%{search.lower()}%")
                 )
             )
         if category:

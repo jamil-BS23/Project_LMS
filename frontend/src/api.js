@@ -4,7 +4,6 @@ export const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || "http://127.0.0
 import axios from 'axios';
 
 // Replace this with your real base URL
-const API_BASE_URL = 'http://172.16.227.173:8000/api';
 
 // Get JWT token from localStorage or any auth store
 const token = "eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwOi8vMTcyLjE2LjIyNy4xNzM6ODAwMC9hcGkvbG9naW4iLCJpYXQiOjE3NTQ1NzYyNTEsImV4cCI6MTc1NDU3OTg1MSwibmJmIjoxNzU0NTc2MjUxLCJqdGkiOiJzdGJkeHNVMnZ6MG1KR2E5Iiwic3ViIjoiMSIsInBydiI6IjIzYmQ1Yzg5NDlmNjAwYWRiMzllNzAxYzQwMDg3MmRiN2E1OTc2ZjcifQ.T1KG_n2qvXYpp4ZFjBQiRFpqeqIoyh_aMoNKqvk3pJg";
