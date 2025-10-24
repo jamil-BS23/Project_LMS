@@ -27,7 +27,7 @@ async def add_review(
 @router.get("/{book_id}", response_model=List[BookReviewOut])
 async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
     """
-        Get all reviews for a specific book.
+    ✅ Get all reviews for a specific book.
     """
     try:
         reviews = await BookReviewCRUD.get_reviews(db, book_id)
@@ -39,5 +39,6 @@ async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
         return reviews
     except Exception as e:
         import traceback
-        traceback.print_exc()
+        traceback.print_exc()  # 🧠 This will print the exact error in console
         raise HTTPException(status_code=500, detail=f"Failed to fetch reviews: {str(e)}")
+

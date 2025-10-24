@@ -81,12 +81,12 @@ class BorrowCRUD:
         if not book.book_availabity:
             raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
 
-        borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
+        borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db) 
         borrow_day_limit = borrow_day_limit if borrow_day_limit is not None else 14
 
         # Borrow/Return dates auto-set
         borrow_date = date.today()
-        return_date = borrow_date + timedelta(days=borrow_day_limit)
+        return_date = borrow_date + timedelta(days=borrow_day_limit)         
 
         # Create borrow record
         db_borrow = BorrowRecord(

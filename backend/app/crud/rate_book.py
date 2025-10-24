@@ -9,9 +9,7 @@ from typing import Optional
 from app.models.book import Book
 from app.models.user_rating import UserRating
 
-class RateBookCRUD:
-    def __init__(self):
-        pass
+class RateBook:
 
 
     async def rate_book(self, db: AsyncSession, book_id: int, rating: float, user_id: str) -> Optional[Book]:

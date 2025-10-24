@@ -37,3 +37,7 @@ Thumbs.db
 .env
 *.env
 .env.*
+
+
+## source "/home/bs01604/Documents/LMS_Team_Version/venv/bin/activate"
+## uvicorn app.main:app --reload
