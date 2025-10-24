@@ -55,6 +55,7 @@ export default function Home() {
           };
         });
 
+     
       setAllBooks(normalize(allData));
 
       setPopularBooks(normalize(popularData));

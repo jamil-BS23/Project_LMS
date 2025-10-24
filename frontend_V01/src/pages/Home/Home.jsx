@@ -41,9 +41,26 @@ export default function Home() {
       const popularData = popularRes.data;
 
       // Normalize both book lists
-      const normalize = (data) =>
-        data.map((b) => {
-          const category = categories.find(c => c.category_title === b.book_category)?.category_title || "Unknown";
+      // const normalize = (data) =>
+      //   data.map((b) => {
+      //     const category = categories.find(c => c.category_title === b.book_category)?.category_title || "Unknown";
+      //     return {
+      //       ...b,
+      //       category,
+      //       coverImage: b.image
+      //         ? `http://localhost:8000/media/${b.image}`
+      //         : "https://via.placeholder.com/150",
+      //     };
+      //   });
+
+      const normalize = (data) => {
+        const books = Array.isArray(data) ? data : data.items || [];
+   
+        return books.map((b) => {
+          const category =
+            categories.find((c) => c.category_title === b.book_category)?.category_title ||
+            "Unknown";
+   
           return {
             ...b,
             category,
@@ -52,6 +69,9 @@ export default function Home() {
               : "https://via.placeholder.com/150",
           };
         });
+      };
+   
+   
 
       setAllBooks(normalize(allData));
 

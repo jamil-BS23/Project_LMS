@@ -17,24 +17,36 @@ class BookCRUD:
     def __init__(self):
         pass  # no instance attributes needed; db is passed per method
 
+
     async def get_all(
-        self, db: AsyncSession, skip: int = 0, limit: int = 20,
-        search: Optional[str] = None, category: Optional[str] = None
+        self, db: AsyncSession, search: Optional[str] = None, category: Optional[str] = None
     ) -> List[Book]:
         query = select(Book)
+
         if search:
+            like_pattern = f"%{search.lower()}%"
             query = query.filter(
                 or_(
-                    Book.book_title.ilike(f"%{search.lower()}%"),
-                    Book.book_author.ilike(f"%{search.lower()}%"),
-                    Book.book_description.ilike(f"%{search.lower()}%")
+                    Book.book_title.ilike(like_pattern),
+                    Book.book_author.ilike(like_pattern),
+                    Book.book_description.ilike(like_pattern),
+                    Book.book_category.ilike(like_pattern),
                 )
             )
+
+        # ✅ Filter by category if specified
         if category:
             query = query.filter(Book.book_category == category)
-        query = query.offset(skip).limit(limit)
+
+        # ✅ Execute the query efficiently
         result = await db.execute(query)
-        return result.scalars().all()
+        books = result.scalars().unique().all()
+
+        return books
+
+
+    
+
 
     async def get_by_id(self, db: AsyncSession, book_id: int) -> Optional[Book]:
         result = await db.execute(select(Book).where(Book.book_id == book_id))
