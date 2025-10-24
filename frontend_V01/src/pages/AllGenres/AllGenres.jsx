@@ -76,7 +76,7 @@ useEffect(() => {
       const categories = categoriesRes.data;
       const data = booksRes.data;
 
-      const normalized = data.map((b) => {
+      const normalized = data.items.map((b) => {
         const category = categories.find(c => c.id === b.category_id)?.name || "Unknown";
         return {
           ...b,

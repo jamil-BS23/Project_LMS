@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BookCard from "../../components/BookCard/BookCard";
-import axios from "axios";
+import axios, { all } from "axios";
 export default function Home() {
   const [filter, setFilter] = useState(null);
   const [openFilters, setOpenFilters] = useState(false); // mobile sidebar
@@ -41,17 +41,23 @@ export default function Home() {
       const popularData = popularRes.data;
 
       // Normalize both book lists
-      const normalize = (data) =>
-        data.map((b) => {
-          const category = categories.find(c => c.category_title === b.book_category)?.category_title || "Unknown";
-          return {
-            ...b,
-            category,
-            coverImage: b.image
-              ? `http://localhost:8000/media/${b.image}`
-              : "https://via.placeholder.com/150",
-          };
-        });
+      const normalize = (data) => {
+      const books = Array.isArray(data) ? data : data.items || [];
+
+      return books.map((b) => {
+        const category =
+          categories.find((c) => c.category_title === b.book_category)?.category_title ||
+          "Unknown";
+
+        return {
+          ...b,
+          category,
+          coverImage: b.image
+            ? `http://localhost:8000/media/${b.image}`
+            : "https://via.placeholder.com/150",
+        };
+      });
+    };
 
       setAllBooks(normalize(allData));
 

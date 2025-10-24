@@ -120,7 +120,7 @@ export default function BookCard({ book, compact = false }) {
       {/* Cover image in a fixed-size box (no white background, just a light bottom shadow) */}
       <div className="mx-auto h-56 w-full flex items-center justify-center">
         <img
-          src={safe( book?.book_image)}
+          src={safe(book?.book_image)}
           alt={safe(book?.book_title, "Book cover")}
           loading="lazy"
           className="
@@ -138,7 +138,7 @@ export default function BookCard({ book, compact = false }) {
           {formatTitle(book?.book_title)}
         </h3>
 
-        {book?.book_author && (
+        {book?.author && (
           <p className="mt-0.5 text-xs text-gray-600">{book.book_author}</p>
         )}
 
@@ -167,7 +167,7 @@ export default function BookCard({ book, compact = false }) {
         {!compact && (
           <div className="mt-3">
             <Link
-              to={`/book/${book.book_id}`}
+              to={`/book/${book.id}`}
               className="inline-block bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-md shadow-md"
             >
               View Details
