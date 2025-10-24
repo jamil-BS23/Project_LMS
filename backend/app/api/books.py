@@ -8,6 +8,7 @@ from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, Upoad
 from app.core.security import get_current_user, get_current_admin
 from app.models.user import User
 from app.utils.minio_utils import upload_file
+from fastapi_pagination import Page, paginate 
 
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
@@ -35,7 +36,8 @@ async def get_books(
 
 
 
-@router.get("/featured", response_model=List[BookDetail])
+
+@router.get("/featured_book", response_model=List[BookDetail])
 async def get_featured_books(
     db: AsyncSession = Depends(get_db),
     skip: int = 0, limit: int = 20
@@ -45,8 +47,7 @@ async def get_featured_books(
 
 @router.get("/popular", response_model=List[BookDetail])
 async def get_popular_books(db: AsyncSession = Depends(get_db),
-                            current_user: User = Depends(get_current_user),
-                             skip: int = 0, limit: int = 20):
+                            skip: int = 0, limit: int = 20):
     return await book_crud.get_popular(db, skip=skip, limit=limit)
 
 
@@ -56,7 +57,7 @@ async def get_new_books(db: AsyncSession = Depends(get_db), skip: int = 0, limit
 
 
 @router.get("/{book_id}", response_model=BookDetail)
-async def get_book(book_id: int, db: AsyncSession = Depends(get_db)):
+async def get_book(book_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_user)):
     book = await book_crud.get_by_id(db, book_id)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -77,7 +78,7 @@ async def create_book(
     book_pdf: UploadFile = File(None),
     book_audio: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
-    
+    current_user: User = Depends(get_current_admin)
 ):
     
     photo_url = upload_file(book_image, folder="books")
@@ -106,35 +107,21 @@ async def create_book(
 @router.patch("/{book_id}", response_model=BookDetail)
 async def update_book(
     book_id: int,
-    book_title: Optional[str] = Form(None),
-    book_category: Optional[str] = Form(None),
-    book_author: Optional[str] = Form(None),
-    book_description: Optional[str] = Form(None),
-    available_copies: Optional[int] = Form(None),
-    featured: Optional[bool] = Form(None),
-    book_availabity: Optional[bool] = Form(None),
-    book_rating: Optional[float] = Form(None),
+    form_data: BookUpdate = Depends(BookUpdate.as_form),
     book_image: Optional[UploadFile] = File(None),
     book_pdf: Optional[UploadFile] = File(None),
     book_audio: Optional[UploadFile] = File(None),
     db: AsyncSession = Depends(get_db),
+    current_user: User = Depends(get_current_admin)
 ):
     photo_url = upload_file(book_image, folder="books")
     pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
     audio_url = upload_file(book_audio, folder="book_audios") if book_audio else None
-    payload = BookUpdate(
-        book_title=book_title,
-        book_category=book_category,
-        book_author=book_author,
-        book_description=book_description,
-        available_copies=available_copies,
-        featured=featured,
-        book_availabity=book_availabity,
-        book_rating=book_rating,
-        book_image=photo_url,
-        book_pdf=pdf_url,
-        book_audio=audio_url
-    )
+    payload = form_data.copy(update={
+        "book_image": photo_url,
+        "book_pdf": pdf_url,
+        "book_audio": audio_url
+    })
 
 
     book = await book_crud.update(db, book_id, payload)
@@ -144,7 +131,7 @@ async def update_book(
 
 
 @router.delete("/{book_id}")
-async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
+async def delete_book(book_id: int, db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_admin)):
     deleted = await book_crud.delete(db, book_id)
     if not deleted:
         raise HTTPException(status_code=404, detail="Book not found")
@@ -154,7 +141,8 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db)):
 
 
 @router.patch("/{book_id}/feature", response_model=BookDetail)
-async def toggle_feature(book_id: int, payload: UpoadateFeatures, db: AsyncSession = Depends(get_db)):
+async def toggle_feature(book_id: int, payload: UpoadateFeatures, db: AsyncSession = Depends(get_db),
+                         current_user: User = Depends(get_current_admin)):
     book = await book_crud.toggle_featured(db, book_id, payload.featured)
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")

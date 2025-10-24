@@ -1,5 +1,3 @@
-
-
 from fastapi import APIRouter, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -17,6 +15,7 @@ class LoginRequest(BaseModel):
 class LoginResponse(BaseModel):
     access_token: str
     token_type: str = "Bearer"
+    user_id: str
 
 @router.post("/login", response_model=LoginResponse, tags=["Auth"])
 async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
@@ -30,6 +29,6 @@ async def login(payload: LoginRequest, db: AsyncSession = Depends(get_db)):
 
     token = create_access_token(user_id=user.user_id, role=user.role)
 
-    return {"access_token": token, "token_type": "Bearer"}
+    return {"access_token": token, "token_type": "Bearer", "user_id": user.user_id }
 
 

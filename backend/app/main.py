@@ -1,6 +1,6 @@
 import asyncio
 from fastapi import FastAPI
-from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book
+from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book, rate_book, book_review
 from fastapi.middleware.cors import CORSMiddleware
  
 from fastapi_pagination import add_pagination

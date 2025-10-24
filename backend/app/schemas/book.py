@@ -2,7 +2,7 @@ from pydantic import BaseModel
 from typing import Optional
 from pydantic import Field, HttpUrl
 from datetime import datetime
-
+from fastapi import Form
 class BookDetail(BaseModel):
     book_id: int
     book_title: str
@@ -75,6 +75,31 @@ class BookUpdate(BaseModel):
 
     class Config:
         orm_mode = True
+
+
+    @classmethod
+    def as_form(
+        cls,
+        book_title: Optional[str] = Form(None),
+        book_category: Optional[str] = Form(None),
+        book_author: Optional[str] = Form(None),
+        book_description: Optional[str] = Form(None),
+        available_copies: Optional[int] = Form(None),
+        book_availabity: Optional[bool] = Form(None),
+        featured: Optional[bool] = Form(None),
+        book_rating: Optional[float] = Form(None),
+    ):
+        return cls(
+            book_title=book_title,
+            book_category=book_category,
+            book_author=book_author,
+            book_description=book_description,
+            available_copies=available_copies,
+            book_availabity=book_availabity,
+            featured=featured,
+            book_rating=book_rating,
+        )
+
 
 class RateBook(BaseModel):
     book_id: int

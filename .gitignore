@@ -16,6 +16,7 @@ htmlcov/
 dist/
 build/
 *.egg-info/
+minio_data/
 
 # --- Node / React / Frontend ---
 node_modules/
@@ -31,7 +32,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-
+*.yml
 # --- Environment and secret files ---
 .env
 *.env
