@@ -236,7 +236,7 @@ export default function Home() {
                       <div className="flex gap-5 p-3 sm:p-4 snap-x snap-mandatory">
                         {recommended.map((b) => (
                           <BookCard
-                            key={b.id}
+                            key={b.book_id}
                             book={{
                               ...b,
                               coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
