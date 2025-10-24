@@ -19,3 +19,4 @@ class BookReviewCRUD:
     async def get_reviews(db: AsyncSession, book_id: int):
         result = await db.execute(select(BookReview).where(BookReview.book_id == book_id))
         return result.scalars().all()
+    

@@ -9,9 +9,11 @@ class BookReviewCreate(BaseModel):
 class BookReviewOut(BaseModel):
     review_id: int
     user_id: str
+    username: Optional[str] = None
     book_id: int
     review_text: str
     created_at: datetime
 
-    class Config:
-        orm_mode = True
+    model_config = {
+        "from_attributes": True 
+    }
