@@ -167,7 +167,7 @@ export default function BookCard({ book, compact = false }) {
         {!compact && (
           <div className="mt-3">
             <Link
-              to={`/book/${book.id}`}
+              to={`/book/${book.book_id}`}
               className="inline-block bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-md shadow-md"
             >
               View Details

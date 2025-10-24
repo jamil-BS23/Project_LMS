@@ -192,7 +192,7 @@ const handlePdfClick = async (bookId, pdfLink) => {
     }
 
     await axios.post(
-      `http://localhost:8000/borrows/pdf-view/${bookId}`,
+      `${import.meta.env.VITE_API_BASE_URL}/borrow/pdf/${bookId}`,
       {},
       {
         headers: {
@@ -236,14 +236,13 @@ useEffect(() => {
         const resAll = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-      const others = (resAll.data || [])
+      const others = (resAll.data.items || [])
         .filter((book) => String(book.book_id) !== String(id))
         .filter((book) => book.book_category === b.book_category)
         .slice(0, 3)
         .filter(Boolean);
      
       setRelatedBooks(others);
-      console.log("Related books:", others);
 
       } catch (err) {
         console.error("Failed to fetch book details:", err);
@@ -394,7 +393,7 @@ useEffect(() => {
   if (!bookData?.id) return;
 
   try {
-    const res = await axios.get(`http://localhost:8000/reviews/book/${bookData.id}/rating-breakdown`);
+    const res = await axios.get(`http://localhost:8000/rate_book/${bookData.id}/rating-breakdown`);
     const data = res.data;
     setPack({
       heading: "Employee Review",
@@ -413,12 +412,11 @@ const fetchReviews = async () => {
   if (!bookData?.id) return;
 
   try {
-    const res = await axios.get(`http://localhost:8000/reviews/book/${bookData.id}`, {
+    const res = await axios.get(`http://localhost:8000/book_review/${bookData.id}`, {
       headers: { Authorization: `Bearer ${token}` } // make sure token exists
     });
 
     const data = res.data;
-
     // Calculate overall rating, total, breakdown
     const total = data.length;
     const overall = total > 0 ? data.reduce((sum, r) => sum + r.rating, 0) / total : 0;
@@ -446,7 +444,7 @@ const fetchReviews = async () => {
 
   try {
     const res = await axios.post(
-      "http://localhost:8000/reviews/",
+      "http://localhost:8000/book_review/",
       {
         book_id: bookData.id,
         rating,
@@ -471,7 +469,7 @@ const fetchReviews = async () => {
 
   // const pack = REVIEWS_DB[String(bookData.id)] || null;
   const localReviewCount = pack?.reviews?.length ?? 0;
-  const ratingCountDisplay = pack ? localReviewCount : 0;
+  const ratingCountDisplay = pack ?.total ?? 0;
   const reviewsTextDisplay = pack
     ? localReviewCount > 0
       ? `${localReviewCount} Reviews`
@@ -878,16 +876,30 @@ const fetchReviews = async () => {
         <div className="lg:col-span-1">
           <div className="">
             <div className="text-sm text-gray-700 font-semibold">Rate this product</div>
-           <div className="mt-2 flex items-center gap-1">
+          <div className="mt-2 flex items-center gap-1">
             {[...Array(5)].map((_, i) => (
               <Star
                 key={i}
                 className={`w-6 h-6 cursor-pointer ${i < rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
-                onClick={() => setRating(i + 1)}
+                onClick={async () => {
+                  setRating(i + 1);
+                  try {
+                    await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/rate_book/rate`, {
+                      book_id: bookData.id,
+                      book_rating: i + 1,
+                    },
+                   {
+                      headers: { Authorization: `Bearer ${token}` } // make sure token exists
+                    });
+                                  fetchRatingBreakdown(); // refresh overall rating & breakdown
+                  } catch (err) {
+                    alert(err.response?.data?.detail || "Failed to rate book");
+                  }
+                }}
               />
             ))}
           </div>
-          <textarea
+        <textarea
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             className="w-full border rounded p-2 mt-2"
@@ -895,14 +907,28 @@ const fetchReviews = async () => {
           />
           <button
             className="mt-3 inline-flex items-center border border-gray-300 text-sky-600 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-sky-50"
-            onClick={submitReview}
+            onClick={async () => {
+              if (!comment) return alert("Please write a review");
+              try {
+                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/book_review/${bookData.id}`, {
+                  book_id: bookData.id,
+                  review_text: comment
+                }, {
+                    headers: { Authorization: `Bearer ${token}` } // make sure token exists
+                     });
+                fetchReviews(); // refresh reviews list
+                setComment("");
+                alert("Review submitted successfully!");
+              } catch (err) {
+                alert(err.response?.data?.detail || "Failed to submit review");
+              }
+            }}
           >
             Review Write
           </button>
           </div>
 
           {!pack || pack.total === 0 ? (
-            console.log("No reviews available"),
             <div className="text-sm text-gray-500 mt-6">No reviews yet for this book.</div>
           ) : (
             <div className="space-y-6 mt-10 sm:mt-20">
@@ -925,11 +951,11 @@ const fetchReviews = async () => {
                         </div>
 
                          <div className="text-sm">
-                          <span>{r.comment}</span>
+                          <span>{r.review_text}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs mt-0.5 text-gray-500">
                           {renderStars(r.rating)}
-                          <span className="ml-1 font-medium">{r.rating.toFixed(1)}</span>
+                          {/* <span className="ml-1 font-medium">{r.rating.toFixed(1)}</span> */}
                           <span className="text-gray-300 mx-1">|</span>
                           <time dateTime={r.created_at}>{r.created_at}</time>
                         </div>
