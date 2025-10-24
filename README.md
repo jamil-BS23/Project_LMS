@@ -1,135 +1,126 @@
  📚 Library Management System (LMS)
-
-Full-Stack Web Application – Modern digital library platform for managing physical and digital books.  
+Full-Stack Web Application – A modern digital library platform for managing physical and digital books.  
 Supports patrons (users) and administrators (library staff) with full role-based access control (RBAC).
 
- 🔹 Table of Contents
-1. [Project Overview]
-2. [User Roles & Access]
-3. [Getting Started]
-4. [Frontend Overview]
-5. [Backend Overview]
-6. [Core Features]
-7. [Technical Stack]
-8. [Routing & State Management]
-9. [API Endpoints]
-10. [Security & Error Handling]
-11. [Project Structure]
-12. [Developer Commands]
-13. [Contributing]
-14. [License]
-15. [Contact]
+🔹 Table of Contents
+1. [Project Overview](#project-overview)
+2. [User Roles & Access](#user-roles--access)
+3. [Getting Started](#getting-started)
+4. [Frontend Overview](#frontend-overview)
+5. [Backend Overview](#backend-overview)
+6. [Core Features](#core-features)
+7. [Technical Stack](#technical-stack)
+8. [Routing & State Management](#routing--state-management)
+9. [API Endpoints](#api-endpoints-highlights)
+10. [Security & Error Handling](#security--error-handling)
+11. [Project Structure](#project-structure)
+12. [Developer Commands](#developer-commands)
+13. [Contributing](#contributing)
+14. [System Architecture](#system-architecture)
+15. [User Flow Diagram](#user-flow-diagram)
+16. [Database / ERD](#database--erd-simplified)
+17. [License & Contact](#license--contact)
 
 🔹 Project Overview
 
-The Library Management System is a modern web-based application designed to manage a library’s physical and digital books efficiently.  
+The Library Management System (LMS) is a web-based platform that simplifies management of both physical and digital library resources.
 
 Goals:
- For Users: Search, borrow/return books, manage personal loans, submit reviews.
- For Administrators: Manage books, track loans, view user activity, manage digital assets.
- For the Library: Centralized records ensuring accurate book stock tracking and engagement monitoring.
+- For Users: Search, borrow, and return books, submit reviews.
+- For Administrators: Manage inventory, users, and digital assets.
+- For Libraries: Maintain accurate tracking and reporting for circulation data.
 
 Screenshots (Placeholder):
-[Home Page] 
-[Admin Dashboard]
-
-🔹 User Roles & Access
- Standard User (Patron)
-- Search and browse the catalog  
+- 🏠 site page / My library 
+- 🧭 Admin Dashboard
+- 
+- 🔹 User Roles & Access
+- 
+Standard User (Patron)
+- Search and browse books  
 - Borrow and return books  
 - View borrowing history  
-- Submit ratings and reviews  
-
-Administrator (Librarian/Staff)
-- Full standard user permissions  
-- Add, update, delete books  
-- Manage categories and digital assets (PDFs, cover images)  
-- View all active and historical loan records
+- Submit ratings and reviews
 - 
- 🔹 Getting Started
+Administrator (Librarian / Staff)
+- All standard user permissions  
+- Add, update, delete books  
+- Manage categories & digital assets  
+- View all loans and user activity
+- 
+🔹 Getting Started
  Prerequisites
-- Node.js v18+  
-- npm or yarn  
-- Python v3.8+  
-- PostgreSQL (optional, SQLite supported for development)
-
+- Node.js v18+
+- npm or yarn
+- Python v3.8+
+- PostgreSQL (or SQLite for development)
+- 
 Backend Setup
 ```bash
 cd backend
 python -m venv .venv
-# macOS/Linux
-source .venv/bin/activate
-
+source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
-
-cp .env.example .env
- Edit .env with your database and MinIO credentials
-
+cp .env.example .env  # Edit database and MinIO credentials
 alembic upgrade head
-
-python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
+uvicorn app.main:app --reload
 
 Frontend Setup
 
 cd frontend
 npm install
-
-Start frontend server
-npm run de
+npm run dev
 
 Access:
+Frontend → http://localhost:5173
 
-    Frontend at http://localhost:5173
-    Backend at http://localhost:8000/doc
-
+Backend → http://localhost:8000/doc
 🔹 Frontend Overview
 
-    SPA built with React + Vite + Tailwind CSS & DaisyUI
+    Built with React + Vite + Tailwind CSS + DaisyUI
 
     Role-based route protection (RoleBasedRoute)
 
-    Global state management via React Context API (AuthProvider)
+    Global auth state via React Context API
 
-    Responsive mobile-first design
+    Responsive, mobile-first UI
 
-    Centralized Axios instance for API communication
+    Axios for API communication
 
 🔹 Backend Overview
 
-    FastAPI with asynchronous SQLAlchemy ORM
+    FastAPI with async SQLAlchemy ORM
 
-    PostgreSQL for relational data storage
+    PostgreSQL as primary database
 
-    MinIO (S3-compatible) for binary files (book covers, PDFs)
+    MinIO (S3-compatible) for file storage
 
-    Modular architecture with service/repository pattern
+    Service-repository modular architecture
 
-    JWT-based authentication & RBAC for security
+    JWT-based authentication & RBAC
 
 🔹 Core Features
 User Features
 
-    Search/browse books by title, author, ISBN, or category
+    Search/browse books by title, author, or ISBN
 
     Borrow and return books
 
-    Submit ratings and reviews
+    Rate and review titles
 
-    View personal borrowing history
+    Track personal loan history
 
 Admin Features
 
-    Add, update, delete books
+    Add, edit, delete books and categories
 
-    Manage categories
+    Manage user loans and assets
 
-    Track loans and user activity
-
-    Upload book assets to MinIO
+    Upload and organize digital media (PDFs, covers)
 
 🔹 Technical Stack
-Layer	Technology
-Frontend	React + Vite + Tailwind CSS/DaisyUI
+Layer	Technology:
+Frontend	React + Vite + Tailwind CSS + DaisyUI
 Routing	React Router DOM v6
 State Management	React Context API
 HTTP Client	Axios
@@ -138,49 +129,54 @@ ORM	SQLAlchemy (Async)
 Database	PostgreSQL
 File Storage	MinIO
 Authentication	JWT, RBAC
+
 🔹 Routing & State Management
-
-    Role-based Route Protection: Conditional rendering based on user roles
-
-    AuthProvider: Manages global authentication state
-
-    Layout Shells: Conditional display of navbar/sidebar based on route
+    Role-based route protection.
+    AuthProvider manages login state.
+    Conditional layout shells for each role.
 
 🔹 API Endpoints (Highlights)
-Authentication & User Interaction
-Endpoint	Method	Body/Query	Response	Notes
-auth/register	POST	email, password	201 Created	Error 409 if email exists
-auth/login	POST	email, password	200 OK (JWT)	401 Unauthorized
-books/rate/{id}	POST	rating, review_text	201 Created	400 if already rated
-Catalog & Borrowing
-Endpoint	Method	Notes
-books	GET	Query: category, search, pagination
-books/{id}	GET	Detailed book info
-books/borrow/{id}	POST	Borrow a book (auth only)
-books/return/{id}	POST	Return a book (auth only)
-Admin Operations
-Endpoint	Method	Notes
-admin/books	POST	Add book with MinIO upload
-admin/books/{id}	PUT	Update book
-admin/books/{id}	DELETE	Delete book (if not borrowed)
-admin/loans	GET	View all loans
+📦 Authentication & User Interaction
+
++----------------+--------+------------------------+---------------+---------------------------+
+| Endpoint       | Method | Body / Query           | Response      | Notes                     |
++----------------+--------+------------------------+---------------+---------------------------+
+| auth/register  | POST   | email, password        | 201 Created   | 409 if email exists       |
+| auth/login     | POST   | email, password        | 200 OK (JWT)  | 401 Unauthorized          |
+| books/rate/{id}| POST   | rating, review_text    | 201 Created   | 400 if already rated      |
++----------------+--------+------------------------+---------------+---------------------------+
+
+📦 Catalog & Borrowing
+
++------------------+--------+-----------------------------------+
+| Endpoint         | Method | Notes                             |
++------------------+--------+-----------------------------------+
+| books            | GET    | Query: category, search, pagination|
+| books/{id}       | GET    | Detailed book info                 |
+| books/borrow/{id}| POST   | Borrow a book (auth only)          |
+| books/return/{id}| POST   | Return a book (auth only)          |
++------------------+--------+-----------------------------------+
+
+📦 Admin Operations
+
++-------------------+--------+--------------------------------------+
+| Endpoint          | Method | Notes                                |
++-------------------+--------+--------------------------------------+
+| admin/books       | POST   | Add book with MinIO upload           |
+| admin/books/{id}  | PUT    | Update book                          |
+| admin/books/{id}  | DELETE | Delete book (if not borrowed)        |
+| admin/loans       | GET    | View all loans                       |
++-------------------+--------+--------------------------------------+
+
 🔹 Security & Error Handling
-
-    JWT Authentication & Role-based Access Control
-
-    Standard HTTP response codes:
-
-        400 Bad Request – Client-side error
-
-        401 Unauthorized – Authentication failure
-
-        403 Forbidden – Unauthorized access
-
-        404 Not Found – Resource missing
-
-        409 Conflict – Business rules violated
-
-        422 Unprocessable Entity – Validation errors
+    JWT authentication and RBAC
+    Standard HTTP responses:
+        400 – Bad Request
+        401 – Unauthorized
+        403 – Forbidden
+        404 – Not Found
+        409 – Conflict
+        422 – Validation error
 
 🔹 Project Structure
 
@@ -210,29 +206,24 @@ Project_LMS
 └── README.md
 
 🔹 Developer Commands
-Action	Command
-Run backend:	uvicorn app.main:app --reload
-Run frontend:	npm run dev 
-Build frontend	npm run build 
+Action	Command:
+Run backend =	uvicorn app.main:app --reload
+Run frontend =	npm run dev
+Build frontend	npm run build
 Lint frontend	npx eslint . --ext .js,.jsx
 Format code	npx prettier --write .
 🔹 Contributing
-
-    Fork the repository
-
-    Create a feature/bugfix branch
-
-    Commit your changes
-
-    Push and submit a Pull Request
+    Fork the repo
+    Create a new branch (feature/your-feature)
+    Commit and push changes
+    Open a Pull Request
 
 🔹 System Architecture
 
 +-------------------+      HTTP/API       +-------------------+
 |   React Frontend  | <----------------> |   FastAPI Backend |
-|  SPA + RBAC/Auth  |                    |  Business Logic  |
+|  SPA + RBAC/Auth  |                    |  Business Logic   |
 +-------------------+                    +-------------------+
-        |                                      |
         |                                      |
         v                                      v
 +-------------------+                    +-------------------+
@@ -243,26 +234,11 @@ Format code	npx prettier --write .
 🔹 User Flow Diagram
 Standard User (Patron)
 
-Login/Register
-      |
-      v
-Browse/Search Books
-      |
-      v
-Borrow Book <--> Return Book
-      |
-      v
-Rate & Review
+Login/Register → Browse/Search Books → Borrow/Return → Rate/Review
 
 Administrator (Librarian/Staff)
 
-Login/Register
-      |
-      v
-Admin Dashboard
-  |       |       |
-  v       v       v
-Manage Books   Manage Loans   Manage Assets
+Login/Register → Admin Dashboard → Manage Books → Manage Loans → Manage Assets
 
 🔹 Database / ERD (Simplified)
 
@@ -286,4 +262,3 @@ Manage Books   Manage Loans   Manage Assets
 | rating  |
 | text    |
 +---------+
-
