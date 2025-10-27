@@ -106,9 +106,9 @@ const slugify = (s = "") =>
         // normalize response
         const apiCategories = Array.isArray(res.data)
           ? res.data.map((cat) => ({
-              id: cat.id,
-              name: cat.name,
-              slug: slugify(cat.name),
+              id: cat.category_id,
+              name: cat.category_title,
+              slug: slugify(cat.category_title),
             }))
           : [];
 
@@ -191,7 +191,7 @@ const slugify = (s = "") =>
   try {
     const token = localStorage.getItem("token");
     const payload = {
-      name: form.name.trim(),
+      category_title: form.name.trim(),
       slug: slugify(form.name),
     };
 
@@ -199,7 +199,7 @@ const slugify = (s = "") =>
     if (mode === "edit" && editingIndex > -1) {
       // ✅ Update existing category
       const categoryId = categories[editingIndex].id;
-      res = await axios.put(
+      res = await axios.patch(
         `http://localhost:8000/categories/${categoryId}`,
         payload,
         {
@@ -215,7 +215,7 @@ const slugify = (s = "") =>
       });
     } else {
       // ✅ Add new category
-      res = await axios.post("http://localhost:8000/categories/all", payload, {
+      res = await axios.post("http://localhost:8000/categories", payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 

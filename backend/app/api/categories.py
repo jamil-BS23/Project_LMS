@@ -51,7 +51,6 @@ async def update_category(
     admin: User = Depends(get_current_admin),
     db: AsyncSession = Depends(get_db)
 ):
-    print("Category Id, Category upd :", category_id, category_update)
     category = await CategoryCRUD.update_category(db, category_id, category_update)
     if not category:
         raise not_found_error("Category", category_id)

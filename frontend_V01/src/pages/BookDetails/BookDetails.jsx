@@ -432,7 +432,7 @@ const fetchReviews = async () => {
     });
   } catch (err) {
     console.error("Failed to fetch reviews:", err);
-    alert("Failed to load reviews");
+    // alert("Failed to load reviews");
   }
 };
 
