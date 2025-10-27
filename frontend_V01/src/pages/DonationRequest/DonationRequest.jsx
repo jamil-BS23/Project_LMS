@@ -134,17 +134,25 @@ export default function DonationRequest() {
         // 🔹 If you store token after login
         const token = localStorage.getItem("token");
 
-        const [resItems, resHistory] = await Promise.all([
-          axios.get("http://localhost:8000/donation_books", {
+              const resItems = await axios.get("http://127.0.0.1:8000/donation", {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        // Fetch non-pending donations (accepted + rejected)
+        const [resAccepted, resRejected] = await Promise.all([
+          axios.get("http://127.0.0.1:8000/donation/status", {
+            params: { book_approve: "accepted" },
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://localhost:8000/donation_books/history", {
+          axios.get("http://127.0.0.1:8000/donation/status", {
+            params: { book_approve: "rejected" },
             headers: { Authorization: `Bearer ${token}` },
           }),
         ]);
 
+        const resHistory = [...(resAccepted.data || []), ...(resRejected.data || [])];
         setItems(resItems.data || []);
-        setHistory(resHistory.data || []);
+        setHistory(resHistory);
       } catch (err) {
         if (err.response?.status === 401) {
           setError("You must log in to view donation requests.");
@@ -258,7 +266,7 @@ export default function DonationRequest() {
       if (!/^BS\d{4}$/i.test(bsTrim)) return [];
       const target = bsTrim.toUpperCase();
       const sub = items.filter((it) => (it.BS_ID || "").toUpperCase() === target);
-      return statusFilter === "all" ? sub : sub.filter((it) => it.status === statusFilter);
+      return statusFilter === "all" ? sub : sub.filter((it) => it.donation_status === statusFilter);
     }
 
     // General search: donor, author, book title, note, email (NO id/amount)
@@ -266,24 +274,24 @@ export default function DonationRequest() {
     return items.filter((it) => {
       const matchQ =
         !q ||
-        it.username.toLowerCase().includes(q) ||
-        (it.author || "").toLowerCase().includes(q) ||
-        it.title.toLowerCase().includes(q) ||
-        (it.note || "").toLowerCase().includes(q) ||
-        it.email.toLowerCase().includes(q);
-      const matchS = statusFilter === "all" ? true : it.status === statusFilter;
+        it.donor_name.toLowerCase().includes(q) ||
+        (it.book_author || "").toLowerCase().includes(q) ||
+        it.book_title.toLowerCase().includes(q) ||
+        (it.book_description || "").toLowerCase().includes(q) ||
+        it.BS_email.toLowerCase().includes(q);
+      const matchS = statusFilter === "all" ? true : it.donation_status === statusFilter;
       return matchQ && matchS;
     });
   }, [items, query, statusFilter, bsTrim]);
 
-  const pendingRows = filtered.filter((x) => x.status === "pending");
-  const acceptedRows = filtered.filter((x) => x.status === "accepted");
-  const rejectedRows = filtered.filter((x) => x.status === "rejected");
+  const pendingRows = filtered.filter((x) => x.donation_status === "pending");
+  const acceptedRows = filtered.filter((x) => x.donation_status === "accepted");
+  const rejectedRows = filtered.filter((x) => x.donation_status === "rejected");
 
   // Correct counters (not affected by filtering)
-  const totalPending = items.filter((x) => x.status === "pending").length;
-  const totalAccepted = items.filter((x) => x.status === "accepted").length; // Collected
-  const totalRejected = items.filter((x) => x.status === "rejected").length;
+  const totalPending = items.filter((x) => x.donation_status === "pending").length;
+  const totalAccepted = items.filter((x) => x.donation_status === "accepted").length; // Collected
+  const totalRejected = items.filter((x) => x.donation_status === "rejected").length;
 
   // ---------- Actions ----------
   /*const actOn = (id, action) => {
@@ -320,14 +328,14 @@ export default function DonationRequest() {
 
     // 🔹 Call backend PATCH API
     const res = await axios.patch(
-      `http://localhost:8000/donation_books/${id}/status`,
+      `http://localhost:8000/donation/${id}/status`,
       { status: action },
       { headers: { Authorization: `Bearer ${token}` } }
     );
 
     const updatedDonation = res.data;
     const nextItems = items.map((it) =>
-      it.id === id ? { ...it, status: updatedDonation.status } : it
+      it.id === id ? { ...it, status: updatedDonation.donation_status } : it
     );
 
     const entry = {
@@ -336,7 +344,7 @@ export default function DonationRequest() {
       action: updatedDonation.status,
       at: new Date().toISOString(),
       amount: updatedDonation.amount,
-      donorName: updatedDonation.username || updatedDonation.user_name,
+      donorName: updatedDonation.username || updatedDonation.donor_name,
       bookTitle: updatedDonation.title,
     };
     const nextHistory = [entry, ...history];
@@ -344,7 +352,7 @@ export default function DonationRequest() {
     setHistory(nextHistory);
     persist(nextItems, nextHistory);
 
-    showToast(action, `${action === "accepted" ? "Accepted" : "Rejected"}: ${updatedDonation.username || "Request"}`);
+    showToast(action, `${action === "accepted" ? "Accepted" : "Rejected"}: ${updatedDonation.donor_name || "Request"}`);
 
     setPage(2);
     setHistoryTablePage(1);
@@ -403,48 +411,48 @@ export default function DonationRequest() {
                   {idx + 1 + (pageForCalc - 1) * PAGE_SIZE}
                 </td>
                 <td className="px-4 py-2">
-                  <div className="font-medium">{r.username}</div>
+                  <div className="font-medium">{r.donor_name}</div>
                   {r.BS_ID && <div className="text-[11px] text-gray-500 mt-0.5">BSID: {r.BS_ID}</div>}
                 </td>
                 <td className="px-4 py-2">
-                  <div className="font-medium">{r.title}</div>
+                  <div className="font-medium">{r.book_title}</div>
                   <div className="text-xs text-gray-500">
-                    Author: {r.author || "Unknown Author"}
+                    Author: {r.book_author || "Unknown Author"}
                   </div>
-                  {r.note && <div className="text-xs text-gray-500">{r.note}</div>}
+                  {r.book_description && <div className="text-xs text-gray-500">{r.book_description}</div>}
                 </td>
                 <td className="px-4 py-2">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold border
                       ${
-                        r.status === "accepted"
+                        r.donation_status === "accepted"
                           ? "bg-green-50 text-green-700 border-green-200"
-                          : r.status === "rejected"
+                          : r.donation_status === "rejected"
                           ? "bg-rose-50 text-rose-700 border-rose-200"
                           : "bg-amber-50 text-amber-700 border-amber-200"
                       }`}
                   >
-                    {r.status === "accepted" ? (
+                    {r.donation_status === "accepted" ? (
                       <CheckCircle2 size={14} />
-                    ) : r.status === "rejected" ? (
+                    ) : r.donation_status === "rejected" ? (
                       <XCircle size={14} />
                     ) : (
                       <Clock size={14} />
                     )}
-                    {r.status === "accepted" ? "Collected" : r.status.charAt(0).toUpperCase() + r.status.slice(1)}
+                    {r.donation_status === "accepted" ? "Collected" : r.donation_status.charAt(0).toUpperCase() + r.donation_status.slice(1)}
                   </span>
                 </td>
                 {showActions && (
                   <td className="px-4 py-2">
                     <div className="flex justify-end gap-2">
                       <button
-                        onClick={() => actOn(r.id, "accepted")}
+                        onClick={() => actOn(r.donation_book_id, "accepted")}
                         className="inline-flex items-center gap-1 rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-500"
                       >
                         <CheckCircle2 size={14} /> Accept
                       </button>
                       <button
-                        onClick={() => actOn(r.id, "rejected")}
+                        onClick={() => actOn(r.donation_book_id, "rejected")}
                         className="inline-flex items-center gap-1 rounded-md bg-rose-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-rose-500"
                       >
                         <XCircle size={14} /> Reject
@@ -485,8 +493,8 @@ export default function DonationRequest() {
                 <td className="px-4 py-2 font-medium">
                   {idx + 1 + (pageForCalc - 1) * PAGE_SIZE}
                 </td>
-                <td className="px-4 py-2">{h.username}</td>
-                <td className="px-4 py-2">{h.title}</td>
+                <td className="px-4 py-2">{h.donor_name}</td>
+                <td className="px-4 py-2">{h.book_title}</td>
                 <td className="px-4 py-2">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold border
@@ -496,8 +504,8 @@ export default function DonationRequest() {
                           : "bg-rose-50 text-rose-700 border-rose-200"
                       }`}
                   >
-                    {h.status === "accepted" ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
-                    {h.status === "accepted" ? "Collected" : "Rejected"}
+                    {h.donation_status === "accepted" ? <CheckCircle2 size={14} /> : <XCircle size={14} />}
+                    {h.donation_status === "accepted" ? "Collected" : "Rejected"}
                   </span>
                 </td>
               </tr>
@@ -515,7 +523,7 @@ export default function DonationRequest() {
   const unifiedRows = useMemo(() => {
     if (bsTrim) return filtered;
     if (statusFilter === "all") return filtered;
-    return filtered.filter((it) => it.status === statusFilter);
+    return filtered.filter((it) => it.donation_status === statusFilter);
   }, [filtered, statusFilter, bsTrim]);
   const unifiedTotalPages = totalPages(unifiedRows, PAGE_SIZE);
   const unifiedSlice = paginate(unifiedRows, unifiedPage, PAGE_SIZE);

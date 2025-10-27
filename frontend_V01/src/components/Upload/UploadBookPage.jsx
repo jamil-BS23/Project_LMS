@@ -149,11 +149,14 @@ export default function UploadBookPage() {
   e.preventDefault();
 
     const fieldMapping = {
-      mainCategory: "category",
-      quantity: "copies",
-      bsEmail: "email",
+      mainCategory: "category_title",
+      quantity: "book_copies",
+      bsEmail: "BS_mail",
       bsIdNo: "BS_ID",
-    };
+      title: "book_title",
+      author: "book_author",
+      description: "book_detail",
+      };
 
   const formData = new FormData();
   for (const [key, value] of Object.entries(bookData)) {
@@ -162,13 +165,13 @@ export default function UploadBookPage() {
         formData.append(mappedKey, value);
       }
     }
-  if (files.cover) formData.append("file", files.cover);
-  if (files.audio) formData.append("audio", files.audio);
-  if (files.pdf) formData.append("pdf", files.pdf);
+  if (files.cover) formData.append("book_photo", files.cover);
+  if (files.audio) formData.append("book_audio", files.audio);
+  if (files.pdf) formData.append("book_pdf", files.pdf);
 
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.post("http://localhost:8000/donation_books/", formData, {
+    const res = await axios.put("http://localhost:8000/donation/", formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
@@ -363,7 +366,7 @@ useEffect(() => {
                         <option value="">Select a category</option>
                         {categories.map((c) => (
                           <option key={c.id} value={c.name}>
-                            {c.name}
+                            {c.category_title}
                           </option>
                         ))}
                       </select>
