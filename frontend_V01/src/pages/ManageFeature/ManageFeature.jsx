@@ -110,12 +110,12 @@ const normalizeFeatured = (item) => {
 
 const normalizeCatalog = (b, fallbackIndex) => {
   const cover =
-    b.coverImage || b.image? `http://localhost:8000${b.image}` : PLACEHOLDER_IMG;
+    b.book_image;
   return {
     id: String(b.id ?? b.book_id ?? fallbackIndex ?? Math.random().toString(36).slice(2)),
-    title: b.title || "—",
-    author: b.author || b.authors || "—",
-    category: b.category || "—",
+    title: b.book_title || "—",
+    author: b.book_author || b.authors || "—",
+    category: b.book_category || "—",
     cover,
   };
 };
@@ -149,7 +149,7 @@ export default function ManageFeature() {
     if (!silent) setLoading(true);
     try {
         const token = localStorage.getItem("token");
-         const res = await axios.get("http://localhost:8000/books/featured_book", {
+         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/featured_book`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       const data = res.data || [];
@@ -166,10 +166,10 @@ export default function ManageFeature() {
     (async () => {
       try {
         const token = localStorage.getItem("token");
-         const res = await axios.get("http://localhost:8000/books", {
+         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`, {
         headers: { Authorization: `Bearer ${token}` },
       });
-        const data = res.data || [];
+        const data = res.data.items || [];
         const list = Array.isArray(data) ? data : [];
         const normalized = list.map((b, i) => normalizeCatalog(b, i));
         if (normalized.length) {
@@ -232,8 +232,8 @@ export default function ManageFeature() {
     try {
       const token = localStorage.getItem("token");
       await axios.patch(
-      `http://127.0.0.1:8000/books/${book.id}/feature?featured=${true}`,
-      {}, // body can be empty
+      `${import.meta.env.VITE_API_BASE_URL}/books/${book.id}/feature`,
+      {featured:true}, // body can be empty
       { headers: { Authorization: `Bearer ${token}` } }
     );
       fetchFeatured(true);
@@ -264,8 +264,8 @@ export default function ManageFeature() {
     try {
       const token = localStorage.getItem("token");
        await axios.patch(
-      `http://127.0.0.1:8000/books/${book.id}/feature?featured=${false}`,
-      {}, // body can be empty
+      `${import.meta.env.VITE_API_BASE_URL}/books/${book.id}/feature`,
+      {featured:false}, // body can be empty
       { headers: { Authorization: `Bearer ${token}` } }
     );
       fetchFeatured(true);

@@ -16,7 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import BookCard from "../../components/BookCard/BookCard";
-import axios from "axios";
+import axios, { all } from "axios";
 export default function Home() {
   const [filter, setFilter] = useState(null);
   const [openFilters, setOpenFilters] = useState(false); // mobile sidebar
@@ -250,7 +250,7 @@ export default function Home() {
                       <div className="flex gap-5 p-3 sm:p-4 snap-x snap-mandatory">
                         {recommended.map((b) => (
                           <BookCard
-                            key={b.id}
+                            key={b.book_id}
                             book={{
                               ...b,
                               coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",

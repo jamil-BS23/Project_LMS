@@ -52,9 +52,10 @@ class CategoryCRUD:
         if not db_category:
             return False
 
-        # Check if any available books exist
+        # Check if any available books exist in THIS category
         result_books = await db.execute(
-            select(Book).where(Book.book_category_id == category_id, Book.book_availability == True)
+            select(Book)
+            .where(Book.book_category == db_category.category_title, Book.book_availabity == True)
         )
         available_books = result_books.scalars().all()
         if available_books:

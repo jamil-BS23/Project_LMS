@@ -6,6 +6,7 @@ from app.database import get_db
 from app.schemas.book import BookDetail,RateBook
 from app.core.security import get_current_user
 from app.models.user import User
+from typing import Dict
 
 router = APIRouter()
 
@@ -26,3 +27,16 @@ async def rate_book(
         raise HTTPException(status_code=404, detail="Book not found")
 
     return book
+
+
+@router.get("/{book_id}/rating-breakdown")
+async def get_rating_breakdown(book_id: int, db: AsyncSession = Depends(get_db)) -> Dict:
+    try:
+        stats = await RateBookCRUD.get_rating_breakdown(db, book_id)
+        if stats["total"] == 0 and not stats["reviews"]:
+            raise HTTPException(status_code=404, detail="No ratings or reviews for this book")
+        return stats
+    except Exception as e:
+        import traceback
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail=f"Failed to fetch rating breakdown: {str(e)}")

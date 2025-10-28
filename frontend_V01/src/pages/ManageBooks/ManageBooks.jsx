@@ -43,7 +43,7 @@ function normalizeFromSection(item) {
     cover: item.image ?? item.coverImage ?? PLACEHOLDER_IMG,
     pdf: item.pdf ?? "",
     audio: item.audio ?? "",
-    description: item.summary ?? "",
+    description: item.summary ??  item.book_description ?? "",
   };
 }
 
@@ -67,16 +67,16 @@ async function loadCategories() {
 
 function normalizeFromJson(item) {
   return {
-    id: String(item.id ?? crypto.randomUUID()),
-    title: item.title ?? "—",
-    author: item.authors ?? item.author ?? "—",
-    category: item.category?? "—",
-    copies: item.copies || "—",
+    id: String(item.book_id ?? crypto.randomUUID()),
+    title: item.book_title ?? "—",
+    author: item.authors ?? item.book_author ?? "—",
+    category: item.book_category?? "—",
+    copies: item.available_copies || "—",
     updatedOn: toYMD(item.publishDate ?? ""),
-    cover: item.coverImage || item.image ? `http://localhost:8000${item.image}` : PLACEHOLDER_IMG,
+    cover: item.coverImage || item.book_image ?  item.book_image : PLACEHOLDER_IMG,
     pdf: item.pdf ?? "",
     audio: item.audio ?? "",
-    description: item.summary ?? "",
+    description: item.summary ??  item.book_description ?? "",
   };
 }
 
@@ -209,7 +209,7 @@ export default function ManageBooks() {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
-      const booksFromApi = res.data.map((b) => normalizeFromJson(b));
+      const booksFromApi = res.data.items.map((b) => normalizeFromJson(b));
       setDisplayed(booksFromApi);
     } catch (err) {
       console.error("Failed to fetch books from API:", err);
@@ -452,15 +452,15 @@ const handleSave = async () => {
   try {
     const token = localStorage.getItem("token");
     const formData = new FormData();
-    formData.append("title", form.title);
-    formData.append("author", form.author);
-    formData.append("category_name", form.category);  // backend expects category_id
-    formData.append("copies", form.copies);
-    formData.append("description", form.description);
+    formData.append("book_title", form.title);
+    formData.append("book_author", form.author);
+    formData.append("book_category", form.category);  // backend expects category_id
+    formData.append("available_copies", form.copies);
+    formData.append("book_description", form.description);
 
-    if (form.coverFile) formData.append("file", form.coverFile);
-    if (form.pdfFile) formData.append("pdf", form.pdfFile);
-    if (form.audioFile) formData.append("audio", form.audioFile);
+    if (form.coverFile) formData.append("book_image", form.coverFile);
+    if (form.pdfFile) formData.append("book_pdf", form.pdfFile);
+    if (form.audioFile) formData.append("book_audio", form.audioFile);
 
     let res;
     if (mode ==="edit" && editingIndex >= 0) {
@@ -473,7 +473,7 @@ const handleSave = async () => {
       });
     } else {
       // ✅ create new book
-      res = await axios.post("http://localhost:8000/books", formData, {
+      res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/books`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -761,7 +761,7 @@ useEffect(() => {
                       <option value="">Select a category</option>
                       {categories.map((c) => (
                         <option key={c.id} value={c.name}>
-                          {c.name}
+                          {c.category_title}
                         </option>
                       ))}
                     </select>
