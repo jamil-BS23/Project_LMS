@@ -2,6 +2,7 @@ from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, 
 from sqlalchemy.ext.asyncio import AsyncSession
 from typing import List, Optional
 from app.crud.book import BookCRUD
+from fastapi_pagination import Page, paginate
 from app.database import get_db
 from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, UpoadateFeatures
 from app.core.security import get_current_user, get_current_admin
@@ -12,6 +13,17 @@ from fastapi_pagination import Page, paginate
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
 
+# @router.get("/", response_model=List[BookDetail])
+# async def get_books(
+#     db: AsyncSession = Depends(get_db),
+#     search: str | None = Query(None),
+#     category: str | None = Query(None),
+#     skip: int = Query(0, ge=0),
+#     limit: int = Query(20, ge=1),
+# ):
+#     books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
+#     return books
+
 @router.get("/", response_model=Page[BookDetail])
 async def get_books(
     db: AsyncSession = Depends(get_db),
@@ -20,6 +32,8 @@ async def get_books(
 ):
     books = await book_crud.get_all(db, search=search, category=category)
     return paginate(books)
+
+
 
 
 
@@ -123,6 +137,8 @@ async def delete_book(book_id: int, db: AsyncSession = Depends(get_db), current_
     if not deleted:
         raise HTTPException(status_code=404, detail="Book not found")
     return {"message": "Book deleted successfully"}
+
+
 
 
 @router.patch("/{book_id}/feature", response_model=BookDetail)

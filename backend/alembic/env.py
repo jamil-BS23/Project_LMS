@@ -17,7 +17,7 @@ config = context.config
 
 database_url = os.getenv("DATABASE_URL")
 if not database_url:
-    raise ValueError("❌ DATABASE_URL not found in .env file.")
+    raise ValueError("DATABASE_URL not found in .env file.")
 
 if database_url.startswith("postgresql+asyncpg"):
     sync_database_url = database_url.replace("postgresql+asyncpg", "postgresql+psycopg2")

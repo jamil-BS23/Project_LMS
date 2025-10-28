@@ -12,7 +12,8 @@ from app.models.user_rating import UserRating
 from app.schemas.book_review import BookReviewOut
 from app.api.book_review import get_user_from_api
 
-class RateBookCRUD:
+class RateBook:
+
 
     @staticmethod
     async def rate_book(db: AsyncSession, book_id: int, rating: float, user_id: str) -> Optional[Book]:
