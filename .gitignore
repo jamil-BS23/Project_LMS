@@ -40,4 +40,4 @@ Thumbs.db
 
 
 ## source "/home/bs01604/Documents/LMS_Team_Version/venv/bin/activate"
-## uvicorn app.main:app --reload
+## uvicorn app.main:app --reload.venv/
