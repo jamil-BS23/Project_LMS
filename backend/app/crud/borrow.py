@@ -54,6 +54,16 @@ class BorrowCRUD:
 
         if not book.book_pdf:
             raise HTTPException(status_code=400, detail="PDF not available for this book")
+        
+
+        existing_borrow = await db.execute(
+        select(BorrowRecord)
+        .where(BorrowRecord.user_id == user.user_id, BorrowRecord.book_id == book_id, BorrowRecord.borrow_status == "pdf-viewed")
+        )
+        existing_borrow = existing_borrow.scalars().first()
+
+        if existing_borrow:
+            return existing_borrow
 
         # 2️⃣ Create Borrow record
         today = date.today()
@@ -149,6 +159,8 @@ class BorrowCRUD:
             return_date=return_date,
             borrow_status="pending",
         )
+
+      
         db.add(db_borrow)
 
         # 9️⃣ Update book availability

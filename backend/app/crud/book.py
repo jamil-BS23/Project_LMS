@@ -80,8 +80,11 @@ class BookCRUD:
         book = await self.get_by_id(db, book_id)
         if not book:
             return None
+        protected_fields = {"book_availabity", "featured", "book_rating"}
+
         for key, value in update_data.dict(exclude_unset=True).items():
-            setattr(book, key, value)
+            if key not in protected_fields:
+                setattr(book, key, value)
         await db.commit()
         await db.refresh(book)
         return book

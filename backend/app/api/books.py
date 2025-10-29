@@ -117,14 +117,15 @@ async def update_book(
     photo_url = upload_file(book_image, folder="books")
     pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
     audio_url = upload_file(book_audio, folder="book_audios") if book_audio else None
-    payload = form_data.copy(update={
-        "book_image": photo_url,
-        "book_pdf": pdf_url,
-        "book_audio": audio_url
-    })
+    update_fields = form_data.dict(exclude_unset=True)
+    if photo_url:
+        update_fields["book_image"] = photo_url
+    if pdf_url:
+        update_fields["book_pdf"] = pdf_url
+    if audio_url:
+        update_fields["book_audio"] = audio_url
 
-
-    book = await book_crud.update(db, book_id, payload)
+    book = await book_crud.update(db, book_id, BookUpdate(**update_fields))
     if not book:
         raise HTTPException(status_code=404, detail="Book not found")
     return book
