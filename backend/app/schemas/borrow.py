@@ -91,6 +91,8 @@ class BorrowDetailResponse(BaseModel):
     borrow_date: date
     return_date: date
     borrow_status: str
+    returned_at: Optional[date] = None
+   
 
     class Config:
         orm_mode = True

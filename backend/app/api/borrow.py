@@ -98,7 +98,7 @@ async def update_borrow_status(
     borrow_id: int,
     status: str,
     db: AsyncSession = Depends(get_db),
-    current_user: models.user.User = Depends(get_current_admin),
+    current_user: models.user.User = Depends(get_current_active_user),
 ):
     # if current_user.role == "user":
     #     raise HTTPException(status_code=403, detail="Not authorized")
