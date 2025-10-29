@@ -57,11 +57,12 @@ useEffect(() => {
     }
 
     try {
-      const res = await axios.get("http://localhost:8000/settings/", {
+      const res = await axios.get("http://localhost:8000/settings/public", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
       const data = res.data;
+      console.log("Fetched settings:", data);
       setLimits({
         "borrow-day-limit": data.borrow_day_limit,
         "borrow-extend-limit": data.borrow_extend_limit,

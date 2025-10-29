@@ -41,7 +41,7 @@ export default function UserHistory() {
         return;
       }
       try {
-        const res = await axios.get("http://127.0.0.1:8000/borrows/my/history", {
+        const res = await axios.get("http://127.0.0.1:8000/borrow/my", {
           headers: { Authorization: `Bearer ${token}` },
         });
         setRows(res.data || []);
@@ -64,11 +64,13 @@ export default function UserHistory() {
   switch (status.toLowerCase()) {
     case "pending":
       return "Booked";
-    case "approved":
+    case "accepted":
       if (dueOn && new Date(dueOn) < now) return "Overdue";
       return "Borrowed";
     case "returned":
       return "Returned";
+    case "pdf-viewed":
+      return "PDF Viewed";
     default:
       return status; // fallback
   }
@@ -237,11 +239,11 @@ export default function UserHistory() {
                     <tr key={r.id} className="even:bg-gray-50">
                       <td className="py-3 px-4">{i + 1}</td>
                       <td className="py-3 px-4 font-medium text-gray-800">{r.book_title}</td>
-                      <td className="py-3 px-4 text-gray-700">{r.username}</td>
+                      <td className="py-3 px-4 text-gray-700">{r.user_name}</td>
                       <td className="py-3 px-4 text-gray-700">{r.borrow_date.split('T')[0] || "—"}</td>
                       <td className="py-3 px-4 text-gray-700">{r.return_date ? r.return_date.split('T')[0] : "—"}</td>
                       <td className="py-3 px-4 text-gray-700">{r.returned_at ? r.returned_at.split("T")[0] : "—"}</td>
-                      <td className="py-3 px-4"><span className={badge(r.status)}>{mapStatusLabel(r.status, r.return_date)}</span></td>
+                      <td className="py-3 px-4"><span className={badge(r.borrow_status)}>{mapStatusLabel(r.borrow_status, r.return_date)}</span></td>
                       <td className="py-3 px-4 text-center">
                         <button
                           type="button"
@@ -324,10 +326,10 @@ export default function UserHistory() {
               </div>
 
               <div className="px-4 md:px-6 py-4 md:py-5 space-y-3 text-sm">
-                <div className="flex justify-between gap-4"><span className="text-gray-500">Record ID</span><span className="font-medium text-gray-800">{detail.id}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-gray-500">Record ID</span><span className="font-medium text-gray-800">{detail.book_id}</span></div>
                 <div className="flex justify-between gap-4"><span className="text-gray-500">Book</span><span className="font-medium text-gray-800">{detail.book_title}</span></div>
-                <div className="flex justify-between gap-4"><span className="text-gray-500">User</span><span className="font-medium text-gray-800">{detail.username}</span></div>
-                <div className="flex justify-between gap-4"><span className="text-gray-500">Type</span><span className={badge(detail.status)}>{mapStatusLabel(detail.status, detail.return_date)}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-gray-500">User</span><span className="font-medium text-gray-800">{detail.user_name}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-gray-500">Type</span><span className={badge(detail.status)}>{mapStatusLabel(detail.borrow_status, detail.return_date)}</span></div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
                   <div className="rounded border border-gray-200 p-3"><p className="text-xs text-gray-500 mb-1">Borrowed On</p><p className="font-medium text-gray-800">{detail.borrow_date.split("T")[0] || "—"}</p></div>

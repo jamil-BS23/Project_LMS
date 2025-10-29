@@ -69,7 +69,7 @@ export default function Login() {
     e.preventDefault();
  
     try {
-      const res = await axios.post("http://127.0.0.1:8000/auth/login", {
+      const res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/auth/login`, {
       user_name: username,
       password: password,
 });
@@ -79,7 +79,7 @@ export default function Login() {
       localStorage.setItem("token", token);
       localStorage.setItem("user_id", userId);
 
-      const userRes = await axios.get(`http://localhost:8000/users/${userId}`, {
+      const userRes = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`, {
       headers: { Authorization: `Bearer ${token}` },
       });
       localStorage.setItem("user", JSON.stringify(userRes.data));
