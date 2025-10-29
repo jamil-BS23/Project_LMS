@@ -43,6 +43,6 @@ async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
         return reviews
     except Exception as e:
         import traceback
-         traceback.print_exc()  
+        traceback.print_exc()  
         raise HTTPException(status_code=500, detail=f"Failed to fetch reviews: {str(e)}")
 
