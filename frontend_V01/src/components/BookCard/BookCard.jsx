@@ -70,29 +70,22 @@
 //         </Link>
 //       </div>
 //     </div>
-//   );
-// }
-
-
-
-
+//   )
 import { Star } from "lucide-react";
 import { Link } from "react-router-dom";
 
-export default function BookCard({ book, compact = false }) {
+export default function BookCard({ book, compact = false, onClick }) {
   const safe = (v, d = "") => (v === undefined || v === null ? d : v);
 
-
-// MEDIA_DIR = "media/uploads"
-  // ----- status -----
+  // Determine book status
   const getStatus = (b) => {
-    if(b.available_copies < 1) return "Stock Out";
-    if (typeof b?.inStock === "boolean") return b.inStock ? "Available" : "Stock Out";
+    if (b.available_copies < 1) return "Stock Out";
     const s = (b?.status || "").toString().trim().toLowerCase();
     if (s.includes("out")) return "Stock Out";
     if (s.includes("upcoming") || s.includes("coming")) return "Upcoming";
     return "Available";
   };
+
   const statusText = getStatus(book);
   const statusColor =
     statusText === "Stock Out"
@@ -101,10 +94,9 @@ export default function BookCard({ book, compact = false }) {
       ? "text-amber-600"
       : "text-green-600";
 
-  // rating (stars only, no count)
   const rating = Number(book?.book_rating ?? 0);
 
-  // ----- title: break after 3 words (forces second line) -----
+  // Format long titles nicely
   const formatTitle = (t) => {
     const title = safe(t, "Untitled").toString().trim();
     const words = title.split(/\s+/);
@@ -114,74 +106,86 @@ export default function BookCard({ book, compact = false }) {
     return `${first}\n${rest}`;
   };
 
+  // ✅ Robust cover image handling
+  const getCoverImage = () => {
+    const img = book.coverImage || book.book_image || book.book_photo || book.image;
+    if (!img) return "/images/placeholder.png"; // fallback
+
+    // Backend /media folder serve
+    if (img.startsWith("/media/")) return `http://localhost:8000${img}`;
+
+    // MinIO URL fix (development)
+    if (img.startsWith("http://127.0.0.1:9000")) {
+      return img.replace("127.0.0.1:9000", "localhost:9000");
+    }
+
+    // Any other full URL
+    if (img.startsWith("http")) return img;
+
+    return "/images/placeholder.png"; // default fallback
+  };
+
+  const handleImageError = (e) => {
+    e.target.src = "/images/placeholder.png";
+  };
+
   return (
-    // Narrower fixed width so rows tend to show 4 full + a half-peek
-    <div className="relative w-[200px] sm:w-[200px] snap-start group select-none flex-shrink-0">
-      {/* Cover image in a fixed-size box (no white background, just a light bottom shadow) */}
+    <div
+      onClick={onClick}
+      className="relative w-[200px] sm:w-[200px] snap-start group select-none flex-shrink-0 cursor-pointer"
+    >
       <div className="mx-auto h-56 w-full flex items-center justify-center">
         <img
-          src={safe(book?.book_image)}
+          src={getCoverImage()}
           alt={safe(book?.book_title, "Book cover")}
           loading="lazy"
-          className="
-            h-full w-auto object-contain rounded-md
-            drop-shadow-[0_14px_22px_rgba(0,0,0,0.06)]
-            transition-transform duration-300 group-hover:scale-[1.03]
-          "
+          onError={handleImageError}
+          className="h-full w-auto object-contain rounded-md drop-shadow-[0_14px_22px_rgba(0,0,0,0.06)] transition-transform duration-300 group-hover:scale-[1.03]"
         />
       </div>
 
-      {/* Body — fixed min height to keep button in the same vertical spot */}
       <div className="px-1 pt-3 text-center flex flex-col items-center min-h-[170px]">
-        {/* Title (3-word line break retained) */}
         <h3 className="text-sm font-semibold text-gray-900 whitespace-pre-line line-clamp-2">
           {formatTitle(book?.book_title)}
         </h3>
 
-        {book?.author && (
+        {book?.book_author && (
           <p className="mt-0.5 text-xs text-gray-600">{book.book_author}</p>
         )}
 
-        {/* Stars */}
         {!compact && (
-          <div className="mt-2 flex items-center justify-center gap-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                className={`w-4 h-4 ${
-                  i < Math.round(rating) ? "text-yellow-500 fill-yellow-500" : "text-gray-300"
-                }`}
-              />
-            ))}
-          </div>
-        )}
+          <>
+            <div className="mt-2 flex items-center justify-center gap-1">
+              {[...Array(5)].map((_, i) => (
+                <Star
+                  key={i}
+                  className={`w-4 h-4 ${
+                    i < Math.round(rating)
+                      ? "text-yellow-500 fill-yellow-500"
+                      : "text-gray-300"
+                  }`}
+                />
+              ))}
+            </div>
 
-        {/* Status */}
-        {!compact && (
-          <div className={`mt-2 text-xs font-medium ${statusColor}`}>
-            {statusText}
-          </div>
-        )}
+            <div className={`mt-2 text-xs font-medium ${statusColor}`}>
+              {statusText}
+            </div>
 
-        {/* View Details button BELOW the status (centered, no overlay) */}
-        {!compact && (
-          <div className="mt-3">
-            <Link
-              to={`/book/${book.book_id}`}
-              className="inline-block bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-md shadow-md"
-            >
-              View Details
-            </Link>
-          </div>
+            <div className="mt-3">
+              <Link
+                to={`/book/${book.book_id || book.id}`}
+                className="inline-block bg-sky-500 hover:bg-sky-600 text-white text-sm font-semibold px-5 py-2 rounded-md shadow-md"
+              >
+                View Details
+              </Link>
+            </div>
+          </>
         )}
       </div>
     </div>
   );
 }
-
-
-
-
 
 
 // // src/components/BookCard/BookCard.jsx

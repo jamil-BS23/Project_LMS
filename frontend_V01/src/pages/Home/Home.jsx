@@ -1,118 +1,82 @@
 // src/pages/Home/Home.jsx
 import { useMemo, useRef, useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
-import Section from "../../components/Section/Section";
-// import books from "../../data/sampleBooks";
 import Navbar from "../../components/Navbar/Navbar";
 import FeaturedBanner from "../../components/FeaturedBanner/FeaturedBanner";
 import NewBookCollections from "../../components/NewBookCollections/NewBookCollections";
 import { useNavigate } from "react-router-dom";
-import {
-  Star,
-  Filter,
-  X,
-  MoreVertical,
-  ChevronLeft,
-  ChevronRight,
-} from "lucide-react";
+import { Star, Filter, X, ChevronLeft, ChevronRight } from "lucide-react";
 import BookCard from "../../components/BookCard/BookCard";
-import axios, { all } from "axios";
+import axios from "axios";
+
 export default function Home() {
   const [filter, setFilter] = useState(null);
-  const [openFilters, setOpenFilters] = useState(false); // mobile sidebar
-  const [openMenuId, setOpenMenuId] = useState(null); // kebab menu per-card
+  const [openFilters, setOpenFilters] = useState(false);
+  const [openMenuId, setOpenMenuId] = useState(null);
   const navigate = useNavigate();
   const [allBooks, setAllBooks] = useState([]);
   const [popularBooks, setPopularBooks] = useState([]);
 
-
   useEffect(() => {
-  const fetchBooks = async () => {
-    try {
-      // Fetch all books, popular books, and categories
-      const [booksRes, popularRes, categoriesRes] = await Promise.all([
-        axios.get("http://localhost:8000/books"),
-        axios.get("http://localhost:8000/books/popular"),
-        axios.get("http://localhost:8000/categories/all")
-      ]);
+    const fetchBooks = async () => {
+      try {
+        const [booksRes, popularRes, categoriesRes] = await Promise.all([
+          axios.get("http://localhost:8000/books"),
+          axios.get("http://localhost:8000/books/popular"),
+          axios.get("http://localhost:8000/categories/all")
+        ]);
 
-      const categories = categoriesRes.data;
-      const allData = booksRes.data;
-      const popularData = popularRes.data;
+        const categories = categoriesRes.data;
+        const allData = booksRes.data;
+        const popularData = popularRes.data;
 
-      // Normalize both book lists
-      // const normalize = (data) =>
-      //   data.map((b) => {
-      //     const category = categories.find(c => c.category_title === b.book_category)?.category_title || "Unknown";
-      //     return {
-      //       ...b,
-      //       category,
-      //       coverImage: b.image
-      //         ? `http://localhost:8000/media/${b.image}`
-      //         : "https://via.placeholder.com/150",
-      //     };
-      //   });
+        const normalize = (data) => {
+          const books = Array.isArray(data) ? data : data.items || [];
+          return books.map((b) => {
+            const category =
+              categories.find((c) => c.category_title === b.book_category)?.category_title ||
+              "Unknown";
 
-      const normalize = (data) => {
-        const books = Array.isArray(data) ? data : data.items || [];
-   
-        return books.map((b) => {
-          const category =
-            categories.find((c) => c.category_title === b.book_category)?.category_title ||
-            "Unknown";
-   
-          return {
-            ...b,
-            category,
-            coverImage: b.image
-              ? `http://localhost:8000/media/${b.image}`
-              : "https://via.placeholder.com/150",
-          };
-        });
-      };
-   
-   
+            // ✅ Fix: Use backend proxy URL for images
+            const coverImage = b.book_image
+              ? b.book_image.replace("127.0.0.1:9000", "localhost:8000")
+              : "/images/placeholder.png"; // fallback placeholder
 
-      setAllBooks(normalize(allData));
+            return {
+              ...b,
+              category,
+              coverImage
+            };
+          });
+        };
 
-      setPopularBooks(normalize(popularData));
+        setAllBooks(normalize(allData));
+        setPopularBooks(normalize(popularData));
+      } catch (err) {
+        console.error("Failed to fetch books:", err);
+        setAllBooks([]);
+        setPopularBooks([]);
+      }
+    };
 
-    } catch (err) {
-      console.error("Failed to fetch books:", err);
-      setAllBooks([]);
-      setPopularBooks([]);
-    }
-  };
-
-  fetchBooks();
-}, []);
-
+    fetchBooks();
+  }, []);
 
   const filtered = useMemo(() => {
     if (!filter) return [];
 
     if (filter.type === "all") return allBooks;
-
-    if (filter.type === "category") {
+    if (filter.type === "category")
       return allBooks.filter(
-        (b) =>
-          (b.category || "").toLowerCase() ===
-          (filter.value || "").toLowerCase()
+        (b) => (b.category || "").toLowerCase() === (filter.value || "").toLowerCase()
       );
-    }
-
-    if (filter.type === "subcategory") {
+    if (filter.type === "subcategory")
       return allBooks.filter(
-        (b) =>
-          (b.category || "").toLowerCase() ===
-          (filter.parent || "").toLowerCase()
+        (b) => (b.category || "").toLowerCase() === (filter.parent || "").toLowerCase()
       );
-    }
 
     return allBooks;
   }, [filter, allBooks]);
-
-  
 
   const renderStars = (rating = 0) =>
     [...Array(5)].map((_, i) => (
@@ -124,22 +88,15 @@ export default function Home() {
       />
     ));
 
-  // Data
-  /*const recommended = books?.recommended || [];
-  const popular = books?.popular || [];*/
-  const recommended = allBooks.slice(0, 12); // first 6 books as "recommended"
-  const popular = popularBooks.slice(0, 12);    // next 6 books as "popular"
+  const recommended = allBooks.slice(0, 12);
+  const popular = popularBooks.slice(0, 12);
 
-  // status helper
   const getStatus = (b) => {
     const raw = b.copies;
     if (typeof raw === "number" && raw < 1) return "Stock Out";
     if (raw === "available") return "Available";
-    if (raw === "stock out" || raw === "out of stock" || raw === "out")
-      return "Stock Out";
+    if (raw === "stock out" || raw === "out of stock" || raw === "out") return "Stock Out";
     if (raw === "upcoming" || raw === "coming soon") return "Upcoming";
-
-    if ((b.title || "").toLowerCase().includes("empire")) return "Stock Out";
     return "Available";
   };
 
@@ -151,7 +108,6 @@ export default function Home() {
     return "text-gray-600";
   };
 
-  // navigation + kebab
   const goTo = (id) => navigate(`/book/${id}`);
   const toggleMenu = (e, id) => {
     e.stopPropagation();
@@ -163,25 +119,16 @@ export default function Home() {
     goTo(id);
   };
 
-  // shared card classes
-  const cardBase =
-    "group cursor-pointer border border-gray-300 bg-white shadow-sm hover:shadow-md transition-shadow duration-200 rounded-lg overflow-hidden focus:outline-none focus:ring-2 focus:ring-sky-500 relative";
-  const imgBase =
-    "w-full h-40 object-cover transition-transform duration-300 group-hover:scale-[1.02]";
-
-  // --- Horizontal scroll refs & helpers (left↔right scrolling) ---
   const recRowRef = useRef(null);
   const popRowRef = useRef(null);
 
   const scrollByAmount = (node, dir = 1) => {
     if (!node?.current) return;
     const container = node.current;
-    // Scroll by ~one card (includes gap)
     const step = Math.min(360, container.clientWidth * 0.8);
     container.scrollBy({ left: step * dir, behavior: "smooth" });
   };
 
-  // close any open kebab on scroll
   const handleRowScroll = () => {
     if (openMenuId !== null) setOpenMenuId(null);
   };
@@ -190,16 +137,12 @@ export default function Home() {
     <div className="min-h-screen bg-gray-50">
       <Navbar />
 
-      {/* Main Content (centered container) */}
       <div className="mx-auto max-w-7xl w-full flex flex-col md:flex-row px-4 sm:px-6 lg:px-8 py-4 gap-4">
-        {/* Desktop/Tablet Sidebar */}
         <aside className="hidden md:block w-full md:w-64 lg:w-72 flex-none md:sticky md:top-20">
           <Sidebar onSelect={setFilter} />
         </aside>
 
-        {/* Content Area */}
         <main className="flex-1 min-w-0">
-          {/* Mobile Filters Button */}
           <div className="md:hidden mb-3">
             <button
               type="button"
@@ -214,7 +157,7 @@ export default function Home() {
           <div className="bg-white p-4 sm:p-6 rounded-lg border border-gray-200 shadow-sm">
             {!filter ? (
               <>
-                {/* ======== RECOMMENDED ======== */}
+                {/* Recommended */}
                 <div className="mb-8 rounded-lg border border-gray-300 overflow-hidden">
                   <div className="px-4 py-3 bg-white flex items-center justify-between">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
@@ -250,11 +193,8 @@ export default function Home() {
                       <div className="flex gap-5 p-3 sm:p-4 snap-x snap-mandatory">
                         {recommended.map((b) => (
                           <BookCard
-                            key={b.book_id}
-                            book={{
-                              ...b,
-                              coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
-                            }}
+                            key={b.id || b.book_id}
+                            book={b}
                             variant="row"
                             status={getStatus(b)}
                             onClick={() => goTo(b.id)}
@@ -263,30 +203,10 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-
-                    <div className="sm:hidden absolute inset-y-0 left-1 flex items-center">
-                      <button
-                        onClick={() => scrollByAmount(recRowRef, -1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-                        aria-label="Scroll left"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="sm:hidden absolute inset-y-0 right-1 flex items-center">
-                      <button
-                        onClick={() => scrollByAmount(recRowRef, 1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-                        aria-label="Scroll right"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
                 </div>
-                {/* ======== /RECOMMENDED ======== */}
 
-                {/* ======== POPULAR ======== */}
+                {/* Popular */}
                 <div className="mb-8 rounded-lg border border-gray-300 overflow-hidden">
                   <div className="px-4 py-3 bg-white flex items-center justify-between">
                     <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
@@ -323,11 +243,8 @@ export default function Home() {
                       <div className="flex gap-5 p-3 sm:p-4 snap-x snap-mandatory">
                         {popular.map((b) => (
                           <BookCard
-                            key={b.id}
-                            book={{
-                              ...b,
-                              coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
-                            }}
+                            key={b.id || b.book_id}
+                            book={b}
                             variant="row"
                             status={getStatus(b)}
                             onClick={() => goTo(b.id)}
@@ -336,30 +253,9 @@ export default function Home() {
                         ))}
                       </div>
                     </div>
-
-                    <div className="sm:hidden absolute inset-y-0 left-1 flex items-center">
-                      <button
-                        onClick={() => scrollByAmount(popRowRef, -1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-                        aria-label="Scroll left"
-                      >
-                        <ChevronLeft className="w-4 h-4" />
-                      </button>
-                    </div>
-                    <div className="sm:hidden absolute inset-y-0 right-1 flex items-center">
-                      <button
-                        onClick={() => scrollByAmount(popRowRef, 1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-                        aria-label="Scroll right"
-                      >
-                        <ChevronRight className="w-4 h-4" />
-                      </button>
-                    </div>
                   </div>
                 </div>
-                {/* ======== /POPULAR ======== */}
 
-                {/* Keep rest as-is */}
                 <NewBookCollections />
               </>
             ) : (
@@ -381,18 +277,14 @@ export default function Home() {
                   </button>
                 </div>
 
-                {/* Filtered results — fixed-size cards like scrollers */}
                 {filtered.length === 0 ? (
                   <div className="text-gray-500 text-sm">No books found.</div>
                 ) : (
                   <div className="flex flex-wrap gap-5">
                     {filtered.map((b) => (
                       <BookCard
-                        key={b.id}
-                        book={{
-                          ...b,
-                          coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
-                        }}
+                        key={b.id || b.book_id}
+                        book={b}
                         variant="grid"
                         size="scroller"
                         status={getStatus(b)}
@@ -408,12 +300,10 @@ export default function Home() {
         </main>
       </div>
 
-      {/* Center the banner to match the content width */}
       <div className="mx-auto max-w-7xl px-4 sm:px-6 lg:px-8">
         <FeaturedBanner />
       </div>
 
-      {/* Mobile Sidebar Drawer */}
       {openFilters && (
         <div className="fixed inset-0 z-50 md:hidden">
           <div

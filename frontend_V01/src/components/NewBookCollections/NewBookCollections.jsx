@@ -1,15 +1,13 @@
-// src/components/NewBookCollections/NewBookCollections.jsx
 import { useRef, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { ChevronRight, ChevronLeft } from "lucide-react";
 import BookCard from "../../components/BookCard/BookCard";
 import axios from "axios";
+
 export default function NewBookCollections() {
   const popRowRef = useRef(null);
   const navigate = useNavigate();
-
-
-const [books, setBooks] = useState([]);
+  const [books, setBooks] = useState([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -23,16 +21,19 @@ const [books, setBooks] = useState([]);
         setLoading(false);
       }
     };
-
     fetchNewBooks();
   }, []);
 
   if (loading) {
-    return <div className="text-center py-10 text-gray-500">Loading new books...</div>;
+    return (
+      <div className="text-center py-10 text-gray-500">
+        Loading new books...
+      </div>
+    );
   }
 
   const goTo = (b) =>
-    navigate(`/book/${b.id}`, {
+    navigate(`/book/${b.id || b.book_id}`, {
       state: { fromSlider: b },
     });
 
@@ -43,7 +44,14 @@ const [books, setBooks] = useState([]);
     el.scrollBy({ left: dir * step, behavior: "smooth" });
   };
 
-  const handleRowScroll = () => {};
+  // ✅ Fixed image handling
+  const getCoverImage = (b) => {
+    const img = b.coverImage || b.book_image || b.book_photo || b.image;
+    if (!img) return "/images/placeholder.png";
+    if (img.startsWith("http")) return img; // ✅ keep MinIO URL
+    if (img.startsWith("/")) return img;
+    return `/${img}`;
+  };
 
   return (
     <section className="mt-12">
@@ -75,17 +83,12 @@ const [books, setBooks] = useState([]);
           <div className="pointer-events-none absolute left-0 top-0 h-full w-6 bg-gradient-to-r from-white to-transparent" />
           <div className="pointer-events-none absolute right-0 top-0 h-full w-6 bg-gradient-to-l from-white to-transparent" />
 
-          <div
-            ref={popRowRef}
-            onScroll={handleRowScroll}
-            className="overflow-x-auto no-scrollbar"
-          >
+          <div ref={popRowRef} className="overflow-x-auto no-scrollbar">
             <div className="flex gap-5 p-3 sm:p-4 snap-x snap-mandatory">
               {books.map((b) => (
                 <BookCard
-                  key={b.id}
-                  book={{ ...b, coverImage: b.image ?  `http://localhost:8000${b.image}` 
-                         : "https://via.placeholder.com/150", }} // map to the shared card shape
+                  key={b.id || b.book_id}
+                  book={{ ...b, coverImage: getCoverImage(b) }}
                   variant="row"
                   status={b.copies > 1 ? "available" : "unavailable"}
                   onClick={() => goTo(b)}
@@ -93,25 +96,6 @@ const [books, setBooks] = useState([]);
                 />
               ))}
             </div>
-          </div>
-
-          <div className="sm:hidden absolute inset-y-0 left-1 flex items-center">
-            <button
-              onClick={() => scrollByAmount(popRowRef, -1)}
-              className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-              aria-label="Scroll left"
-            >
-              <ChevronLeft className="w-4 h-4" />
-            </button>
-          </div>
-          <div className="sm:hidden absolute inset-y-0 right-1 flex items-center">
-            <button
-              onClick={() => scrollByAmount(popRowRef, 1)}
-              className="p-2 rounded-md border border-gray-300 bg-white/90 hover:bg-white shadow"
-              aria-label="Scroll right"
-            >
-              <ChevronRight className="w-4 h-4" />
-            </button>
           </div>
         </div>
       </div>

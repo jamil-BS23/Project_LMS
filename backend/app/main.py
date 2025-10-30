@@ -1,5 +1,6 @@
 import asyncio
 from fastapi import FastAPI
+from fastapi.staticfiles import StaticFiles
 from app.api import auth, users, books, categories, borrow, admin,  uploads, settings, donation_book, rate_book, book_review
 from fastapi.middleware.cors import CORSMiddleware
  
@@ -30,6 +31,7 @@ app.include_router(borrow.router, prefix="", tags=["Borrow"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 app.include_router(donation_book.router, prefix="/donation", tags=["Donation Book"])
+app.mount("/media", StaticFiles(directory="media"), name="media")
  
  
 @app.get("/")
