@@ -232,6 +232,8 @@ Format code	npx prettier --write .
 |    Book & Loan DB |                    |  Book Assets (PDFs, Covers) |
 +-------------------+                    +-------------------+
 
+![System Architecture](assets/Diagram.png)
+
 🔹 User Flow Diagram
 Standard User (Patron)
 
