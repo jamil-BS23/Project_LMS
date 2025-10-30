@@ -47,7 +47,6 @@ class BorrowCRUD:
 
     @staticmethod
     async def create_pdf_borrow(db: AsyncSession, user: User, book_id: int):
-        # 1️⃣ Get the book
         book = await db.get(Book, book_id)
         if not book:
             raise HTTPException(status_code=404, detail="Book not found")
@@ -106,6 +105,7 @@ class BorrowCRUD:
             .where(BorrowRecord.user_id == user.user_id)
             .where(BorrowRecord.book_id == borrow.book_id)
             .where(BorrowRecord.borrow_status != "returned")
+            .where(BorrowRecord.borrow_status != "rejected")
             .where(BorrowRecord.borrow_status != "pdf-viewed")
         )
         existing_borrow = existing_borrow.scalars().first()
@@ -118,6 +118,8 @@ class BorrowCRUD:
             .select_from(BorrowRecord)
             .where(BorrowRecord.user_id == user.user_id)
             .where(BorrowRecord.borrow_status != "returned")
+            .where(BorrowRecord.borrow_status != "rejected")
+            .where(BorrowRecord.borrow_status != "pdf-viewed")
         )
         total_active_borrows = total_active_borrows.scalar() or 0
         if total_active_borrows >= borrow_max_limit:
@@ -126,13 +128,12 @@ class BorrowCRUD:
                 detail=f"USER_CANNOT_BORROW_MORE_THAN_{borrow_max_limit}_BOOKS"
             )
 
-        # 7️⃣ Determine return date properly
         borrow_date = date.today()
-        requested_return_date = getattr(borrow, "return_date", None)
+        return_date = borrow_date + timedelta(days=borrow_day_limit)
 
-        if requested_return_date:
-    # ✅ Parse mm/dd/yyyy from frontend into date object
+        if getattr(borrow, "return_date", None):
             try:
+                requested_return_date = borrow.return_date
                 if isinstance(requested_return_date, str):
                     requested_return_date = datetime.strptime(requested_return_date, "%m/%d/%Y").date()
             except ValueError:
@@ -141,16 +142,13 @@ class BorrowCRUD:
                     detail="INVALID_DATE_FORMAT_EXPECTED_MM_DD_YYYY"
                 )
 
-    # ✅ Now safely compare
-            if requested_return_date > date.today() + timedelta(days=borrow_day_limit):
+            max_allowed_date = borrow_date + timedelta(days=borrow_day_limit)
+            if requested_return_date > max_allowed_date:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS"
+                    detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS_FROM_TODAY"
                 )
             return_date = requested_return_date
-        else:
-            return_date = date.today() + timedelta(days=borrow_day_limit)
-        # 8️⃣ Create borrow record
 
         
         db_borrow = BorrowRecord(
@@ -245,6 +243,7 @@ class BorrowCRUD:
 
             user = await db.get(User, borrow.user_id)
             borrow.user_name = user.user_name if user else None
+            borrow.user_email = user.user_email if user else None
         
         print("Borrowes      ::: ",borrows)
 
@@ -407,6 +406,13 @@ class BorrowCRUD:
                 book.available_copies = (book.available_copies or 0) + 1
                 db.add(book)
 
+        if status == "rejected":
+            # Update the book's available copies
+            book = await db.get(Book, db_borrow.book_id)
+            if book:
+                book.book_availabity = True
+                book.available_copies = (book.available_copies or 0) + 1
+                db.add(book)
         db.add(db_borrow)
         await db.commit()
         await db.refresh(db_borrow)

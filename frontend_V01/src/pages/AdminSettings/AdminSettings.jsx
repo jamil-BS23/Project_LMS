@@ -57,7 +57,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await axios.get("http://localhost:8000/settings/public", {
+      const res = await axios.get("http://localhost:8000/settings/admin", {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -65,8 +65,8 @@ useEffect(() => {
       console.log("Fetched settings:", data);
       setLimits({
         "borrow-day-limit": data.borrow_day_limit,
-        "borrow-extend-limit": data.borrow_extend_limit,
-        "borrow-limit": data.borrow_limit,
+        "borrow-extend-limit": data.borrow_day_extension_limit,
+        "borrow-limit": data.borrow_max_limit,
         "booking-duration": data.booking_duration,
         "booking-days-limit": data.booking_days_limit,
       });
@@ -121,13 +121,13 @@ useEffect(() => {
   try {
     const payload = {
       borrow_day_limit: limits["borrow-day-limit"],
-      borrow_extend_limit: limits["borrow-extend-limit"],
-      borrow_limit: limits["borrow-limit"],
+      borrow_day_extension_limit: limits["borrow-extend-limit"],
+      borrow_max_limit: limits["borrow-limit"],
       booking_duration: limits["booking-duration"],
       booking_days_limit: limits["booking-days-limit"],
     };
 
-    await axios.patch("http://localhost:8000/settings/", payload, {
+    await axios.post("http://localhost:8000/settings/admin", payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

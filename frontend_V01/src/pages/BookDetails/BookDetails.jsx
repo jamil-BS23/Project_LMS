@@ -138,7 +138,7 @@ export default function BookDetails() {
   // If the path starts with "/", prepend your backend base URL
   return audioPath.startsWith("http")
     ? audioPath
-    : `http://localhost:8000${b.audio}`;
+    : `${import.meta.env.VITE_API_BASE_URL}${b.audio}`;
   }
 
   const normalize = (b) =>
@@ -229,7 +229,7 @@ useEffect(() => {
         setBookData({
           ...b,
           coverImage: b.book_image 
-            ? `http://localhost:8000${b.image}`
+            ? `${import.meta.env.VITE_API_BASE_URL}${b.image}`
             : "https://via.placeholder.com/150",
         });
         setBookData(normalize(b));
@@ -393,7 +393,7 @@ useEffect(() => {
   if (!bookData?.id) return;
 
   try {
-    const res = await axios.get(`http://localhost:8000/rate_book/${bookData.id}/rating-breakdown`);
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/rate_book/${bookData.id}/rating-breakdown`);
     const data = res.data;
     setPack({
       heading: "Employee Review",
@@ -412,7 +412,7 @@ const fetchReviews = async () => {
   if (!bookData?.id) return;
 
   try {
-    const res = await axios.get(`http://localhost:8000/book_review/${bookData.id}`, {
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/book_review/${bookData.id}`, {
       headers: { Authorization: `Bearer ${token}` } // make sure token exists
     });
 
@@ -444,7 +444,7 @@ const fetchReviews = async () => {
 
   try {
     const res = await axios.post(
-      "http://localhost:8000/book_review/",
+      '${import.meta.env.VITE_API_BASE_URL}/book_review/',
       {
         book_id: bookData.id,
         rating,

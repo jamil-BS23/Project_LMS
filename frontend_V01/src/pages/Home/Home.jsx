@@ -31,9 +31,9 @@ export default function Home() {
     try {
       // Fetch all books, popular books, and categories
       const [booksRes, popularRes, categoriesRes] = await Promise.all([
-        axios.get("http://localhost:8000/books"),
-        axios.get("http://localhost:8000/books/popular"),
-        axios.get("http://localhost:8000/categories/all")
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/popular`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`)
       ]);
 
       const categories = categoriesRes.data;
@@ -53,7 +53,7 @@ export default function Home() {
           ...b,
           category,
           coverImage: b.image
-            ? `http://localhost:8000/media/${b.image}`
+            ? `${import.meta.env.VITE_API_BASE_URL}/media/${b.image}`
             : "https://via.placeholder.com/150",
         };
       });

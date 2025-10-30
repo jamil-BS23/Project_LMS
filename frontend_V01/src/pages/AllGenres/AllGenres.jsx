@@ -285,7 +285,7 @@ export default function AllGenres() {
         params.append("search", search.trim());
       }
  
-      const { data } = await axios.get(`http://localhost:8000/books/?${params.toString()}`);
+      const { data } = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/?${params.toString()}`);
  
       // ✅ Handle paginated structure from backend
       if (data && data.items) {

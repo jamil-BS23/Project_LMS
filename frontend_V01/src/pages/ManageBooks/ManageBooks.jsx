@@ -53,7 +53,7 @@ let categoryMap = {}; // cache for id → name
 async function loadCategories() {
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.get("http://localhost:8000/categories/all", {
+    const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`, {
       headers: { Authorization: `Bearer ${token}` }
     });
     categoryMap = res.data.reduce((map, cat) => {
@@ -205,7 +205,7 @@ export default function ManageBooks() {
   const fetchBooks = async () => {
     try {
       const token = localStorage.getItem("token"); // if auth needed
-      const res = await axios.get("http://localhost:8000/books", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`, {
         headers: token ? { Authorization: `Bearer ${token}` } : {},
       });
 
@@ -465,7 +465,7 @@ const handleSave = async () => {
     let res;
     if (mode ==="edit" && editingIndex >= 0) {
       // ✅ update book
-      res = await axios.patch(`http://localhost:8000/books/${form.id}`, formData, {
+      res = await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/books/${form.id}`, formData, {
         headers: {
           "Content-Type": "multipart/form-data",
           Authorization: `Bearer ${token}`,
@@ -522,7 +522,7 @@ const confirmDelete = async () => {
 
   try {
     const token = localStorage.getItem("token");
-    await axios.delete(`http://localhost:8000/books/${pendingDeleteId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/books/${pendingDeleteId}`, {
       headers: {
         Authorization: `Bearer ${token}`,
       },
@@ -557,7 +557,7 @@ useEffect(() => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8000/categories/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

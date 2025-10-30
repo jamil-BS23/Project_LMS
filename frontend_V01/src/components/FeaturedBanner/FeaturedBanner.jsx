@@ -108,7 +108,7 @@ const FeaturedBanner = () => {
     const fetchFeaturedBooks = async () => {
       try {
         const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/books/featured_book", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/featured_book`, {
           headers: { Authorization: `Bearer ${token}` },
         });
         setFeatured(res.data || []);

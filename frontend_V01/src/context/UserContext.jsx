@@ -24,7 +24,7 @@ export const UserProvider = ({ children }) => {
 
     const fetchUser = async () => {
       try {
-        const res = await axios.get(`http://localhost:8000/users/${userId}`, {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/users/${userId}`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 

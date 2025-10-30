@@ -1,6 +1,6 @@
 from fastapi import APIRouter, Depends, HTTPException, Query, UploadFile, File, Form
 from sqlalchemy.ext.asyncio import AsyncSession
-from typing import List, Optional
+from typing import List, Optional, Dict
 from app.crud.book import BookCRUD
 from app.database import get_db
 from app.schemas.book import BookDetail, BookCreate, BookUpdate, RateBook, UpoadateFeatures
@@ -21,7 +21,14 @@ async def get_books(
     books = await book_crud.get_all(db, search=search, category=category)
     return paginate(books)
 
-
+@router.get("/count", tags=["Public Books"])
+async def count_books(db: AsyncSession = Depends(get_db)) -> Dict[str, int]:
+    """
+    Returns the total number of books in the library.
+    Example response: {"total_books": 123}
+    """
+    total = await BookCRUD.count_books(db)
+    return {"count": total}
 
 @router.get("/featured_book", response_model=List[BookDetail])
 async def get_featured_books(

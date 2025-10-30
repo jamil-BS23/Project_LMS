@@ -18,6 +18,19 @@ import {
 import { Link } from "react-router-dom";
 import Sidebar from "../../components/DashboardSidebar/DashboardSidebar";
 import axios from "axios";
+
+export const axiosAuth = () => {
+  const token = localStorage.getItem("token");
+  if (!token) throw new Error("No token found. Please login.");
+
+  return axios.create({
+    baseURL: import.meta.env.VITE_API_BASE_URL,
+    headers: {
+      Authorization: `Bearer ${token}`,
+    },
+  });
+};
+
 export default function Dashboard() {
   useEffect(() => {
     document.title = "Library Dashboard";
@@ -33,24 +46,34 @@ export default function Dashboard() {
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const token = localStorage.getItem("token"); // get JWT token
-        if (!token) throw new Error("No token found. Please login.");
-
-        const response = await axios.get("http://localhost:8000/borrows/stats", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
+        const api = axiosAuth(); // use axios instance with token
+  
+        const [borrowedRes, returnedRes, pendingRes, totalRes] =
+          await Promise.all([
+            api.get("/borrow/status/accepted/count"),
+            api.get("/borrow/status/returned/count"),
+            api.get("/borrow/status/pending/count"),
+            api.get("/books/count"),
+          ]);
+  
+        const borrowed = borrowedRes.data.count || 0;
+        const total = totalRes.data.count || 0;
+  
+        setStats({
+          borrowed_copies: borrowed,
+          returned_copies: returnedRes.data.count || 0,
+          pending_copies: pendingRes.data.count || 0,
+          total_copies: total,
+          available_copies: total - (borrowed+ pendingRes.data.count || 0),
         });
-
-        setStats(response.data);
       } catch (err) {
-        console.error("Error fetching stats:", err);
+        console.error("Error fetching stats:", err.response?.data || err);
         setError("Failed to load stats");
       } finally {
         setLoading(false);
       }
     };
-
+  
     fetchStats();
   }, []);
   const dashboardItems = [
@@ -72,18 +95,10 @@ export default function Dashboard() {
    useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-    const token = localStorage.getItem("token"); // get your JWT token
-    if (!token) {
-      throw new Error("No token found, please login");
-    }
+        const api = axiosAuth();
+        const res = await api.get("/borrow/status/pending/list");
 
-    const response = await axios.get("http://localhost:8000/borrows/pending", {
-      headers: {
-        Authorization: `Bearer ${token}`, // attach token here
-      },
-    });
-
-    setRequests(response.data);
+        setRequests(res.data);
   } catch (err) {
     console.error("Error fetching pending requests:", err);
     setError("Failed to load borrow requests");
@@ -98,7 +113,7 @@ export default function Dashboard() {
   
   // Confirmation modal state
   const [confirm, setConfirm] = useState({ open: false, type: null, index: -1, id: null });
-  const openConfirm = (type, index,id) => setConfirm({ open: true, type, index,id: requests[index]?.id });
+  const openConfirm = (type, index,id) => setConfirm({ open: true, type, index,id: requests[index]?.borrow_id });
   const closeConfirm = () => setConfirm({ open: false, type: null, index: -1, id: null });
 
   // Toast (2s)
@@ -117,30 +132,31 @@ export default function Dashboard() {
     closeConfirm();
   };*/
 
-  const doConfirm = async () => {
-  const { type, index, id } = confirm; // make sure confirm has borrow.id also
-  if (index < 0 || !id) console.log("Invalid confirm state:", confirm);
-
-  try {
-    const token = localStorage.getItem("token");
-
-    // Call backend API
-    const res = await axios.put(
-       `http://localhost:8000/borrows/${id}/status?status=${type === "accept" ? "approved" : "rejected"}`,
-  {},
-      { headers: { Authorization: `Bearer ${token}` } }
-    );
-
-    // Update local UI state if API success
-    setRequests((prev) => prev.filter((_, i) => i !== index));
-    showToast(type, type === "accept" ? "Request accepted" : "Request rejected");
-  } catch (err) {
-    console.error("Failed to update borrow status:", err.response?.data || err);
-    showToast("error", "Failed to update borrow status");
-  }
-
-  closeConfirm();
-};
+ const doConfirm = async () => {
+    const { type, id } = confirm;
+    if (!id) {
+      console.error("No borrow_id found:", confirm);
+      return;
+    }
+  
+    try {
+      const api = axiosAuth();
+      const res = await api.patch(`/borrow/${id}/status`, null, {
+        params: { status: type === "accept" ? "accepted" : "rejected" },
+      });
+      console.log("Borrow status updated:", res.data);
+  
+      // ✅ Optionally refresh the pending list after approval/rejection
+      setRequests(prev => prev.filter(r => r.borrow_id !== id));
+  
+      showToast(type, type === "accept" ? "Request accepted" : "Request rejected");
+    } catch (err) {
+      console.error("Failed to update borrow status:", err.response?.data || err);
+      showToast("error", "Failed to update borrow status");
+    } finally {
+      closeConfirm();
+    }
+  };
 
   // -------------------- WEEKLY LINE CHART --------------------
   const WEEK_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -159,28 +175,18 @@ export default function Dashboard() {
 
    const [rows, setRows] = useState([]);
 
-  useEffect(() => {
-    const fetchBorrows = async () => {
+ useEffect(() => {
+    const fetchOverdue = async () => {
       try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/borrows", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const today = new Date();
-        const overdue = (res.data || []).filter((r) => {
-          if (!r.return_date) return false;
-          const due = new Date(r.return_date);
-          return !r.returned_at && due < today;
-        });
-
-        setRows(overdue);
+        const api = axiosAuth();
+        const res = await api.get("/borrow/status/overdue/list");
+        setRows(res.data || []);
       } catch (err) {
-        console.error("Failed to fetch overdue history:", err);
+        console.error("Failed to fetch overdue history:", err.response?.data || err);
       }
     };
-
-    fetchBorrows();
+  
+    fetchOverdue();
   }, []);
 
   // Smooth path helpers (quadratic mid-point)
@@ -474,11 +480,11 @@ export default function Dashboard() {
               <tr key={r.id} className="border-b border-gray-200">
                 <td>{idx + 1}</td>
                 <td className="font-semibold">{r.book_title?r.book_title : "—"}</td>
-                <td>{r.username?r.username : "—"}</td>
+                <td>{r.user_name?r.user_name : "—"}</td>
                 <td className="text-center">
                   <span className="inline-flex items-center justify-center gap-1 text-gray-700">
                     <Mail size={16} className="text-gray-500" />
-                    <span>{r.email? r.email : "—"}</span>
+                    <span>{r.user_email? r.user_email : "—"}</span>
                   </span>
                 </td>
                 <td className="text-red-600 font-medium">
@@ -628,7 +634,7 @@ export default function Dashboard() {
                         <span className="font-medium">
                           {requests[confirm.index]?.book_title}
                         </span>{" "}
-                        — {requests[confirm.index]?.username}
+                        — {requests[confirm.index]?.user_name}
                       </p>
                     )}
                   </div>
