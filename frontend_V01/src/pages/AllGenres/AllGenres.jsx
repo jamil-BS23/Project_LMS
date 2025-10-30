@@ -1,153 +1,84 @@
-// // src/pages/AllGenres/AllGenres.jsx
+// src/pages/AllGenres/AllGenres.jsx
 // import { useNavigate, useLocation } from "react-router-dom";
-// import { useMemo, useState, useEffect } from "react";
-// import books from "../../data/sampleBooks";
+// import { useState, useEffect } from "react";
 // import Sidebar from "../../components/Sidebar/Sidebar";
 // import BookCard from "../../components/BookCard/BookCard";
-// import api from "../../api";  
 // import axios from "axios";
+
 // const getStockStatus = (b) => {
 //   const raw = b.available_book;
 //   if (typeof raw === "number" && raw < 1) return "Stock Out";
-//   const t = b.book_category.toLowerCase();
+//   const t = b.book_category?.toLowerCase() || "";
 //   if (t.includes("out")) return "Stock Out";
 //   if (t.includes("upcoming")) return "Upcoming";
 //   return "Available";
-// };
-
-// // tiny helper to format countdowns like "2d 4h", "3h 12m", "12m"
-// const formatCountdown = (targetMs, nowMs) => {
-//   const diff = Math.max(0, new Date(targetMs).getTime() - nowMs);
-//   const mins = Math.floor(diff / 60000);
-//   const days = Math.floor(mins / (60 * 24));
-//   const hours = Math.floor((mins % (60 * 24)) / 60);
-//   const minutes = mins % 60;
-//   if (days > 0) return `${days}d ${hours}h`;
-//   if (hours > 0) return `${hours}h ${minutes}m`;
-//   return `${minutes}m`;
-// };
-
-// const isToday = (dt) => {
-//   const d = new Date(dt);
-//   const n = new Date();
-//   return (
-//     d.getFullYear() === n.getFullYear() &&
-//     d.getMonth() === n.getMonth() &&
-//     d.getDate() === n.getDate()
-//   );
 // };
 
 // export default function AllGenres() {
 //   const navigate = useNavigate();
 //   const location = useLocation();
 
-//   // const allBooks = [
-//   //   ...(books?.recommended || []),
-//   //   ...(books?.popular || []),
-//   //   ...(books?.featuredBooks || []), // safe if missing
-//   // ];
-
 //   const [allBooks, setAllBooks] = useState([]);
-//   const [loading, setLoading] = useState(true);
+//   const [totalBooks, setTotalBooks] = useState(0);
+//   const [totalPages, setTotalPages] = useState(1);
+//   const [loading, setLoading] = useState(false);
+//   const [filter, setFilter] = useState(location.state?.filter || null);
+//   const [page, setPage] = useState(1);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const PAGE_SIZE = 9;
 
-// // useEffect(() => {
-// //   const fetchBooks = async () => {
-// //     try {
-// //       const res = await api.get("/books"); // <-- Your FastAPI endpoint
-// //       setAllBooks(res.data); // set data from API
-// //     } catch (err) {
-// //       console.error("Failed to fetch books:", err);
-// //     } finally {
-// //       setLoading(false);
-// //     }
-// //   };
-
-// //   fetchBooks();
-// // }, []);
-
-// useEffect(() => {
-//   const fetchBooks = async () => {
+//   // 🔥 Fetch paginated books
+//   const fetchBooks = async (pageNum = 1, currentFilter = filter, search = "") => {
 //     try {
-//       const [booksRes, categoriesRes] = await Promise.all([
-//         axios.get("http://localhost:8000/books"),
-//         axios.get("http://localhost:8000/categories/all")
-//       ]);
+//       setLoading(true);
 
-//       const categories = categoriesRes.data;
-//       const data = booksRes.data;
+//       // Build query params for backend pagination
+//       const params = new URLSearchParams();
+//       params.append("page", pageNum);
+//       params.append("size", PAGE_SIZE);
+//       if (currentFilter?.type === "category") {
+//         params.append("category", currentFilter.value);
+//       }
+//       if (search.trim()) {
+//         params.append("search", search.trim());
+//       }
 
-//       const normalized = data.items.map((b) => {
-//         const category = categories.find(c => c.id === b.category_id)?.name || "Unknown";
-//         return {
-//           ...b,
-//           category,
-//           coverImage: b.image ? `http://localhost:8000/media/${b.image}` : "https://via.placeholder.com/150",
-//         };
-//       });
+//       const { data } = await axios.get(`http://localhost:8000/books/?${params.toString()}`);
 
-//       setAllBooks(normalized);
+//       // ✅ Handle paginated structure from backend
+//       if (data && data.items) {
+//         setAllBooks(data.items);
+//         setTotalBooks(data.total || 0);
+//         setTotalPages(data.pages || 1);
+//       } else {
+//         // fallback (in case backend returns array)
+//         setAllBooks(Array.isArray(data) ? data : []);
+//         setTotalBooks(data.length || 0);
+//         setTotalPages(1);
+//       }
 //     } catch (err) {
 //       console.error("Failed to fetch books:", err);
 //       setAllBooks([]);
+//       setTotalBooks(0);
+//       setTotalPages(1);
+//     } finally {
+//       setLoading(false);
 //     }
 //   };
 
-//   fetchBooks();
-// }, []);
-
-
-
-
-//   const [filter, setFilter] = useState(location.state?.filter || null);
-
-//   // pagination
-//   const PAGE_SIZE = 9; // keep your paging logic
-//   const [page, setPage] = useState(1);
-
-//   const [now, setNow] = useState(Date.now());
+//   // 🕐 Debounce search input (waits 500ms)
 //   useEffect(() => {
-//     const id = setInterval(() => setNow(Date.now()), 60000);
-//     return () => clearInterval(id);
-//   }, []);
+//     const handler = setTimeout(() => {
+//       setPage(1);
+//       fetchBooks(1, filter, searchTerm);
+//     }, 500);
+//     return () => clearTimeout(handler);
+//   }, [searchTerm]);
 
+//   // 🔁 Refetch on page or filter change
 //   useEffect(() => {
-//     if (location.state?.filter !== undefined) setFilter(location.state.filter);
-//   }, [location.state]);
-
-//   const filtered = useMemo(() => {
-//     if (!filter) return allBooks;
-//     console.log("Filtering books with", filter);
-//     if (filter.type === "all") return allBooks;
-//     if (filter.type === "category") {
-//       return allBooks.filter(
-//         (b) =>
-//           (b.book_category || "").toLowerCase() ===
-//           (filter.value || "").toLowerCase()
-//       );
-//     }
-//     if (filter.type === "subcategory") {
-//       return allBooks.filter(
-//         (b) =>
-//           (b.category || "").toLowerCase() ===
-//           (filter.parent || "").toLowerCase()
-//       );
-//     }
-//     return allBooks;
-//   }, [filter, allBooks]);
-
-//   useEffect(() => {
-//     setPage(1);
-//   }, [filter]);
-
-//   const totalPages = Math.max(1, Math.ceil((filtered?.length || 0) / PAGE_SIZE));
-//   useEffect(() => {
-//     if (page > totalPages) setPage(totalPages);
-//   }, [page, totalPages]);
-
-//   const start = (page - 1) * PAGE_SIZE;
-//   const pageItems = filtered.slice(start, start + PAGE_SIZE);
-
-//   const goTo = (id) => navigate(`/book/${id}`);
+//     fetchBooks(page, filter, searchTerm);
+//   }, [filter, page]);
 
 //   return (
 //     <div className="flex min-h-screen bg-white">
@@ -328,7 +259,7 @@ export default function AllGenres() {
     <div className="flex min-h-screen bg-white">
       {/* Sidebar */}
       <Sidebar onSelect={setFilter} />
- 
+
       {/* Main Section */}
       <div className="flex-1 p-6">
         <h1 className="text-2xl font-bold mb-6">All Genres</h1>
@@ -339,7 +270,7 @@ export default function AllGenres() {
             <h2 className="text-lg sm:text-xl font-semibold text-gray-800">
               Browse Books
             </h2>
- 
+
             {/* 🔍 Search Bar */}
             <div className="relative w-full sm:w-64">
               <input
@@ -360,7 +291,7 @@ export default function AllGenres() {
               </svg>
             </div>
           </div>
- 
+
           {/* Book Grid */}
           <div className="border-t border-gray-200">
             {loading ? (
@@ -390,7 +321,7 @@ export default function AllGenres() {
             ) : (
               <div className="p-4 text-sm text-gray-500">No books found.</div>
             )}
- 
+
             {/* Pagination Controls */}
             {totalBooks > 0 && totalPages > 1 && (
               <div className="px-4 pb-4 flex items-center justify-center gap-2">
@@ -402,7 +333,7 @@ export default function AllGenres() {
                 >
                   Previous
                 </button>
- 
+
                 {/* Page Numbers (show only 3 around current page) */}
                 {Array.from({ length: totalPages }, (_, i) => i + 1)
                   .filter((n) => n >= page - 1 && n <= page + 1) // 👈 only 3 pages around current
@@ -418,7 +349,7 @@ export default function AllGenres() {
                       {n}
                     </button>
                   ))}
- 
+
                 {/* Next Button */}
                 <button
                   onClick={() => setPage((p) => Math.min(totalPages, p + 1))}

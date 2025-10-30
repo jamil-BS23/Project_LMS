@@ -8,8 +8,6 @@ REQUEST_STATUS = {"accept", "pending", "reject"}
 
 
 
-
-
 class BorrowRequestRecord(BaseModel):
     borrow_id: int
     user_id: str

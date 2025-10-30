@@ -64,7 +64,6 @@ class BorrowCRUD:
         if existing_borrow:
             return existing_borrow
 
-        # 2️⃣ Create Borrow record
         today = date.today()
         db_borrow = BorrowRecord(
             user_id=user.user_id,
@@ -159,7 +158,6 @@ class BorrowCRUD:
             borrow_status="pending",
         )
 
-      
         db.add(db_borrow)
 
         # 9️⃣ Update book availability
@@ -226,6 +224,89 @@ class BorrowCRUD:
 #         return db_borrow
 
 
+    # @staticmethod
+    # async def create_borrow(db: AsyncSession, borrow: "BorrowCreate", user: User):
+    #     book = await db.get(Book, borrow.book_id)
+    #     if not book:
+    #         raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
+
+    #     if not book.book_availabity or (book.available_copies is not None and book.available_copies < 1):
+    #         raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
+
+    #     borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
+    #     if borrow_day_limit is None:
+    #         raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
+
+    #     borrow_max_limit = 5
+
+    #     existing_borrow = await db.execute(
+    #         select(BorrowRecord)
+    #         .where(BorrowRecord.user_id == user.user_id)
+    #         .where(BorrowRecord.book_id == borrow.book_id)
+    #         .where(BorrowRecord.borrow_status != "returned")
+    #     )
+    #     existing_borrow = existing_borrow.scalars().first()
+    #     if existing_borrow:
+    #         raise HTTPException(status_code=409, detail="USER_ALREADY_BORROWED_THIS_BOOK")
+
+    #     total_active_borrows = await db.execute(
+    #         select(func.count())
+    #         .select_from(BorrowRecord)
+    #         .where(BorrowRecord.user_id == user.user_id)
+    #         .where(BorrowRecord.borrow_status != "returned")
+    #     )
+    #     total_active_borrows = total_active_borrows.scalar() or 0
+    #     if total_active_borrows >= borrow_max_limit:
+    #         raise HTTPException(
+    #             status_code=409,
+    #             detail=f"USER_CANNOT_BORROW_MORE_THAN_{borrow_max_limit}_BOOKS"
+    #         )
+
+    #     borrow_date = date.today()
+    #     requested_return_date = getattr(borrow, "return_date", None)
+
+    #     if requested_return_date:
+    #         try:
+    #             if isinstance(requested_return_date, str):
+    #                 requested_return_date = datetime.strptime(requested_return_date, "%m/%d/%Y").date()
+    #         except ValueError:
+    #             raise HTTPException(
+    #                 status_code=400,
+    #                 detail="INVALID_DATE_FORMAT_EXPECTED_MM_DD_YYYY"
+    #             )
+
+    #         if requested_return_date > date.today() + timedelta(days=borrow_day_limit):
+    #             raise HTTPException(
+    #                 status_code=400,
+    #                 detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS"
+    #             )
+    #         return_date = requested_return_date
+    #     else:
+    #         return_date = date.today() + timedelta(days=borrow_day_limit)
+
+        
+    #     db_borrow = BorrowRecord(
+    #         user_id=user.user_id,
+    #         book_id=book.book_id,
+    #         borrow_date=borrow_date,
+    #         return_date=return_date,
+    #         borrow_status="pending",
+    #     )
+
+      
+    #     db.add(db_borrow)
+
+    #     if book.available_copies is not None and book.available_copies > 0:
+    #         book.available_copies -= 1
+    #     book.book_availabity = book.available_copies > 0
+    #     db.add(book)
+
+    #     await db.commit()
+    #     await db.refresh(db_borrow)
+
+    #     return db_borrow
+
+
 
     @staticmethod
     async def list_by_borrow_status(db: AsyncSession, status: str):
@@ -242,14 +323,12 @@ class BorrowCRUD:
             borrow.book_title = book.book_title if book else None
 
             user = await db.get(User, borrow.user_id)
+            borrow.user_email = user.user_email
             borrow.user_name = user.user_name if user else None
             borrow.user_email = user.user_email if user else None
         
-        print("Borrowes      ::: ",borrows)
-
+       
         return borrows
-
-
 
 
 
@@ -371,6 +450,18 @@ class BorrowCRUD:
     #     return result.scalar_one()
 
 
+        if updated:
+            await db.commit()
+
+        result = await db.execute(
+            select(func.count()).select_from(BorrowRecord).where(
+            BorrowRecord.user_id == user_id,
+            BorrowRecord.borrow_status == status
+        )
+        )
+        return result.scalar_one()
+
+    
 
 
 

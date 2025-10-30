@@ -177,7 +177,7 @@ export default function UserHistory() {
                       <span className={badge(r.type)}>{mapStatusLabel(r.borrow_status, r.return_date)}</span>
                     </div>
                     <h3 className="mt-1 font-semibold text-gray-900">{r.book_title}</h3>
-                    <p className="text-sm text-gray-600">{r.username}</p>
+                    <p className="text-sm text-gray-600">{r.user_name}</p>
                   </div>
                   <button
                     type="button"

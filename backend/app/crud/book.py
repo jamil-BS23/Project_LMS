@@ -11,12 +11,13 @@ from typing import Optional, List
 from app.models.book import Book
 from app.models.user_rating import UserRating
 from app.schemas.book import BookCreate, BookUpdate
+
 class BookCRUD:
     """CRUD operations for Book"""
 
     def __init__(self):
-        pass  # no instance attributes needed; db is passed per method
-
+        pass  # 
+    
     async def get_all(
         self,
         db: AsyncSession,
@@ -32,6 +33,7 @@ class BookCRUD:
                 or_(
                     Book.book_title.ilike(like_pattern),
                     Book.book_author.ilike(like_pattern),
+                    Book.book_description.ilike(like_pattern),
                     Book.book_category.ilike(like_pattern),
                 )
             )

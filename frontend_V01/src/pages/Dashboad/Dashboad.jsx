@@ -32,6 +32,8 @@ export const axiosAuth = () => {
 };
 
 export default function Dashboard() {
+
+  
   useEffect(() => {
     document.title = "Library Dashboard";
   }, []);
@@ -43,6 +45,8 @@ export default function Dashboard() {
     total_copies: 0,
     available_copies: 0,
   });
+
+  // utils/axiosAuth.js
   useEffect(() => {
     const fetchStats = async () => {
       try {
@@ -76,6 +80,9 @@ export default function Dashboard() {
   
     fetchStats();
   }, []);
+  
+  
+  
   const dashboardItems = [
     { label: "Borrowed Books", value: stats.borrowed_copies },
     { label: "Returned Books", value: stats.returned_copies },
@@ -92,7 +99,8 @@ export default function Dashboard() {
   const [requests, setRequests] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
-   useEffect(() => {
+
+  useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
         const api = axiosAuth();
@@ -106,9 +114,37 @@ export default function Dashboard() {
     setLoading(false);
   }
     };
-
+  
     fetchPendingRequests();
   }, []);
+  
+
+
+  //  useEffect(() => {
+  //   const fetchPendingRequests = async () => {
+  //     try {
+  //   const token = localStorage.getItem("token"); // get your JWT token
+  //   if (!token) {
+  //     throw new Error("No token found, please login");
+  //   }
+
+  //   const response = await axios.get("http://localhost:8000/borrows/pending", {
+  //     headers: {
+  //       Authorization: `Bearer ${token}`, // attach token here
+  //     },
+  //   });
+
+  //   setRequests(response.data);
+  // } catch (err) {
+  //   console.error("Error fetching pending requests:", err);
+  //   setError("Failed to load borrow requests");
+  // } finally {
+  //   setLoading(false);
+  // }
+  //   };
+
+  //   fetchPendingRequests();
+  // }, []);
 
   
   // Confirmation modal state
@@ -188,6 +224,32 @@ export default function Dashboard() {
   
     fetchOverdue();
   }, []);
+  
+  
+
+  // useEffect(() => {
+  //   const fetchBorrows = async () => {
+  //     try {
+  //       const token = localStorage.getItem("token");
+  //       const res = await axios.get("http://localhost:8000/borrows", {
+  //         headers: { Authorization: `Bearer ${token}` },
+  //       });
+
+  //       const today = new Date();
+  //       const overdue = (res.data || []).filter((r) => {
+  //         if (!r.return_date) return false;
+  //         const due = new Date(r.return_date);
+  //         return !r.returned_at && due < today;
+  //       });
+
+  //       setRows(overdue);
+  //     } catch (err) {
+  //       console.error("Failed to fetch overdue history:", err);
+  //     }
+  //   };
+
+  //   fetchBorrows();
+  // }, []);
 
   // Smooth path helpers (quadratic mid-point)
   const chartBox = { w: 720, h: 200, padX: 36, padY: 20 };
@@ -264,85 +326,7 @@ export default function Dashboard() {
     <div className="min-h-screen flex bg-gray-100">
       {/* Sidebar */}
       <Sidebar />
-      {/* <aside className="w-64 bg-white shadow-md px-4 py-6 flex flex-col justify-between">
-        <div>
-          <h2 className="text-xl font-bold mb-6">Library</h2>const [requests, setRequests] = useState([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-   useEffect(() => {
-    const fetchPendingRequests = async () => {
-      try {
-    const token = localStorage.getItem("token"); // get your JWT token
-    if (!token) {
-      throw new Error("No token found, please login");
-    }
-
-    const response = await axios.get("http://localhost:8000/borrows/pending", {
-      headers: {
-        Authorization: `Bearer ${token}`, // attach token here
-      },
-    });
-
-    setRequests(response.data);
-  } catch (err) {
-    console.error("Error fetching pending requests:", err);
-    setError("Failed to load borrow requests");
-  } finally {
-    setLoading(false);
-  }
-    };
-
-    fetchPendingRequests();
-  }, []);
-          <ul className="space-y-3">
-            <li>
-              <Link to="/dashboard" className="flex items-center gap-2 text-sky-600 font-medium">
-                <CalendarDays size={18} /> Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link to="/manage-books" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <BookOpen size={18} /> Manage Books
-              </Link>
-            </li>
-            <li>
-              <Link to="/manage-category" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <Layers size={18} /> Manage Category
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link to="/upload" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <Upload size={18} /> Upload Books
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link to="/fill-up-form" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <BookOpen size={18} /> Fill Up Form
-              </Link>
-            </li>
-            <li>
-              <Link to="/members" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <Users size={18} /> Member
-              </Link>
-            </li>
-            <li>
-              <Link to="/check-out" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <BookOpen size={18} /> Check-out Books
-              </Link>
-            </li>
-            <li>
-              <Link to="/setting" className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors">
-                <HelpCircle size={18} /> Setting
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <Link to="/logout" className="flex items-center gap-2 text-red-600 font-medium hover:underline underline-offset-4">
-            <LogOut size={18} /> Logout
-          </Link>
-        </div>
-      </aside> */}
+     
 
       {/* Main */}
       <main className="flex-1 p-6 space-y-6">
@@ -528,21 +512,21 @@ export default function Dashboard() {
                 <tr key={`${r.book}__${r.user}__${i}`} className="border-b border-gray-200">
                   <td>{startIndex + i + 1}</td>
                   <td className="font-medium">{r.book_title}</td>
-                  <td>{r.username}</td>
+                  <td>{r.user_name}</td>
                   <td>{r.borrow_date.split('T')[0]}</td>
                   <td>{r.return_date.split('T')[0]}</td>
                   <td className="text-center">
                     <div className="flex items-center justify-center gap-2">
                       <button
                         type="button"
-                        onClick={() => openConfirm("accept", i)}
+                        onClick={() => openConfirm("accept", i, r.borrow_id)}
                         className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
                       >
                         Accept
                       </button>
                       <button
                         type="button"
-                        onClick={() => openConfirm("reject", i)}
+                        onClick={() => openConfirm("reject", i, r.borrow_id)}
                         className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300"
                       >
                         Reject
