@@ -9,7 +9,7 @@ from fastapi import HTTPException, status
 from datetime import date, timedelta, datetime
 from app.crud.settings import SettingsCRUD  
 from sqlalchemy import func
-from datetime import datetime, date
+from datetime import date, timedelta, datetime
 
 
 
@@ -47,7 +47,6 @@ class BorrowCRUD:
 
     @staticmethod
     async def create_pdf_borrow(db: AsyncSession, user: User, book_id: int):
-        # 1️⃣ Get the book
         book = await db.get(Book, book_id)
         if not book:
             raise HTTPException(status_code=404, detail="Book not found")
@@ -65,7 +64,6 @@ class BorrowCRUD:
         if existing_borrow:
             return existing_borrow
 
-        # 2️⃣ Create Borrow record
         today = date.today()
         db_borrow = BorrowRecord(
             user_id=user.user_id,
@@ -81,26 +79,22 @@ class BorrowCRUD:
 
 
 
+
     @staticmethod
     async def create_borrow(db: AsyncSession, borrow: "BorrowCreate", user: User):
-        # 1️⃣ Get the book
         book = await db.get(Book, borrow.book_id)
         if not book:
             raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
 
-        # 2️⃣ Check book availability
         if not book.book_availabity or (book.available_copies is not None and book.available_copies < 1):
             raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
 
-        # 3️⃣ Fetch borrow_day_limit from settings
         borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
         if borrow_day_limit is None:
-            raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
+            borrow_day_limit = 14
 
-        # 4️⃣ Borrow max limit (can later come from Settings)
         borrow_max_limit = 5
 
-        # 5️⃣ Check if user already borrowed this book without returning it
         existing_borrow = await db.execute(
             select(BorrowRecord)
             .where(BorrowRecord.user_id == user.user_id)
@@ -111,13 +105,13 @@ class BorrowCRUD:
         if existing_borrow:
             raise HTTPException(status_code=409, detail="USER_ALREADY_BORROWED_THIS_BOOK")
 
-        # 6️⃣ Check total borrowed books for user
         total_active_borrows = await db.execute(
             select(func.count())
             .select_from(BorrowRecord)
             .where(BorrowRecord.user_id == user.user_id)
             .where(BorrowRecord.borrow_status != "returned")
         )
+        
         total_active_borrows = total_active_borrows.scalar() or 0
         if total_active_borrows >= borrow_max_limit:
             raise HTTPException(
@@ -125,13 +119,12 @@ class BorrowCRUD:
                 detail=f"USER_CANNOT_BORROW_MORE_THAN_{borrow_max_limit}_BOOKS"
             )
 
-        # 7️⃣ Determine return date properly
         borrow_date = date.today()
-        requested_return_date = getattr(borrow, "return_date", None)
+        return_date = borrow_date + timedelta(days=borrow_day_limit)
 
-        if requested_return_date:
-    # ✅ Parse mm/dd/yyyy from frontend into date object
+        if getattr(borrow, "return_date", None):
             try:
+                requested_return_date = borrow.return_date
                 if isinstance(requested_return_date, str):
                     requested_return_date = datetime.strptime(requested_return_date, "%m/%d/%Y").date()
             except ValueError:
@@ -140,18 +133,14 @@ class BorrowCRUD:
                     detail="INVALID_DATE_FORMAT_EXPECTED_MM_DD_YYYY"
                 )
 
-    # ✅ Now safely compare
-            if requested_return_date > date.today() + timedelta(days=borrow_day_limit):
+            max_allowed_date = borrow_date + timedelta(days=borrow_day_limit)
+            if requested_return_date > max_allowed_date:
                 raise HTTPException(
                     status_code=400,
-                    detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS"
+                    detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS_FROM_TODAY"
                 )
             return_date = requested_return_date
-        else:
-            return_date = date.today() + timedelta(days=borrow_day_limit)
-        # 8️⃣ Create borrow record
 
-        
         db_borrow = BorrowRecord(
             user_id=user.user_id,
             book_id=book.book_id,
@@ -160,71 +149,101 @@ class BorrowCRUD:
             borrow_status="pending",
         )
 
-      
         db.add(db_borrow)
 
-        # 9️⃣ Update book availability
         if book.available_copies is not None and book.available_copies > 0:
             book.available_copies -= 1
+
         book.book_availabity = book.available_copies > 0
         db.add(book)
 
-        # 🔟 Commit transaction
         await db.commit()
         await db.refresh(db_borrow)
 
         return db_borrow
 
-#     @staticmethod
-#     async def create_borrow(db: AsyncSession, borrow: BorrowCreate, user: User):
-#         # Get book
-#         book = await db.get(Book, borrow.book_id)
-#         if not book:
-#             raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
 
-#         # Validate availability
-#         if not book.book_availabity:
-#             raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
+    # @staticmethod
+    # async def create_borrow(db: AsyncSession, borrow: "BorrowCreate", user: User):
+    #     book = await db.get(Book, borrow.book_id)
+    #     if not book:
+    #         raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
 
-#         borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db) 
-#         borrow_day_limit = borrow_day_limit if borrow_day_limit is not None else 14
+    #     if not book.book_availabity or (book.available_copies is not None and book.available_copies < 1):
+    #         raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
 
-#         # Borrow/Return dates auto-set
-#         borrow_date = date.today()
-#         return_date = borrow_date + timedelta(days=borrow_day_limit)         
+    #     borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
+    #     if borrow_day_limit is None:
+    #         raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
 
-#         # Create borrow record
-#         db_borrow = BorrowRecord(
-#             user_id=user.user_id,
-#             #user_name=user.user_name,   
-#             book_id=book.book_id,
-#             #book_title=book.book_title,      
-#             borrow_date=borrow_date,
-#             return_date=return_date,
-#             borrow_status="pending",
+    #     borrow_max_limit = 5
 
-#         )
+    #     existing_borrow = await db.execute(
+    #         select(BorrowRecord)
+    #         .where(BorrowRecord.user_id == user.user_id)
+    #         .where(BorrowRecord.book_id == borrow.book_id)
+    #         .where(BorrowRecord.borrow_status != "returned")
+    #     )
+    #     existing_borrow = existing_borrow.scalars().first()
+    #     if existing_borrow:
+    #         raise HTTPException(status_code=409, detail="USER_ALREADY_BORROWED_THIS_BOOK")
 
-#         print("all info: ", db_borrow)
+    #     total_active_borrows = await db.execute(
+    #         select(func.count())
+    #         .select_from(BorrowRecord)
+    #         .where(BorrowRecord.user_id == user.user_id)
+    #         .where(BorrowRecord.borrow_status != "returned")
+    #     )
+    #     total_active_borrows = total_active_borrows.scalar() or 0
+    #     if total_active_borrows >= borrow_max_limit:
+    #         raise HTTPException(
+    #             status_code=409,
+    #             detail=f"USER_CANNOT_BORROW_MORE_THAN_{borrow_max_limit}_BOOKS"
+    #         )
+
+    #     borrow_date = date.today()
+    #     requested_return_date = getattr(borrow, "return_date", None)
+
+    #     if requested_return_date:
+    #         try:
+    #             if isinstance(requested_return_date, str):
+    #                 requested_return_date = datetime.strptime(requested_return_date, "%m/%d/%Y").date()
+    #         except ValueError:
+    #             raise HTTPException(
+    #                 status_code=400,
+    #                 detail="INVALID_DATE_FORMAT_EXPECTED_MM_DD_YYYY"
+    #             )
+
+    #         if requested_return_date > date.today() + timedelta(days=borrow_day_limit):
+    #             raise HTTPException(
+    #                 status_code=400,
+    #                 detail=f"RETURN_DATE_CANNOT_EXCEED_{borrow_day_limit}_DAYS"
+    #             )
+    #         return_date = requested_return_date
+    #     else:
+    #         return_date = date.today() + timedelta(days=borrow_day_limit)
+
+        
+    #     db_borrow = BorrowRecord(
+    #         user_id=user.user_id,
+    #         book_id=book.book_id,
+    #         borrow_date=borrow_date,
+    #         return_date=return_date,
+    #         borrow_status="pending",
+    #     )
+
       
-#         db.add(db_borrow)
+    #     db.add(db_borrow)
 
-# # --- Update book availability based on count ---
-# # Decrease the count of available copies
-#         if book.book_availabity is not None and book.available_copies > 0:
-#             book.available_copies -= 1
+    #     if book.available_copies is not None and book.available_copies > 0:
+    #         book.available_copies -= 1
+    #     book.book_availabity = book.available_copies > 0
+    #     db.add(book)
 
-# # If no copies left, mark as unavailable
-#         if book.available_copies == 0:
-#             book.book_availabity = False
-#         else:
-#             book.book_availabity = True  # remains available if count > 0
+    #     await db.commit()
+    #     await db.refresh(db_borrow)
 
-#         db.add(book)
-
-#         await db.commit()
-#         await db.refresh(db_borrow)
-#         return db_borrow
+    #     return db_borrow
 
 
 
@@ -247,10 +266,7 @@ class BorrowCRUD:
             borrow.user_name = user.user_name if user else None
         
        
-
         return borrows
-
-
 
 
 
@@ -324,9 +340,7 @@ class BorrowCRUD:
     @staticmethod
     async def count_my_borrow_status(db: AsyncSession, user_id: str, status: str) -> int:
    
-        now = datetime.utcnow().date()  # ✅ Convert to date only
-
-    # Fetch all user's active borrows
+        now = datetime.utcnow().date()  
         result = await db.execute(
             select(BorrowRecord).where(
                 BorrowRecord.user_id == user_id,
@@ -338,7 +352,6 @@ class BorrowCRUD:
     # Update overdue borrows
         updated = False
         for borrow in user_borrows:
-        # ✅ Ensure both are date objects for safe comparison
             if borrow.return_date and borrow.return_date < now and borrow.borrow_status != "overdue":
                 borrow.borrow_status = "overdue"
                 db.add(borrow)
@@ -347,7 +360,6 @@ class BorrowCRUD:
         if updated:
             await db.commit()
 
-    # Count the requested status
         result = await db.execute(
             select(func.count()).select_from(BorrowRecord).where(
             BorrowRecord.user_id == user_id,
@@ -357,21 +369,6 @@ class BorrowCRUD:
         return result.scalar_one()
 
     
-    # @staticmethod
-    # async def count_my_borrow_status(db: AsyncSession, user_id: str, status: str) -> int:
-    #     """
-    #     Count borrows for a specific user filtered by borrow_status.
-    #     Async-safe ORM query using select().
-    #     """
-    #     result = await db.execute(
-    #         select(func.count()).select_from(BorrowRecord).where(
-    #             BorrowRecord.user_id == user_id,
-    #             BorrowRecord.borrow_status == status
-    #         )
-    #     )
-    #     return result.scalar_one()
-
-
 
 
 

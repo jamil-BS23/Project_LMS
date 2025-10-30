@@ -60,95 +60,55 @@ export default function FillUpForm() {
     }));
   };
 
-  /*const handleSubmit = () => {
-    console.log("Submitted Data:", formData);
-    alert("Form submitted successfully!");
-    navigate("/dashboard");
-  };*/
 
-/*const handleSubmit = async () => {
-  if (!formData.book_id) {
-    alert("Please select a book!");
-    return;
-  }
-  if (!formData.return_date) {
-    alert("Please select a return date!");
-    return;
-  }
 
-  // Convert "YYYY-MM-DD" → full ISO datetime
-  const returnDateISO = new Date(formData.return_date).toISOString();
-
-  const payload = {
-    book_id: Number(formData.book_id),
-    return_date: returnDateISO,
-  };
-
-  console.log("Sending payload:", payload);
-
-  try {
-    const token = localStorage.getItem("token");
-    const res = await api.post("/borrows/", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log("Borrowed successfully:", res.data);
-    alert("Book borrowed successfully!");
-    navigate("/dashboard");
-  } catch (error) {
-    console.error("Failed to borrow book:", error.response?.data || error);
-    alert("Borrow failed!");
-  }
-};*/
-const handleSubmit = async () => {
-  if (!borrowedBooks.length) return alert("No book selected");
-
-  const book = borrowedBooks[0]; // You only support one book here
-  const bookForm = formData[book.id];
-
-  if (!bookForm || !bookForm.returnDate) {
-    alert("Please select a return date!");
-    return;
-  }
-
-  const payload = {
-    book_id: Number(book.id),
-    return_date: new Date(bookForm.returnDate).toISOString(),
-  };
-
-  console.log("Sending payload:", payload);
-
-  try {
-    const token = localStorage.getItem("token");
-    const res = await axios.post("http://localhost:8000/borrow/", payload, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
-
-    console.log("Borrowed successfully:", res.data);
-    alert("Book borrowed successfully!");
-    navigate("/user");
-  } catch (error) {
-    console.error("Failed to borrow book:", error.response?.data || error);
-
-    // 🔹 Get backend error detail
-    const backendDetail = error.response?.data?.detail;
-
-    // 🔹 Map backend codes to user-friendly messages
-    const messageMap = {
-      "USER_ALREADY_BORROWED_THIS_BOOK": "You already borrowed this book!",
-      "USER_CANNOT_BORROW_MORE_THAN_5_BOOKS": "You cannot borrow more books than allowed!",
-      "RETURN_DATE_EXCEEDS_LIMIT": "Return date exceeds the maximum borrow limit!",
-      "BOOK_NOT_FOUND": "The selected book does not exist!",
-      "BOOK_UNAVAILABLE": "This book is currently unavailable!",
+  let borrow_max_limit = 5; // default fallback
+  let borrow_day_limit = 14; // default fallback
+  
+  const handleSubmit = async () => {
+    if (!borrowedBooks.length) return alert("No book selected");
+  
+    const book = borrowedBooks[0]; 
+    const bookForm = formData[book.id];
+  
+    if (!bookForm || !bookForm.returnDate) {
+      alert("Please select a return date!");
+      return;
+    }
+  
+    const payload = {
+      book_id: Number(book.id),
+      return_date: new Date(bookForm.returnDate).toISOString(),
     };
-
-    const alertMessage = messageMap[backendDetail] || backendDetail || "Borrow failed!";
-    alert(alertMessage);
-  }
-};
-
-
-
+  
+    try {
+      const token = localStorage.getItem("token");
+      const res = await axios.post("http://localhost:8000/borrow/", payload, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+  
+      // Update limits from backend if returned
+      if (res.data.borrow_max_limit) borrow_max_limit = res.data.borrow_max_limit;
+      if (res.data.borrow_day_limit) borrow_day_limit = res.data.borrow_day_limit;
+  
+      alert("Book borrowed successfully!");
+      navigate("/user");
+    } catch (error) {
+      const backendDetail = error.response?.data?.detail;
+  
+      const messageMap = {
+        "USER ALREADY BORROWED THIS BOOK": "You already borrowed this book!",
+        "BOOK LIMIT EXCEEDED": `You cannot borrow more than ${borrow_max_limit} books!`,
+        "RETURN DATE EXCEEDS LIMIT": `Return date exceeds the maximum borrow limit of ${borrow_day_limit} days!`,
+        "BOOK_NOT_FOUND": "The selected book does not exist!",
+        "BOOK_UNAVAILABLE": "This book is currently unavailable!",
+      };
+  
+      const alertMessage = messageMap[backendDetail] || backendDetail || "Borrow failed!";
+      alert(alertMessage);
+    }
+  };
+  
 
 
   return (
@@ -182,10 +142,11 @@ const handleSubmit = async () => {
                   {/* Availability timeline (dummy) */}
                   <div className="bg-gray-50 border border-dashed border-gray-300 p-3 rounded mb-4">
                     <p className="text-sm text-gray-600">
-                      <span className="font-medium">Available from:</span> 12 Aug 2025<br />
-                      <span className="font-medium">Must return by:</span> 19 Aug 2025
+                      <span className="font-medium">Available from:</span> {new Date().toLocaleDateString()}<br />
+                      <span className="font-medium">Must return by:</span> {new Date(new Date().setDate(new Date().getDate() + borrow_day_limit)).toLocaleDateString()}
                     </p>
                   </div>
+
 
                   {/* Form fields */}
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
