@@ -12,7 +12,7 @@ class BorrowRequestRecord(BaseModel):
     borrow_id: int
     user_id: str
     user_name: Optional[str]
-    user_email: Optional[str] = None
+    user_email: Optional[str]=None
     book_id: int
     book_title: Optional[str]
     borrow_date: date
@@ -43,7 +43,6 @@ class BorrowCreate(BaseModel):
     # borrow_date: date
     book_id: int
     return_date: date
-    
 
     # @validator("return_date")
     # def check_date_range(cls, v, values):

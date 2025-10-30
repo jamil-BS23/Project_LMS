@@ -102,10 +102,10 @@ export default function Navbar() {
     return books
       .filter(
         (b) =>
-          hit(b.title) ||
-          hit(b.authors || b.author || "") ||
-          hit(b.category || "") ||
-          hit(b.summary || b.description || "")
+          hit(b.book_title) ||
+          hit(b.authors || b.book_author || "") ||
+          hit(b.book_category || "") ||
+          hit(b.summary || b.book_description || "")
       )
       .slice(0, 8);
   }, [books, query]);
@@ -120,7 +120,6 @@ export default function Navbar() {
     e.preventDefault();
     if (results[0]) goToBook(results[0].id);
   };
-
   const toggleSignIn = () => {
     if (user) {
       // sign out

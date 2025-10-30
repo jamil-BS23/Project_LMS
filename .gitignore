@@ -24,6 +24,8 @@ dist/
 build/
 *.lock
 *.log
+frontend/
+media/
 
 # --- OS / IDE files ---
 .DS_Store

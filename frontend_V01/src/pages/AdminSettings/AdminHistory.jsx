@@ -6,12 +6,12 @@ import axios from "axios";
 const badge = (type) => {
   const base = "inline-flex items-center rounded px-2 py-0.5 text-xs font-medium";
   switch (type) {
-    case "Borrowed":  return `${base} bg-sky-100 text-sky-700`;
-    case "Returned":  return `${base} bg-green-100 text-green-700`;
-    case "Booked":    return `${base} bg-amber-100 text-amber-700`;
-    case "Overdue":   return `${base} bg-amber-100 text-amber-700`;
-    case "Pdf Viewed":  return `${base} bg-violet-100 text-violet-700`;
-    default:          return `${base} bg-gray-100 text-gray-700`;
+    case "accepted":  return `${base} bg-sky-100 text-sky-700`;
+    case "returned":  return `${base} bg-green-100 text-green-700`;
+    case "pending":    return `${base} bg-amber-100 text-amber-700`;
+    case "overdue":   return `${base} bg-amber-100 text-amber-700`;
+    case "pdf-viewed":  return `${base} bg-violet-100 text-violet-700`;
+    default:          return `${base} bg-red-100 text-gray-700`;
   }
 };
 
@@ -69,6 +69,12 @@ export default function UserHistory() {
       return "Borrowed";
     case "returned":
       return "Returned";
+    case "pdf viewed":
+      return "Pdf Viewed";
+    case "overdue":
+      return "Overdue";
+    case "rejected":
+      return "Rejected";
     default:
       return status; // fallback
   }
@@ -130,7 +136,7 @@ export default function UserHistory() {
                   <Filter size={16} /> Type:
                 </span>
                 <div className="flex items-center gap-2">
-                  {["All", "Borrowed", "Returned", "Booked", "overdue","Pdf Viewed"].map((t) => (
+                  {["All", "Borrowed", "Returned", "Booked", "Overdue","Pdf Viewed", "Returned"].map((t) => (
                     <button
                       key={t}
                       type="button"
@@ -325,10 +331,10 @@ export default function UserHistory() {
               </div>
 
               <div className="px-4 md:px-6 py-4 md:py-5 space-y-3 text-sm">
-                <div className="flex justify-between gap-4"><span className="text-gray-500">Record ID</span><span className="font-medium text-gray-800">{detail.id}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-gray-500">Record ID</span><span className="font-medium text-gray-800">{detail.borrow_id}</span></div>
                 <div className="flex justify-between gap-4"><span className="text-gray-500">Book</span><span className="font-medium text-gray-800">{detail.book_title}</span></div>
                 <div className="flex justify-between gap-4"><span className="text-gray-500">User</span><span className="font-medium text-gray-800">{detail.user_name}</span></div>
-                <div className="flex justify-between gap-4"><span className="text-gray-500">Type</span><span className={badge(detail.status)}>{mapStatusLabel(detail.status, detail.return_date)}</span></div>
+                <div className="flex justify-between gap-4"><span className="text-gray-500">Type</span><span className={badge(detail.borrow_status)}>{mapStatusLabel(detail.borrow_status, detail.return_date)}</span></div>
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-3 pt-2">
                   <div className="rounded border border-gray-200 p-3"><p className="text-xs text-gray-500 mb-1">Borrowed On</p><p className="font-medium text-gray-800">{detail.borrow_date.split("T")[0] || "—"}</p></div>

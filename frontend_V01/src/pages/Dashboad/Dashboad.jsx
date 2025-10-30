@@ -31,10 +31,6 @@ export const axiosAuth = () => {
   });
 };
 
-
-
-
-
 export default function Dashboard() {
 
   
@@ -72,7 +68,7 @@ export default function Dashboard() {
           returned_copies: returnedRes.data.count || 0,
           pending_copies: pendingRes.data.count || 0,
           total_copies: total,
-          available_copies: total - borrowed,
+          available_copies: total - (borrowed+ pendingRes.data.count || 0),
         });
       } catch (err) {
         console.error("Error fetching stats:", err.response?.data || err);
@@ -109,13 +105,14 @@ export default function Dashboard() {
       try {
         const api = axiosAuth();
         const res = await api.get("/borrow/status/pending/list");
-        setRequests(res.data || []);
-      } catch (err) {
-        console.error("Error fetching pending requests:", err.response?.data || err);
-        setError("Failed to load borrow requests");
-      } finally {
-        setLoading(false);
-      }
+
+        setRequests(res.data);
+  } catch (err) {
+    console.error("Error fetching pending requests:", err);
+    setError("Failed to load borrow requests");
+  } finally {
+    setLoading(false);
+  }
     };
   
     fetchPendingRequests();
@@ -151,7 +148,10 @@ export default function Dashboard() {
 
   
   // Confirmation modal state
- 
+  const [confirm, setConfirm] = useState({ open: false, type: null, index: -1, id: null });
+  const openConfirm = (type, index,id) => setConfirm({ open: true, type, index,id: requests[index]?.borrow_id });
+  const closeConfirm = () => setConfirm({ open: false, type: null, index: -1, id: null });
+
   // Toast (2s)
   const [toast, setToast] = useState({ show: false, type: "accept", message: "" });
   const showToast = (type, message) => {
@@ -168,24 +168,7 @@ export default function Dashboard() {
     closeConfirm();
   };*/
 
-
-  const [confirm, setConfirm] = useState({
-    open: false,
-    type: null,
-    index: -1,
-    id: null,
-  });
-
-  // ✅ This must be inside the component
-  const openConfirm = (type, index, borrow_id) => {
-    setConfirm({ open: true, type, index, id: borrow_id });
-  };
-
-  const closeConfirm = () => {
-    setConfirm({ open: false, type: null, index: -1, id: null });
-  };
-  
-  const doConfirm = async () => {
+ const doConfirm = async () => {
     const { type, id } = confirm;
     if (!id) {
       console.error("No borrow_id found:", confirm);
@@ -210,7 +193,6 @@ export default function Dashboard() {
       closeConfirm();
     }
   };
-  
 
   // -------------------- WEEKLY LINE CHART --------------------
   const WEEK_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
@@ -228,7 +210,8 @@ export default function Dashboard() {
   
 
    const [rows, setRows] = useState([]);
-   useEffect(() => {
+
+ useEffect(() => {
     const fetchOverdue = async () => {
       try {
         const api = axiosAuth();

@@ -99,7 +99,7 @@ const slugify = (s = "") =>
     const fetchCategories = async () => {
       try {
         const token = localStorage.getItem("token"); // if auth is needed
-        const res = await axios.get("http://localhost:8000/categories/all", {
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`, {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
 
@@ -200,13 +200,14 @@ const slugify = (s = "") =>
       // ✅ Update existing category
       const categoryId = categories[editingIndex].id;
       res = await axios.patch(
-        `http://localhost:8000/categories/${categoryId}`,
+        `${import.meta.env.VITE_API_BASE_URL}/categories/${categoryId}`,
         payload,
         {
           headers: { Authorization: `Bearer ${token}` },
         }
       );
 
+      console.log("Updated category response:", res.data);
       // Update frontend state
       setCategories((prev) => {
         const next = [...prev];
@@ -215,7 +216,7 @@ const slugify = (s = "") =>
       });
     } else {
       // ✅ Add new category
-      res = await axios.post("http://localhost:8000/categories", payload, {
+      res = await axios.post(`${import.meta.env.VITE_API_BASE_URL}/categories`, payload, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -260,7 +261,7 @@ const slugify = (s = "") =>
     const categoryId = categories[pendingDeleteIndex].id;
 
     // ✅ Call API
-    await axios.delete(`http://localhost:8000/categories/${categoryId}`, {
+    await axios.delete(`${import.meta.env.VITE_API_BASE_URL}/categories/${categoryId}`, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

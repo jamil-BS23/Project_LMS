@@ -60,11 +60,11 @@ export default function UserSidebar({ active = "dashboard" }) {
               <CheckCircle size={18} /> History
             </Link>
           </li>
-          <li>
+          {/* <li>
             <Link to="/settings" className={isSettings ? on : off}>
               <Settings size={18} /> Settings
             </Link>
-          </li>
+          </li> */}
         </ul>
       </div>
       {/* <div>

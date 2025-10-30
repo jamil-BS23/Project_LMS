@@ -31,9 +31,9 @@ export default function Home() {
     try {
       // Fetch all books, popular books, and categories
       const [booksRes, popularRes, categoriesRes] = await Promise.all([
-        axios.get("http://localhost:8000/books"),
-        axios.get("http://localhost:8000/books/popular"),
-        axios.get("http://localhost:8000/categories/all")
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/popular`),
+        axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`)
       ]);
 
       const categories = categoriesRes.data;
@@ -54,24 +54,22 @@ export default function Home() {
       //   });
 
       const normalize = (data) => {
-        const books = Array.isArray(data) ? data : data.items || [];
-   
-        return books.map((b) => {
-          const category =
-            categories.find((c) => c.category_title === b.book_category)?.category_title ||
-            "Unknown";
-   
-          return {
-            ...b,
-            category,
-            coverImage: b.image
-              ? `http://localhost:8000/media/${b.image}`
-              : "https://via.placeholder.com/150",
-          };
-        });
-      };
-   
-   
+      const books = Array.isArray(data) ? data : data.items || [];
+
+      return books.map((b) => {
+        const category =
+          categories.find((c) => c.category_title === b.book_category)?.category_title ||
+          "Unknown";
+
+        return {
+          ...b,
+          category,
+          coverImage: b.image
+            ? `${import.meta.env.VITE_API_BASE_URL}/media/${b.image}`
+            : "https://via.placeholder.com/150",
+        };
+      });
+    };
 
       setAllBooks(normalize(allData));
 

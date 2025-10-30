@@ -178,7 +178,7 @@ function AppContent() {
               <Route path="/manage-category" element={ <ProtectedRoute adminOnly={true}><ManageCategory /></ProtectedRoute>} />
               <Route path="/user" element={ <ProtectedRoute userOnly={true}><UserDashboard /></ProtectedRoute>} />
               <Route path="/loans" element={ <ProtectedRoute userOnly={true}><MyLoansBlank /></ProtectedRoute>} />
-              <Route path="/settings" element={ <ProtectedRoute userOnly={true}><UserSettings /></ProtectedRoute>} />
+              {/* <Route path="/settings" element={ <ProtectedRoute userOnly={true}><UserSettings /></ProtectedRoute>} /> */}
               <Route path="/history" element={ <ProtectedRoute userOnly={true}><UserHistory /></ProtectedRoute>} />
               <Route path="/all-history" element={ <ProtectedRoute adminOnly={true}><AdminHistory /></ProtectedRoute>} />
               <Route path="/setting" element={ <ProtectedRoute adminOnly={true}><AdminSettings /></ProtectedRoute>} />
