@@ -24,6 +24,7 @@ async def add_review(
 
 
 
+
 @router.get("/{book_id}", response_model=List[BookReviewOut])
 async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
     """

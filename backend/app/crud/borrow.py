@@ -243,9 +243,10 @@ class BorrowCRUD:
             borrow.book_title = book.book_title if book else None
 
             user = await db.get(User, borrow.user_id)
+            borrow.user_email = user.user_email
             borrow.user_name = user.user_name if user else None
         
-        print("Borrowes      ::: ",borrows)
+       
 
         return borrows
 
