@@ -102,7 +102,7 @@ Backend → http://localhost:8000/doc
 
 🔹 Core Features
 User Features
-
+    
     Search/browse books by title, author, or ISBN
 
     Borrow and return books
