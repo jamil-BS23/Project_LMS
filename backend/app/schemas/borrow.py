@@ -14,6 +14,7 @@ class BorrowRequestRecord(BaseModel):
     borrow_id: int
     user_id: str
     user_name: Optional[str]
+    user_email: Optional[str]
     book_id: int
     book_title: Optional[str]
     borrow_date: date
@@ -91,6 +92,8 @@ class BorrowDetailResponse(BaseModel):
     borrow_date: date
     return_date: date
     borrow_status: str
+    returned_at: Optional[date] = None
+   
 
     class Config:
         orm_mode = True

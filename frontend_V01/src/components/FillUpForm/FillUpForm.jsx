@@ -120,7 +120,7 @@ const handleSubmit = async () => {
 
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.post("http://localhost:8000/borrows/", payload, {
+    const res = await axios.post("http://localhost:8000/borrow/", payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
 
@@ -129,9 +129,24 @@ const handleSubmit = async () => {
     navigate("/user");
   } catch (error) {
     console.error("Failed to borrow book:", error.response?.data || error);
-    alert("Borrow failed!");
+
+    // 🔹 Get backend error detail
+    const backendDetail = error.response?.data?.detail;
+
+    // 🔹 Map backend codes to user-friendly messages
+    const messageMap = {
+      "USER_ALREADY_BORROWED_THIS_BOOK": "You already borrowed this book!",
+      "USER_CANNOT_BORROW_MORE_THAN_5_BOOKS": "You cannot borrow more books than allowed!",
+      "RETURN_DATE_EXCEEDS_LIMIT": "Return date exceeds the maximum borrow limit!",
+      "BOOK_NOT_FOUND": "The selected book does not exist!",
+      "BOOK_UNAVAILABLE": "This book is currently unavailable!",
+    };
+
+    const alertMessage = messageMap[backendDetail] || backendDetail || "Borrow failed!";
+    alert(alertMessage);
   }
 };
+
 
 
 

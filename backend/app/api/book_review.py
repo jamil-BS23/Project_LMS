@@ -47,6 +47,7 @@ async def add_review(
         )
 
 
+
 @router.get("/{book_id}", response_model=List[BookReviewOut])
 async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
     """
@@ -66,8 +67,15 @@ async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
 
         return reviews
     except Exception as e:
+<<<<<<< HEAD
         traceback.print_exc()
         raise HTTPException(
             status_code=status.HTTP_500_INTERNAL_SERVER_ERROR,
             detail=f"Failed to fetch reviews: {str(e)}"
         )
+=======
+        import traceback
+        traceback.print_exc()  
+        raise HTTPException(status_code=500, detail=f"Failed to fetch reviews: {str(e)}")
+
+>>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0

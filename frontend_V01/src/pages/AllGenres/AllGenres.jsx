@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 import { useNavigate, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import Sidebar from "../../components/Sidebar/Sidebar";
@@ -12,20 +13,38 @@ const getStockStatus = (b) => {
   if (t.includes("upcoming")) return "Upcoming";
   return "Available";
 };
+=======
+// src/pages/AllGenres/AllGenres.jsx
+// import { useNavigate, useLocation } from "react-router-dom";
+// import { useState, useEffect } from "react";
+// import Sidebar from "../../components/Sidebar/Sidebar";
+// import BookCard from "../../components/BookCard/BookCard";
+// import axios from "axios";
 
-export default function AllGenres() {
-  const navigate = useNavigate();
-  const location = useLocation();
+// const getStockStatus = (b) => {
+//   const raw = b.available_book;
+//   if (typeof raw === "number" && raw < 1) return "Stock Out";
+//   const t = b.book_category?.toLowerCase() || "";
+//   if (t.includes("out")) return "Stock Out";
+//   if (t.includes("upcoming")) return "Upcoming";
+//   return "Available";
+// };
+>>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
 
-  const [allBooks, setAllBooks] = useState([]);
-  const [totalBooks, setTotalBooks] = useState(0);
-  const [totalPages, setTotalPages] = useState(1);
-  const [loading, setLoading] = useState(false);
-  const [filter, setFilter] = useState(location.state?.filter || null);
-  const [page, setPage] = useState(1);
-  const [searchTerm, setSearchTerm] = useState("");
-  const PAGE_SIZE = 9;
+// export default function AllGenres() {
+//   const navigate = useNavigate();
+//   const location = useLocation();
 
+//   const [allBooks, setAllBooks] = useState([]);
+//   const [totalBooks, setTotalBooks] = useState(0);
+//   const [totalPages, setTotalPages] = useState(1);
+//   const [loading, setLoading] = useState(false);
+//   const [filter, setFilter] = useState(location.state?.filter || null);
+//   const [page, setPage] = useState(1);
+//   const [searchTerm, setSearchTerm] = useState("");
+//   const PAGE_SIZE = 9;
+
+<<<<<<< HEAD
   const fetchBooks = async (pageNum = 1, currentFilter = filter, search = "") => {
     try {
       setLoading(true);
@@ -38,9 +57,27 @@ export default function AllGenres() {
       if (search.trim()) {
         params.append("search", search.trim());
       }
+=======
+//   // 🔥 Fetch paginated books
+//   const fetchBooks = async (pageNum = 1, currentFilter = filter, search = "") => {
+//     try {
+//       setLoading(true);
 
-      const { data } = await axios.get(`http://localhost:8000/books/?${params.toString()}`);
+//       // Build query params for backend pagination
+//       const params = new URLSearchParams();
+//       params.append("page", pageNum);
+//       params.append("size", PAGE_SIZE);
+//       if (currentFilter?.type === "category") {
+//         params.append("category", currentFilter.value);
+//       }
+//       if (search.trim()) {
+//         params.append("search", search.trim());
+//       }
+>>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
 
+//       const { data } = await axios.get(`http://localhost:8000/books/?${params.toString()}`);
+
+<<<<<<< HEAD
       if (data && data.items) {
         setAllBooks(data.items);
         setTotalBooks(data.total || 0);
@@ -73,6 +110,42 @@ export default function AllGenres() {
   useEffect(() => {
     fetchBooks(page, filter, searchTerm);
   }, [filter, page]);
+=======
+//       // ✅ Handle paginated structure from backend
+//       if (data && data.items) {
+//         setAllBooks(data.items);
+//         setTotalBooks(data.total || 0);
+//         setTotalPages(data.pages || 1);
+//       } else {
+//         // fallback (in case backend returns array)
+//         setAllBooks(Array.isArray(data) ? data : []);
+//         setTotalBooks(data.length || 0);
+//         setTotalPages(1);
+//       }
+//     } catch (err) {
+//       console.error("Failed to fetch books:", err);
+//       setAllBooks([]);
+//       setTotalBooks(0);
+//       setTotalPages(1);
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // 🕐 Debounce search input (waits 500ms)
+//   useEffect(() => {
+//     const handler = setTimeout(() => {
+//       setPage(1);
+//       fetchBooks(1, filter, searchTerm);
+//     }, 500);
+//     return () => clearTimeout(handler);
+//   }, [searchTerm]);
+
+//   // 🔁 Refetch on page or filter change
+//   useEffect(() => {
+//     fetchBooks(page, filter, searchTerm);
+//   }, [filter, page]);
+>>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
 
   const goTo = (id) => navigate(`/book/${id}`);
 
