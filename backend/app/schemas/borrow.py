@@ -14,6 +14,7 @@ class BorrowRequestRecord(BaseModel):
     borrow_id: int
     user_id: str
     user_name: Optional[str]
+    user_email: Optional[str]
     book_id: int
     book_title: Optional[str]
     borrow_date: date
