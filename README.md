@@ -4,6 +4,8 @@ Full-Stack Web Application – A modern digital library platform for managing ph
 Supports patrons (users) and administrators (library staff) with full role-based access control (RBAC).
 
 🔹 Table of Contents
+## 📚 Table of Contents
+
 1. [Project Overview](#project-overview)
 2. [User Roles & Access](#user-roles--access)
 3. [Getting Started](#getting-started)
@@ -19,8 +21,9 @@ Supports patrons (users) and administrators (library staff) with full role-based
 13. [Contributing](#contributing)
 14. [System Architecture](#system-architecture)
 15. [User Flow Diagram](#user-flow-diagram)
-16. [Database / ERD](#database--erd-simplified)
+16. [Database / ERD (Simplified)](#database--erd-simplified)
 17. [License & Contact](#license--contact)
+
 
 🔹 Project Overview
 
