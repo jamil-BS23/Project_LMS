@@ -56,14 +56,14 @@ services:
     build:
       context: ./frontend_V01
       dockerfile: Dockerfile
-    container_name: frontend
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
     depends_on:
       - backend
-    env_file:
-      - ./frontend_V01/.env
     ports:
       - "5174:80"
     restart: unless-stopped
+
 
 volumes:
   db_data:
