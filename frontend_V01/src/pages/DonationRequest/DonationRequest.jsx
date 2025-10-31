@@ -134,17 +134,17 @@ export default function DonationRequest() {
         // 🔹 If you store token after login
         const token = localStorage.getItem("token");
 
-              const resItems = await axios.get("http://127.0.0.1:8000/donation", {
+              const resItems = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/donation`, {
           headers: { Authorization: `Bearer ${token}` },
         });
 
         // Fetch non-pending donations (accepted + rejected)
         const [resAccepted, resRejected] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/donation/status", {
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/donation/status`, {
             params: { book_approve: "accepted" },
             headers: { Authorization: `Bearer ${token}` },
           }),
-          axios.get("http://127.0.0.1:8000/donation/status", {
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/donation/status`, {
             params: { book_approve: "rejected" },
             headers: { Authorization: `Bearer ${token}` },
           }),
