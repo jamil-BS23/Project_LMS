@@ -35,7 +35,7 @@ Screenshots (Placeholder):
 - 🏠 site page / My library 
 - 🧭 Admin Dashboard
 - 
- ##  User Roles & Access
+ ## User Roles & Access
 - 
 Standard User (Patron)
 - Search and browse books  
@@ -49,7 +49,7 @@ Administrator (Librarian / Staff)
 - Manage categories & digital assets  
 - View all loans and user activity
 - 
-##  Getting Started
+## Getting Started
  Prerequisites
 - Node.js v18+
 - npm or yarn
