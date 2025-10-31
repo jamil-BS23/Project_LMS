@@ -113,7 +113,7 @@ const onSave = async() => {
   if (photo) formData.append("image", photo);
   try {
     console.log("Submitting form data:", formData);
-    const res = await axios.put("http://127.0.0.1:8000/users/settings/my", formData, {
+    const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/users/settings/my`, formData, {
       headers: {
         Authorization: `Bearer ${token}`,
         "Content-Type": "multipart/form-data",
@@ -223,7 +223,7 @@ const onSave = async() => {
                 {photoUrl ? (
                   <img
                     // src={photoUrl}
-                    src={`http://127.0.0.1:8000${photoUrl}`}
+                    src={`${import.meta.env.VITE_API_BASE_URL}${photoUrl}`}
                     alt="avatar preview"
                     className="w-full h-full object-cover"
                   />

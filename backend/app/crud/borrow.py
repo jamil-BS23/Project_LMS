@@ -92,6 +92,7 @@ class BorrowCRUD:
         if borrow_day_limit is None:
             raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
 
+        # 4️⃣ Borrow max limit (can later come from Settings)
         borrow_max_limit = await SettingsCRUD.get_borrow_max_limit(db)
 
         existing_borrow = await db.execute(

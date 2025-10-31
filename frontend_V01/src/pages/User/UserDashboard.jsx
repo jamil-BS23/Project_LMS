@@ -510,9 +510,9 @@ export default function UserDashboard() {
       try {
         // Fetch counts
         const [borrowedRes, overdueRes, returnedRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/borrow/status/accepted/count/my", { headers }),
-          axios.get("http://127.0.0.1:8000/borrow/status/overdue/count/my", { headers }),
-          axios.get("http://127.0.0.1:8000/borrow/status/returned/count/my", { headers }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/accepted/count/my`, { headers }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/overdue/count/my`, { headers }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/returned/count/my`, { headers }),
         ]);
 
         setCounts({
@@ -523,8 +523,8 @@ export default function UserDashboard() {
 
         // Fetch lists
         const [borrowedListRes, overdueListRes] = await Promise.all([
-          axios.get("http://127.0.0.1:8000/borrow/status/accepted/list/my", { headers }),
-          axios.get("http://127.0.0.1:8000/borrow/status/overdue/list/my", { headers }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/accepted/list/my`, { headers }),
+          axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/overdue/list/my`, { headers }),
         ]);
 
         const combinedLoans = [
@@ -590,7 +590,7 @@ export default function UserDashboard() {
     try {
       // PATCH endpoint expects status as a query param.
       // Use the same path format you've used elsewhere: /borrow/borrow/{id}/status
-      const url = `http://127.0.0.1:8000/borrow/${loan.borrow_id}/status`;
+      const url = `${import.meta.env.VITE_API_BASE_URL}/borrow/${loan.borrow_id}/status`;
   
       // call PATCH with params (status=returned)
       const res = await axios.patch(url, null, {
