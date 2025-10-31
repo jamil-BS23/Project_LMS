@@ -6,8 +6,7 @@ Supports patrons (users) and administrators (library staff) with full role-based
 ## Table of Contents
 1. [Project Overview](#project-overview)
 2. [User Roles & Access](#user-roles--access)
-3. [Getting Started](#getting-started)
-4. [Frontend Overview](#frontend-overview)
+3. [Frontend Overview](#frontend-overview)
 5. [Backend Overview](#backend-overview)
 6. [Core Features](#core-features)
 7. [Technical Stack](#technical-stack)
