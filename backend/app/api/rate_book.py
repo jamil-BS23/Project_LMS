@@ -33,8 +33,13 @@ async def rate_book(
 async def get_rating_breakdown(book_id: int, db: AsyncSession = Depends(get_db)) -> Dict:
     try:
         stats = await RateBookCRUD.get_rating_breakdown(db, book_id)
-        if stats["total"] == 0 and not stats["reviews"]:
-            raise HTTPException(status_code=404, detail="No ratings or reviews for this book")
+        if not stats or stats.get("total", 0) == 0:
+            return {
+                "total": 0,
+                "average": 0.0,
+                "counts": {5: 0, 4: 0, 3: 0, 2: 0, 1: 0},
+                "reviews": []
+            }
         return stats
     except Exception as e:
         import traceback

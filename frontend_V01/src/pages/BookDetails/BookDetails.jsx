@@ -417,6 +417,7 @@ const fetchReviews = async () => {
     });
 
     const data = res.data;
+
     // Calculate overall rating, total, breakdown
     const total = data.length;
     const overall = total > 0 ? data.reduce((sum, r) => sum + r.rating, 0) / total : 0;
@@ -432,7 +433,7 @@ const fetchReviews = async () => {
     });
   } catch (err) {
     console.error("Failed to fetch reviews:", err);
-    // alert("Failed to load reviews");
+    alert("Failed to load reviews");
   }
 };
 
@@ -444,7 +445,7 @@ const fetchReviews = async () => {
 
   try {
     const res = await axios.post(
-      '${import.meta.env.VITE_API_BASE_URL}/book_review/',
+      `${import.meta.env.VITE_API_BASE_URL}/book_review/`,
       {
         book_id: bookData.id,
         rating,

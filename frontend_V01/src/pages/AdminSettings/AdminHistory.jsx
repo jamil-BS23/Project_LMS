@@ -136,7 +136,7 @@ export default function UserHistory() {
                   <Filter size={16} /> Type:
                 </span>
                 <div className="flex items-center gap-2">
-                  {["All", "Borrowed", "Returned", "Booked", "Overdue","Pdf Viewed", "Returned"].map((t) => (
+                  {["All", "Borrowed", "Returned", "Booked", "Overdue","Pdf Viewed", "Rejected"].map((t) => (
                     <button
                       key={t}
                       type="button"

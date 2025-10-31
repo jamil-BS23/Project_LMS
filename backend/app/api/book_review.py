@@ -32,10 +32,7 @@ async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
     try:
         reviews = await BookReviewCRUD.get_reviews(db, book_id)
         if not reviews:
-            raise HTTPException(
-                status_code=status.HTTP_404_NOT_FOUND,
-                detail="No reviews found for this book."
-            )
+            return []
         for r in reviews:
             user_res = await get_user_from_api(r.user_id, db)
             r.username = user_res.user_name if user_res else "Unknown"

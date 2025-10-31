@@ -97,7 +97,7 @@ class BorrowCRUD:
             raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
 
         # 4️⃣ Borrow max limit (can later come from Settings)
-        borrow_max_limit = 5
+        borrow_max_limit = await SettingsCRUD.get_borrow_max_limit(db)
 
         # 5️⃣ Check if user already borrowed this book without returning it
         existing_borrow = await db.execute(
