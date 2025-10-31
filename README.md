@@ -49,7 +49,7 @@ Administrator (Librarian / Staff)
 - Manage categories & digital assets  
 - View all loans and user activity
 - 
-🔹 Getting Started
+##  Getting Started
  Prerequisites
 - Node.js v18+
 - npm or yarn
@@ -66,7 +66,7 @@ cp .env.example .env  # Edit database and MinIO credentials
 alembic upgrade head
 uvicorn app.main:app --reload
 
-Frontend Setup
+ Frontend Setup
 
 cd frontend
 npm install
@@ -76,7 +76,7 @@ Access:
 Frontend → http://localhost:5173
 
 Backend → http://localhost:8000/doc
-🔹 Frontend Overview
+##  Frontend Overview
 
     Built with React + Vite + Tailwind CSS + DaisyUI
 
@@ -88,7 +88,7 @@ Backend → http://localhost:8000/doc
 
     Axios for API communication
 
-🔹 Backend Overview
+##  Backend Overview
 
     FastAPI with async SQLAlchemy ORM
 
@@ -100,7 +100,7 @@ Backend → http://localhost:8000/doc
 
     JWT-based authentication & RBAC
 
-🔹 Core Features
+##  Core Features
 User Features
     
     Search/browse books by title, author, or ISBN
@@ -119,7 +119,7 @@ Admin Features
 
     Upload and organize digital media (PDFs, covers)
 
-🔹 Technical Stack
+##  Technical Stack
 Layer	Technology:
 Frontend	React + Vite + Tailwind CSS + DaisyUI
 Routing	React Router DOM v6
@@ -131,12 +131,12 @@ Database	PostgreSQL
 File Storage	MinIO
 Authentication	JWT, RBAC
 
-🔹 Routing & State Management
+##  Routing & State Management
     Role-based route protection.
     AuthProvider manages login state.
     Conditional layout shells for each role.
 
-🔹 API Endpoints (Highlights)
+##  API Endpoints (Highlights)
 📦 Authentication & User Interaction
 
 +----------------+--------+------------------------+---------------+---------------------------+
@@ -169,7 +169,7 @@ Authentication	JWT, RBAC
 | admin/loans       | GET    | View all loans                       |
 +-------------------+--------+--------------------------------------+
 
-🔹 Security & Error Handling
+##  Security & Error Handling
     JWT authentication and RBAC
     Standard HTTP responses:
         400 – Bad Request
@@ -179,7 +179,7 @@ Authentication	JWT, RBAC
         409 – Conflict
         422 – Validation error
 
-🔹 Project Structure
+##  Project Structure
 
 Project_LMS
 ├── backend
@@ -219,7 +219,7 @@ Format code	npx prettier --write .
     Commit and push changes
     Open a Pull Request
 
-🔹 System Architecture
+##  System Architecture
 
 +-------------------+      HTTP/API       +-------------------+
 |   React Frontend  | <----------------> |   FastAPI Backend |
@@ -243,7 +243,7 @@ Administrator (Librarian/Staff)
 
 Login/Register → Admin Dashboard → Manage Books → Manage Loans → Manage Assets
 
-🔹 Database / ERD (Simplified)
+##  Database / ERD (Simplified)
 
 +---------+       +---------+       +---------+
 |  Users  |       |  Books  |       |  Loans  |
