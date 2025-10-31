@@ -1,9 +1,9 @@
- 📚 Library Management System (LMS)
- 
+# 📚 Library Management System (LMS)
+
 Full-Stack Web Application – A modern digital library platform for managing physical and digital books.  
 Supports patrons (users) and administrators (library staff) with full role-based access control (RBAC).
 
-🔹 Table of Contents
+## Table of Contents
 1. [Project Overview](#project-overview)
 2. [User Roles & Access](#user-roles--access)
 3. [Getting Started](#getting-started)
@@ -22,7 +22,7 @@ Supports patrons (users) and administrators (library staff) with full role-based
 16. [Database / ERD](#database--erd-simplified)
 17. [License & Contact](#license--contact)
 
-🔹 Project Overview
+## Project Overview
 
 The Library Management System (LMS) is a web-based platform that simplifies management of both physical and digital library resources.
 
