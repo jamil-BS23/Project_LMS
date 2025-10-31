@@ -57,7 +57,7 @@ useEffect(() => {
     }
 
     try {
-      const res = await axios.get("http://localhost:8000/settings/admin", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/settings/admin`, {
         headers: { Authorization: `Bearer ${token}` },
       });
 
@@ -127,7 +127,7 @@ useEffect(() => {
       booking_days_limit: limits["booking-days-limit"],
     };
 
-    await axios.post("http://localhost:8000/settings/admin", payload, {
+    await axios.post(`${import.meta.env.VITE_API_BASE_URL}/settings/admin`, payload, {
       headers: { Authorization: `Bearer ${token}` },
     });
 

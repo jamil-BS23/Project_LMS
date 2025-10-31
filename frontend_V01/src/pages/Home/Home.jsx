@@ -239,7 +239,7 @@ export default function Home() {
                             key={b.book_id}
                             book={{
                               ...b,
-                              coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
+                              coverImage: b.coverImage || b.image ? `${import.meta.env.VITE_API_BASE_URL}${b.image}`  : "https://via.placeholder.com/150",
                             }}
                             variant="row"
                             status={getStatus(b)}
@@ -312,7 +312,7 @@ export default function Home() {
                             key={b.id}
                             book={{
                               ...b,
-                              coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
+                              coverImage: b.coverImage || b.image ? `${import.meta.env.VITE_API_BASE_URL}{b.image}`  : "https://via.placeholder.com/150",
                             }}
                             variant="row"
                             status={getStatus(b)}
@@ -377,7 +377,7 @@ export default function Home() {
                         key={b.id}
                         book={{
                           ...b,
-                          coverImage: b.coverImage || b.image ? `http://localhost:8000${b.image}`  : "https://via.placeholder.com/150",
+                          coverImage: b.coverImage || b.image ? `${import.meta.env.VITE_API_BASE_URL}${b.image}`  : "https://via.placeholder.com/150",
                         }}
                         variant="grid"
                         size="scroller"

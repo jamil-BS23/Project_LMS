@@ -171,7 +171,7 @@ export default function UploadBookPage() {
 
   try {
     const token = localStorage.getItem("token");
-    const res = await axios.put("http://localhost:8000/donation/", formData, {
+    const res = await axios.put(`${import.meta.env.VITE_API_BASE_URL}/donation/`, formData, {
       headers: {
         "Content-Type": "multipart/form-data",
         Authorization: `Bearer ${token}`,
@@ -204,7 +204,7 @@ useEffect(() => {
   const fetchCategories = async () => {
     try {
       const token = localStorage.getItem("token");
-      const res = await axios.get("http://localhost:8000/categories/all", {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/categories/all`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

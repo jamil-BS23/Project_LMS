@@ -328,7 +328,7 @@ export default function DonationRequest() {
 
     // 🔹 Call backend PATCH API
     const res = await axios.patch(
-      `http://localhost:8000/donation/${id}/status`,
+      `${import.meta.env.VITE_API_BASE_URL}/donation/${id}/status`,
       { status: action },
       { headers: { Authorization: `Bearer ${token}` } }
     );

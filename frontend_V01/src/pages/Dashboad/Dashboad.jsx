@@ -40,6 +40,7 @@ export default function Dashboard() {
     borrowed_copies: 0,
     returned_copies: 0,
     pending_copies: 0,
+    overdued_copies:0,
     total_copies: 0,
     available_copies: 0,
   });
@@ -48,11 +49,12 @@ export default function Dashboard() {
       try {
         const api = axiosAuth(); // use axios instance with token
   
-        const [borrowedRes, returnedRes, pendingRes, totalRes] =
+        const [borrowedRes, returnedRes, pendingRes, overdueRes,totalRes] =
           await Promise.all([
             api.get("/borrow/status/accepted/count"),
             api.get("/borrow/status/returned/count"),
             api.get("/borrow/status/pending/count"),
+            api.get("/borrow/status/overdue/count"),
             api.get("/books/count"),
           ]);
   
@@ -63,8 +65,9 @@ export default function Dashboard() {
           borrowed_copies: borrowed,
           returned_copies: returnedRes.data.count || 0,
           pending_copies: pendingRes.data.count || 0,
+          overdued_copies: overdueRes.data.count || 0,
           total_copies: total,
-          available_copies: total - (borrowed+ pendingRes.data.count || 0),
+          available_copies: total - (borrowed+ (pendingRes.data.count || 0) + (overdueRes.data.count||0)),
         });
       } catch (err) {
         console.error("Error fetching stats:", err.response?.data || err);
@@ -79,6 +82,7 @@ export default function Dashboard() {
   const dashboardItems = [
     { label: "Borrowed Books", value: stats.borrowed_copies },
     { label: "Returned Books", value: stats.returned_copies },
+    { label: "Overdued Books", value: stats.overdued_copies },
     { label: "Borrows Pending", value: stats.pending_copies },
     { label: "Total Books", value: stats.total_copies },
     { label: "Available Books", value: stats.available_copies },
@@ -528,7 +532,7 @@ export default function Dashboard() {
                 <tr key={`${r.book}__${r.user}__${i}`} className="border-b border-gray-200">
                   <td>{startIndex + i + 1}</td>
                   <td className="font-medium">{r.book_title}</td>
-                  <td>{r.username}</td>
+                  <td>{r.user_name}</td>
                   <td>{r.borrow_date.split('T')[0]}</td>
                   <td>{r.return_date.split('T')[0]}</td>
                   <td className="text-center">

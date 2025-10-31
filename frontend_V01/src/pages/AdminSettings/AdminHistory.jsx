@@ -69,7 +69,7 @@ export default function UserHistory() {
       return "Borrowed";
     case "returned":
       return "Returned";
-    case "pdf viewed":
+    case "pdf-viewed":
       return "Pdf Viewed";
     case "overdue":
       return "Overdue";
