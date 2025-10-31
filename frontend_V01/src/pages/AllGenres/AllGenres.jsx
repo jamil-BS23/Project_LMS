@@ -305,7 +305,7 @@ export default function AllGenres() {
                       book={{
                         ...b,
                         coverImage: b.book_pic
-                          ? `http://localhost:8000${b.book_pic}`
+                          ? `${import.meta.env.VITE_API_BASE_URL}${b.book_pic}`
                           : "https://via.placeholder.com/150",
                         status: getStockStatus(b),
                       }}

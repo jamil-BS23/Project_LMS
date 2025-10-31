@@ -15,7 +15,7 @@ const [books, setBooks] = useState([]);
   useEffect(() => {
     const fetchNewBooks = async () => {
       try {
-        const res = await axios.get("http://localhost:8000/books/new");
+        const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/new`);
         setBooks(res.data);
       } catch (err) {
         console.error("Failed to load new books:", err);
@@ -84,7 +84,7 @@ const [books, setBooks] = useState([]);
               {books.map((b) => (
                 <BookCard
                   key={b.id}
-                  book={{ ...b, coverImage: b.image ?  `http://localhost:8000${b.image}` 
+                  book={{ ...b, coverImage: b.image ?  `${import.meta.env.VITE_API_BASE_URL}${b.image}` 
                          : "https://via.placeholder.com/150", }} // map to the shared card shape
                   variant="row"
                   status={b.copies > 1 ? "available" : "unavailable"}
