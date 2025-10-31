@@ -34,7 +34,7 @@ Thumbs.db
 .idea/
 *.swp
 *.swo
-*.yml
+
 # --- Environment and secret files ---
 .env
 *.env

@@ -147,52 +147,6 @@ const handleSubmit = async () => {
 };
 
 
-  let borrow_max_limit = 5; // default fallback
-  let borrow_day_limit = 14; // default fallback
-  
-  const handleSubmit = async () => {
-    if (!borrowedBooks.length) return alert("No book selected");
-  
-    const book = borrowedBooks[0]; 
-    const bookForm = formData[book.id];
-  
-    if (!bookForm || !bookForm.returnDate) {
-      alert("Please select a return date!");
-      return;
-    }
-  
-    const payload = {
-      book_id: Number(book.id),
-      return_date: new Date(bookForm.returnDate).toISOString(),
-    };
-  
-    try {
-      const token = localStorage.getItem("token");
-      const res = await axios.post("http://localhost:8000/borrow/", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-  
-      // Update limits from backend if returned
-      if (res.data.borrow_max_limit) borrow_max_limit = res.data.borrow_max_limit;
-      if (res.data.borrow_day_limit) borrow_day_limit = res.data.borrow_day_limit;
-  
-      alert("Book borrowed successfully!");
-      navigate("/user");
-    } catch (error) {
-      const backendDetail = error.response?.data?.detail;
-  
-      const messageMap = {
-        "USER ALREADY BORROWED THIS BOOK": "You already borrowed this book!",
-        "BOOK LIMIT EXCEEDED": `You cannot borrow more than ${borrow_max_limit} books!`,
-        "RETURN DATE EXCEEDS LIMIT": `Return date exceeds the maximum borrow limit of ${borrow_day_limit} days!`,
-        "BOOK_NOT_FOUND": "The selected book does not exist!",
-        "BOOK_UNAVAILABLE": "This book is currently unavailable!",
-      };
-  
-      const alertMessage = messageMap[backendDetail] || backendDetail || "Borrow failed!";
-      alert(alertMessage);
-    }
-  };
   
 
 
