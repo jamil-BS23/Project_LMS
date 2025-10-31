@@ -1,4 +1,3 @@
-
 // src/pages/BookDetails/BookDetails.jsx
 import React, { use, useEffect, useRef, useState } from "react";
 import { useParams, useNavigate, Link, useLocation } from "react-router-dom";
@@ -18,55 +17,6 @@ import {
 } from "lucide-react";
 import BookCard from "../../components/BookCard/BookCard";
 import axios from "axios";  
-/** Demo reviews DB (unchanged) */
-const REVIEWS_DB = {
-  "5": {
-    heading: "Employee Review",
-    overall: 4.7,
-    total: 2713,
-    breakdown: { 5: 82, 4: 12, 3: 4, 2: 1, 1: 1 },
-    images: [
-      "https://images.unsplash.com/photo-1544937950-fa07a98d237f?q=80&w=400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1524995997946-a1c2e315a42f?q=80&w=400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1528207776546-365bb710ee93?q=80&w=400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1519682337058-a94d519337bc?q=80&w=400&auto=format&fit=crop",
-      "https://images.unsplash.com/photo-1495446815901-a7297e633e8d?q=80&w=400&auto=format&fit=crop",
-    ],
-    reviews: [
-      { id: "r1", name: "Humayun Kabir", title: "An absolute masterpiece even in 2025", stars: 5, country: "Bangladesh", date: "July 2, 2025", verified: true, body: "Moves you from low-level to high-level architectural thinking. Evergreen patterns and trade-offs. Senior engineers loved it.", helpful: 56 },
-      { id: "r2", name: "Lubaba Jahan", title: "Must Read", stars: 5, country: "Bangladesh", date: "May 26, 2025", verified: false, body: "Seminal work. Not a quick read, but worth the effort. Clear patterns and timeless insights.", helpful: 14 },
-      { id: "r3", name: "Rashedul Zaman", title: "Great print, good quality cover", stars: 4, country: "Bangladesh", date: "April 22, 2025", verified: true, body: "Well packaged, arrived flat. Solid examples and commentary.", helpful: 9 },
-      { id: "r4", name: "Tasmania Rosa .", title: "Practical patterns", stars: 5, country: "Bangladesh", date: "March 02, 2025", verified: true, body: "Explains trade-offs clearly. Helped our team refactor services.", helpful: 11 },
-      { id: "r5", name: "Shuvo Rahman", title: "Dense but rewarding", stars: 4, country: "Bangladesh", date: "Feb 18, 2025", verified: false, body: "Take it slow. Examples are timeless.", helpful: 7 },
-      { id: "r6", name: "Maruf Islam", title: "Go-to reference", stars: 5, country: "Bangladesh", date: "January 11, 2025", verified: true, body: "Keep it on my desk. Patterns map to modern stacks easily.", helpful: 18 },
-      { id: "r7", name: "Sazal Uddin.", title: "Bridges theory and practice", stars: 5, country: "Bangladesh", date: "Nov 3, 2024", verified: true, body: "Rare book that improves code quality quickly.", helpful: 6 },
-      { id: "r8", name: "Naimur Hasan", title: "A classic", stars: 5, country: "Bangladesh", date: "Sep 1, 2024", verified: false, body: "Still relevant, even with new frameworks.", helpful: 4 },
-    ],
-  },
-  "2": {
-    heading: "Employee Review",
-    overall: 4.9,
-    total: 1045,
-    breakdown: { 5: 88, 4: 9, 3: 2, 2: 1, 1: 0 },
-    images: [],
-    reviews: [
-      { id: "r9", name: "Nadia Zahan.", title: "Clear cloud strategy playbook", stars: 5, country: "Bangladesh", date: "May 10, 2024", verified: true, body: "Vendor-neutral frameworks. Helped us choose a service model and avoid re-architecture.", helpful: 22 },
-      { id: "r10", name: "Vitul Shohan", title: "Strong patterns", stars: 4, country: "Bangladesh", date: "Aug 8, 2024", verified: false, body: "Good balance of business & tech requirements.", helpful: 5 },
-      { id: "r11", name: "Purification Meril", title: "Great case studies", stars: 5, country: "Bangladesh", date: "Jan 20, 2025", verified: true, body: "Real migrations and pitfalls. Very useful.", helpful: 9 },
-    ],
-  },
-  "1": {
-    heading: "Employee Review",
-    overall: 4.0,
-    total: 1,
-    breakdown: { 5: 100, 4: 0, 3: 0, 2: 0, 1: 0 },
-    images: [],
-    reviews: [
-      { id: "r12", name: "Alisha Rahman", title: "Inspiring for founders", stars: 5, country: "Bangladesh", date: "March 5, 2023", verified: true, body: "Concise, motivating, and practical.", helpful: 3 },
-    ],
-  },
-};
 
 export default function BookDetails() {
   const { id } = useParams();
@@ -93,7 +43,7 @@ export default function BookDetails() {
   const [authorFollowers, setAuthorFollowers] = useState(0);
   const [rolePicked, setRolePicked] = useState("");
 
-  // “Want to read” dropdown + toast
+  // "Want to read" dropdown + toast
   const [showReadBox, setShowReadBox] = useState(false);
   const [readStatus, setReadStatus] = useState("");
   const [toast, setToast] = useState({ open: false, msg: "" });
@@ -128,17 +78,10 @@ export default function BookDetails() {
     return { intro, tail };
   };
 
-  const pickAudio = (b) =>
-  {
-     const audioPath =
-    b.book_audio || b.audioSrc || b.audioLink || b.audio_clip || b.audioURL || null;
-
-  if (!audioPath) return null;
-
-  // If the path starts with "/", prepend your backend base URL
-  return audioPath.startsWith("http")
-    ? audioPath
-    : `http://localhost:8000${b.audio}`;
+  const pickAudio = (b) => {
+    const audioPath = b.book_audio || b.audioSrc || b.audioLink || b.audio_clip || b.audioURL || null;
+    if (!audioPath) return null;
+    return audioPath.startsWith("http") ? audioPath : `http://localhost:8000${audioPath}`;
   }
 
   const normalize = (b) =>
@@ -148,102 +91,90 @@ export default function BookDetails() {
           id: b.book_id,
           title: b.book_title,
           authors: b.authors || b.book_author || "Unknown Author",
-          coverImage: b.book_image,
+          coverImage: b.book_image ? `http://localhost:8000${b.book_image}` : "https://via.placeholder.com/150",
           rating: b.book_rating ?? 0,
           ratingCount: b.ratingCount ?? 0,
           publisher: b.author ?? "—",
           publishDate: b.created_at ?? "",
           category: b.book_category ?? "General",
-          pdfLink: b.book_pdf? 
-          b.book_pdf // <-- prepend backend media path
-          : "https://via.placeholder.com/150",
+          pdfLink: b.book_pdf ? `http://localhost:8000${b.book_pdf}` : "https://via.placeholder.com/150",
           status: b.status,
-          image: b.book_image,
+          image: b.book_image ? `http://localhost:8000${b.book_image}` : "https://via.placeholder.com/150",
           summary: b.longSummary || b.summary || b.book_description || "",
           summaryIntro: b.summaryIntro || b.summary_intro || null,
           summaryTail: b.summaryTail || b.summary_tail || null,
-          authorPhoto:
-            b.authorPhoto ||
-            b.author_image ||
-            b.authorImage ||
-            "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=240&h=240&fit=crop",
+          authorPhoto: b.author_image ? `http://localhost:8000${b.author_image}` : "https://images.unsplash.com/photo-1527980965255-d3b416303d12?w=240&h=240&fit=crop",
           authorFollowers: Number(b.authorFollowers || b.followers || 16),
-          authorBio: b.authorBio || b.author_bio || b.authorStory || "",
+          authorBio: b.author_bio || b.authorBio || b.authorStory || "",
           audioSrc: pickAudio(b),
-          copies:b.available_copies || b.copies || 0,
+          copies: b.available_copies || b.copies || 0,
         };
 
-  const bucket = (s) => {
-    const v = String(s || "Available").toLowerCase();
-    if (v.includes("upcoming") || v.includes("coming")) return "upcoming";
-    if (v.includes("out") || v.includes("not available") || v.includes("stock"))
-      return "unavailable";
-    return "available";
-  };
+  const token = localStorage.getItem("token");
 
-
-const token = localStorage.getItem("token");
-
-const handlePdfClick = async (bookId, pdfLink) => {
-  try {
+  // Authentication check
+  useEffect(() => {
     if (!token) {
-      alert("Please login first!");
+      navigate("/login");
       return;
     }
+  }, [token, navigate]);
 
-    await axios.post(
-      `${import.meta.env.VITE_API_BASE_URL}/borrow/pdf/${bookId}`,
-      {},
-      {
-        headers: {
-          Authorization: `Bearer ${token}`,
-        },
+  const handlePdfClick = async (bookId, pdfLink) => {
+    try {
+      if (!token) {
+        alert("Please login first!");
+        navigate("/login");
+        return;
       }
-    );
 
-    // ✅ Open the PDF in a new tab
-    window.open(pdfLink, "_blank");
-  } catch (err) {
-    console.error("Failed to record PDF view:", err);
-    // still open PDF even if record fails
-    window.open(pdfLink, "_blank");
-  }
-};
-useEffect(() => {
+      // Record PDF view in backend
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/borrow/pdf/${bookId}`,
+        {},
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
+
+      // Open PDF in new tab
+      window.open(pdfLink, "_blank");
+    } catch (err) {
+      console.error("Failed to record PDF view:", err);
+      window.open(pdfLink, "_blank");
+    }
+  };
+
+  // Fetch book details and related books
+  useEffect(() => {
     const fetchBook = async () => {
       try {
-        const token = localStorage.getItem("token");
-        if (!token) {
-          alert("You must log in to view book details");
-          navigate("/login");
-          return;
-        }
+        if (!token) return;
 
+        // Fetch single book details
         const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books/${id}`, {
-          headers: {
-            Authorization: `Bearer ${token}`, // ✅ token required
-          },
+          headers: { Authorization: `Bearer ${token}` },
         });
-
         const b = res.data;
-        setBookData({
-          ...b,
-          coverImage: b.book_image 
-            ? `http://localhost:8000${b.image}`
-            : "https://via.placeholder.com/150",
-        });
-        setBookData(normalize(b));
-        const resAll = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
-      const others = (resAll.data.items || [])
-        .filter((book) => String(book.book_id) !== String(id))
-        .filter((book) => book.book_category === b.book_category)
-        .slice(0, 3)
-        .filter(Boolean);
-     
-      setRelatedBooks(others);
 
+        // Normalize and set book data
+        const normalizedBook = normalize(b);
+        setBookData(normalizedBook);
+        setAuthorFollowers(normalizedBook.authorFollowers);
+
+        // Fetch all books for related books
+        const resAll = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/books`, {
+          headers: { Authorization: `Bearer ${token}` },
+        });
+
+        const others = (resAll.data.items || resAll.data || [])
+          .filter((book) => String(book.book_id) !== String(id))
+          .filter((book) => book.book_category === b.book_category)
+          .slice(0, 3)
+          .map(normalize)
+          .filter(Boolean);
+
+        setRelatedBooks(others);
       } catch (err) {
         console.error("Failed to fetch book details:", err);
         if (err.response?.status === 401 || err.response?.status === 403) {
@@ -252,20 +183,18 @@ useEffect(() => {
         }
       }
     };
-    
+
     fetchBook();
-  }, [id, navigate]);
+  }, [id, navigate, token]);
 
-
-
-  // init votes when book changes
+  // Fetch reviews and rating breakdown when book changes
   useEffect(() => {
     if (!bookData?.id) return;
     fetchRatingBreakdown();
     fetchReviews(); 
   }, [bookData?.id]);
 
-  // close the read box when clicking outside
+  // Close the read box when clicking outside
   useEffect(() => {
     const handleClickOutside = (e) => {
       if (showReadBox && readBoxRef.current && !readBoxRef.current.contains(e.target)) {
@@ -276,7 +205,7 @@ useEffect(() => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, [showReadBox]);
 
-  // ====== Audio DOM event listeners ======
+  // Audio DOM event listeners
   useEffect(() => {
     const el = audioRef.current;
     if (!el) return;
@@ -381,6 +310,131 @@ useEffect(() => {
       />
     ));
 
+  // Fetch rating breakdown
+  const fetchRatingBreakdown = async () => {
+    if (!bookData?.id) return;
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/rate_book/${bookData.id}/rating-breakdown`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      const data = res.data;
+      setPack({
+        heading: "Employee Review",
+        total: data.total,
+        overall: data.overall,
+        breakdown: data.breakdown,
+        reviews: data.reviews || []
+      });
+    } catch (err) {
+      console.error("Failed to fetch rating breakdown:", err);
+    }
+  };
+
+  // Fetch reviews
+  const fetchReviews = async () => {
+    if (!bookData?.id) return;
+
+    try {
+      const res = await axios.get(`${import.meta.env.VITE_API_BASE_URL}/book_review/${bookData.id}`, {
+        headers: { Authorization: `Bearer ${token}` }
+      });
+
+      const data = res.data;
+      // Calculate overall rating, total, breakdown
+      const total = data.length;
+      const overall = total > 0 ? data.reduce((sum, r) => sum + r.rating, 0) / total : 0;
+      const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
+      data.forEach(r => { breakdown[r.rating] = (breakdown[r.rating] || 0) + 1; });
+
+      setPack({
+        heading: "Employee Review",
+        total,
+        overall: Math.round(overall * 10) / 10,
+        breakdown,
+        reviews: data
+      });
+    } catch (err) {
+      console.error("Failed to fetch reviews:", err);
+    }
+  };
+
+  // Submit review
+  const submitReview = async () => {
+    if (!rating || !comment) {
+      alert("Please provide a rating and comment");
+      return;
+    }
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/book_review/${bookData.id}`,
+        {
+          book_id: bookData.id,
+          review_text: comment,
+          rating: rating
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+
+      // After submission, refresh reviews + rating breakdown
+      fetchReviews();
+      fetchRatingBreakdown();
+      setRating(0);
+      setComment("");
+      alert("Review submitted successfully!");
+    } catch (err) {
+      console.error(err);
+      alert(err.response?.data?.detail || "Failed to submit review");
+    }
+  };
+
+  // Rate book
+  const rateBook = async (newRating) => {
+    try {
+      await axios.patch(
+        `${import.meta.env.VITE_API_BASE_URL}/rate_book/rate`,
+        {
+          book_id: bookData.id,
+          book_rating: newRating,
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      fetchRatingBreakdown(); // refresh overall rating & breakdown
+    } catch (err) {
+      alert(err.response?.data?.detail || "Failed to rate book");
+    }
+  };
+
+  // Follow author
+  const followAuthor = async () => {
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_API_BASE_URL}/follow_author`,
+        {
+          author_id: bookData.id,
+          role: rolePicked
+        },
+        {
+          headers: { Authorization: `Bearer ${token}` }
+        }
+      );
+      setIsFollowing(true);
+      setAuthorFollowers(prev => prev + 1);
+      setShowFollowModal(false);
+    } catch (err) {
+      console.error("Failed to follow author:", err);
+      // Fallback to frontend state if backend fails
+      setIsFollowing(true);
+      setAuthorFollowers(prev => prev + 1);
+      setShowFollowModal(false);
+    }
+  };
+
   if (!bookData) {
     return (
       <div className="text-center text-gray-600 py-20">
@@ -388,88 +442,9 @@ useEffect(() => {
       </div>
     );
   }
-  
-  const fetchRatingBreakdown = async () => {
-  if (!bookData?.id) return;
 
-  try {
-    const res = await axios.get(`http://localhost:8000/rate_book/${bookData.id}/rating-breakdown`);
-    const data = res.data;
-    setPack({
-      heading: "Employee Review",
-      total: data.total,
-      overall: data.overall,
-      breakdown: data.breakdown,
-      reviews: data.reviews
-    });
-  } catch (err) {
-    console.error("Failed to fetch rating breakdown:", err);
-  }
-};
-
-
-const fetchReviews = async () => {
-  if (!bookData?.id) return;
-
-  try {
-    const res = await axios.get(`http://localhost:8000/book_review/${bookData.id}`, {
-      headers: { Authorization: `Bearer ${token}` } // make sure token exists
-    });
-
-    const data = res.data;
-    // Calculate overall rating, total, breakdown
-    const total = data.length;
-    const overall = total > 0 ? data.reduce((sum, r) => sum + r.rating, 0) / total : 0;
-    const breakdown = { 1: 0, 2: 0, 3: 0, 4: 0, 5: 0 };
-    data.forEach(r => { breakdown[r.rating] = (breakdown[r.rating] || 0) + 1; });
-
-    setPack({
-      heading: "Employee Review",
-      total,
-      overall: Math.round(overall * 10) / 10,
-      breakdown,
-      reviews: data
-    });
-  } catch (err) {
-    console.error("Failed to fetch reviews:", err);
-    // alert("Failed to load reviews");
-  }
-};
-
-  const submitReview = async () => {
-  if (!rating || !comment) {
-    alert("Please provide a rating and comment");
-    return;
-  }
-
-  try {
-    const res = await axios.post(
-      "http://localhost:8000/book_review/",
-      {
-        book_id: bookData.id,
-        rating,
-        comment
-      },
-      {
-        headers: { Authorization: `Bearer ${token}` } // make sure token exists
-      }
-    );
-
-    // After submission, refresh reviews + rating breakdown
-    fetchReviews();
-    fetchRatingBreakdown();
-    setRating(0);
-    setComment("");
-    alert("Review submitted successfully!");
-  } catch (err) {
-    console.error(err);
-    alert(err.response?.data?.detail || "Failed to submit review");
-  }
-};
-
-  // const pack = REVIEWS_DB[String(bookData.id)] || null;
   const localReviewCount = pack?.reviews?.length ?? 0;
-  const ratingCountDisplay = pack ?.total ?? 0;
+  const ratingCountDisplay = pack?.total ?? 0;
   const reviewsTextDisplay = pack
     ? localReviewCount > 0
       ? `${localReviewCount} Reviews`
@@ -562,8 +537,6 @@ const fetchReviews = async () => {
               className="w-full h-auto max-h-[460px] object-contain"
             />
           </div>
-          {/* Want to read control (kept commented exactly as you had) */}
-          {/* <div className="mt-3 w-[340px] max-w-full" ref={readBoxRef}> ... </div> */}
         </div>
 
         {/* RIGHT COLUMN (book info) */}
@@ -881,20 +854,9 @@ const fetchReviews = async () => {
               <Star
                 key={i}
                 className={`w-6 h-6 cursor-pointer ${i < rating ? "text-yellow-500 fill-yellow-500" : "text-gray-300"}`}
-                onClick={async () => {
+                onClick={() => {
                   setRating(i + 1);
-                  try {
-                    await axios.patch(`${import.meta.env.VITE_API_BASE_URL}/rate_book/rate`, {
-                      book_id: bookData.id,
-                      book_rating: i + 1,
-                    },
-                   {
-                      headers: { Authorization: `Bearer ${token}` } // make sure token exists
-                    });
-                                  fetchRatingBreakdown(); // refresh overall rating & breakdown
-                  } catch (err) {
-                    alert(err.response?.data?.detail || "Failed to rate book");
-                  }
+                  rateBook(i + 1);
                 }}
               />
             ))}
@@ -907,22 +869,7 @@ const fetchReviews = async () => {
           />
           <button
             className="mt-3 inline-flex items-center border border-gray-300 text-sky-600 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-sky-50"
-            onClick={async () => {
-              if (!comment) return alert("Please write a review");
-              try {
-                await axios.post(`${import.meta.env.VITE_API_BASE_URL}/book_review/${bookData.id}`, {
-                  book_id: bookData.id,
-                  review_text: comment
-                }, {
-                    headers: { Authorization: `Bearer ${token}` } // make sure token exists
-                     });
-                fetchReviews(); // refresh reviews list
-                setComment("");
-                alert("Review submitted successfully!");
-              } catch (err) {
-                alert(err.response?.data?.detail || "Failed to submit review");
-              }
-            }}
+            onClick={submitReview}
           >
             Review Write
           </button>
@@ -933,9 +880,9 @@ const fetchReviews = async () => {
           ) : (
             <div className="space-y-6 mt-10 sm:mt-20">
               {pack.reviews.map((r) => {
-                const isLong = (r.body || "").length > 220;
+                const isLong = (r.review_text || r.body || "").length > 220;
                 const open = !!expanded[r.id];
-                const body = !isLong || open ? r.body : r.body.slice(0, 220) + "…";
+                const body = !isLong || open ? (r.review_text || r.body) : (r.review_text || r.body).slice(0, 220) + "…";
                 const firstLetter = r.username?.trim()?.[0]?.toUpperCase() || "?";
                 const v = votes[r.id] || { up: r.helpful || 0, down: 0, my: null };
                 return (
@@ -955,7 +902,6 @@ const fetchReviews = async () => {
                         </div>
                         <div className="flex items-center gap-1 text-xs mt-0.5 text-gray-500">
                           {renderStars(r.rating)}
-                          {/* <span className="ml-1 font-medium">{r.rating.toFixed(1)}</span> */}
                           <span className="text-gray-300 mx-1">|</span>
                           <time dateTime={r.created_at}>{r.created_at}</time>
                         </div>
@@ -1040,24 +986,6 @@ const fetchReviews = async () => {
                   </div>
                 ))}
               </div>
-
-              {/* {pack.images.length > 0 && (
-                <div className="mt-8">
-                  <h5 className="text-sm font-semibold text-gray-700">Images from reviews</h5>
-                  <div className="flex overflow-x-auto gap-3 mt-3 pb-2 scrollbar-hide">
-                    {pack.images.map((src, i) => (
-                      <div key={i} className="w-24 h-24 sm:w-28 sm:h-28 shrink-0 rounded-md overflow-hidden border border-gray-200">
-                        <img
-                          src={src}
-                          alt={`Review image ${i + 1}`}
-                          loading="lazy"
-                          className="w-full h-full object-cover"
-                        />
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )} */}
             </div>
           )}
         </div>
@@ -1176,11 +1104,7 @@ const fetchReviews = async () => {
               ))}
             </div>
             <button
-              onClick={() => {
-                setIsFollowing(true);
-                setAuthorFollowers((prev) => prev + 1);
-                setShowFollowModal(false);
-              }}
+              onClick={followAuthor}
               disabled={!rolePicked}
               className={`mt-6 w-full font-semibold px-4 py-3 rounded-md transition-colors ${
                 rolePicked

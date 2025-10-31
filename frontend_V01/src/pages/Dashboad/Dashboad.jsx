@@ -1,4 +1,5 @@
-// src/pages/Dashboard/Dashboard.jsx
+// Dashboard.jsx (weekly legend BELOW chart: Borrowed / Returned / Overdue)
+
 import { useEffect, useMemo, useRef, useState } from "react";
 import {
   CalendarDays,
@@ -7,29 +8,24 @@ import {
   BookOpen,
   HelpCircle,
   LogOut,
-  Library,
-  Layers,
+  Library, // optional
+  Layers,  // optional
   AlertTriangle,
   CheckCircle2,
   XCircle,
   Mail,
 } from "lucide-react";
+import { Link } from "react-router-dom";
 import Sidebar from "../../components/DashboardSidebar/DashboardSidebar";
 import axios from "axios";
 
-<<<<<<< HEAD
-export default function Dashboard() {
-  // ------------------------- TITLE -------------------------
-=======
 export const axiosAuth = () => {
   const token = localStorage.getItem("token");
   if (!token) throw new Error("No token found. Please login.");
 
   return axios.create({
-    baseURL: import.meta.env.VITE_API_BASE_URL,
-    headers: {
-      Authorization: `Bearer ${token}`,
-    },
+    baseURL: import.meta.env.VITE_API_BASE_URL || "http://localhost:8000",
+    headers: { Authorization: `Bearer ${token}` },
   });
 };
 
@@ -40,12 +36,10 @@ export const axiosAuth = () => {
 export default function Dashboard() {
 
   
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
   useEffect(() => {
     document.title = "Library Dashboard";
   }, []);
 
-  // ------------------------- STATS -------------------------
   const [stats, setStats] = useState({
     borrowed_copies: 0,
     returned_copies: 0,
@@ -53,28 +47,6 @@ export default function Dashboard() {
     total_copies: 0,
     available_copies: 0,
   });
-<<<<<<< HEAD
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
-
-  useEffect(() => {
-    const fetchStats = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found. Please login.");
-
-        const res = await axios.get("http://localhost:8000/borrows/stats", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setStats({
-          borrowed_copies: res.data.borrowed_copies ?? 0,
-          returned_copies: res.data.returned_copies ?? 0,
-          pending_copies: res.data.pending_copies ?? 0,
-          total_copies: res.data.total_copies ?? 0,
-          available_copies: res.data.available_copies ?? 0,
-        });
-=======
 
   // utils/axiosAuth.js
   useEffect(() => {
@@ -100,7 +72,6 @@ export default function Dashboard() {
           total_copies: total,
           available_copies: total - borrowed,
         });
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
       } catch (err) {
         console.error("Error fetching stats:", err.response?.data || err);
         setError("Failed to load stats");
@@ -111,63 +82,29 @@ export default function Dashboard() {
   
     fetchStats();
   }, []);
-<<<<<<< HEAD
-
-=======
   
   
   
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
   const dashboardItems = [
     { label: "Borrowed Books", value: stats.borrowed_copies },
     { label: "Returned Books", value: stats.returned_copies },
     { label: "Borrows Pending", value: stats.pending_copies },
     { label: "Total Books", value: stats.total_copies },
     { label: "Available Books", value: stats.available_copies },
+    // Add "New Members" if you have an API for it
   ];
-
-  // ------------------------- PENDING BORROWS -------------------------
+  // --- Borrow Request demo data (replace with API later) ---
+  /*const [requests, setRequests] = useState([
+    { book: "Core Java", user: "Sadia Prova", borrowed: "29/07/2025", returned: "03/08/2025" },
+    { book: "SQL in 10 Minutes", user: "Arman Hasan", borrowed: "01/08/2025", returned: "06/08/2025" },
+  ]);*/
   const [requests, setRequests] = useState([]);
-<<<<<<< HEAD
-  const [rows, setRows] = useState([]); // overdue rows
-=======
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
 
   useEffect(() => {
     const fetchPendingRequests = async () => {
       try {
-<<<<<<< HEAD
-        const token = localStorage.getItem("token");
-        if (!token) throw new Error("No token found, please login.");
-
-        const res = await axios.get("http://localhost:8000/borrows/pending", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setRequests(res.data);
-      } catch (err) {
-        console.error("Error fetching pending requests:", err);
-        setError("Failed to load borrow requests");
-      }
-    };
-
-    const fetchBorrows = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/borrows", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        const today = new Date();
-        const overdue = (res.data || []).filter((r) => {
-          if (!r.return_date) return false;
-          const due = new Date(r.return_date);
-          return !r.returned_at && due < today;
-        });
-        setRows(overdue);
-=======
         const api = axiosAuth();
         const res = await api.get("/borrow/status/pending/list");
         setRequests(res.data || []);
@@ -295,19 +232,12 @@ export default function Dashboard() {
         const api = axiosAuth();
         const res = await api.get("/borrow/status/overdue/list");
         setRows(res.data || []);
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
       } catch (err) {
         console.error("Failed to fetch overdue history:", err.response?.data || err);
       }
     };
-<<<<<<< HEAD
-
-    fetchPendingRequests();
-    fetchBorrows();
-=======
   
     fetchOverdue();
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
   }, []);
   
   
@@ -336,76 +266,16 @@ export default function Dashboard() {
   //   fetchBorrows();
   // }, []);
 
-  // ------------------------- CONFIRM MODAL -------------------------
-  const [confirm, setConfirm] = useState({ open: false, type: null, index: -1, id: null });
-  const openConfirm = (type, index) =>
-    setConfirm({ open: true, type, index, id: requests[index]?.id });
-  const closeConfirm = () => setConfirm({ open: false, type: null, index: -1, id: null });
-
-  const [toast, setToast] = useState({ show: false, type: "accept", message: "" });
-  const showToast = (type, message) => {
-    setToast({ show: true, type, message });
-    setTimeout(() => setToast({ show: false, type, message: "" }), 2000);
-  };
-
-  const doConfirm = async () => {
-    const { type, index, id } = confirm;
-    if (index < 0 || !id) return console.error("Invalid confirm state:", confirm);
-
-    try {
-      const token = localStorage.getItem("token");
-      await axios.put(
-        `http://localhost:8000/borrows/${id}/status?status=${type === "accept" ? "approved" : "rejected"}`,
-        {},
-        { headers: { Authorization: `Bearer ${token}` } }
-      );
-
-      setRequests((prev) => prev.filter((_, i) => i !== index));
-      showToast(type, type === "accept" ? "Request accepted" : "Request rejected");
-    } catch (err) {
-      console.error("Failed to update borrow status:", err.response?.data || err);
-      showToast("error", "Failed to update borrow status");
-    }
-
-    closeConfirm();
-  };
-
-  // ------------------------- WEEKLY CHART -------------------------
-  const WEEK_LABELS = ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"];
-  const [series, setSeries] = useState([
-    { name: "Borrowed", color: "stroke-sky-500", dot: "fill-sky-500", values: Array(7).fill(0) },
-    { name: "Returned", color: "stroke-amber-500", dot: "fill-amber-400", values: Array(7).fill(0) },
-    { name: "Overdue", color: "stroke-rose-500", dot: "fill-rose-500", values: Array(7).fill(0) },
-  ]);
-
-  useEffect(() => {
-    const fetchWeekly = async () => {
-      try {
-        const token = localStorage.getItem("token");
-        const res = await axios.get("http://localhost:8000/borrows/weekly", {
-          headers: { Authorization: `Bearer ${token}` },
-        });
-
-        setSeries([
-          { name: "Borrowed", color: "stroke-sky-500", dot: "fill-sky-500", values: res.data.borrowed || [] },
-          { name: "Returned", color: "stroke-amber-500", dot: "fill-amber-400", values: res.data.returned || [] },
-          { name: "Overdue", color: "stroke-rose-500", dot: "fill-rose-500", values: res.data.overdue || [] },
-        ]);
-      } catch (err) {
-        console.error("Failed to fetch weekly chart:", err);
-      }
-    };
-    fetchWeekly();
-  }, []);
-
-  // ------------------------- CHART PATHS & ANIMATION -------------------------
+  // Smooth path helpers (quadratic mid-point)
   const chartBox = { w: 720, h: 200, padX: 36, padY: 20 };
   const allVals = series.flatMap((s) => s.values);
   const yMax = Math.max(1, Math.ceil(Math.max(...allVals) / 10) * 10);
   const yMin = 0;
 
-  const sx = (i) => chartBox.padX + (i * (chartBox.w - chartBox.padX * 2)) / (WEEK_LABELS.length - 1);
-  const sy = (v) => chartBox.h - chartBox.padY - ((v - yMin) / (yMax - yMin)) * (chartBox.h - chartBox.padY * 2);
+  const sx = (i) =>
+    chartBox.padX + (i * (chartBox.w - chartBox.padX * 2)) / (WEEK_LABELS.length - 1);
+  const sy = (v) =>
+    chartBox.h - chartBox.padY - ((v - yMin) / (yMax - yMin)) * (chartBox.h - chartBox.padY * 2);
 
   const makeSmoothPath = (vals) => {
     const pts = vals.map((v, i) => ({ x: sx(i), y: sy(v) }));
@@ -422,6 +292,8 @@ export default function Dashboard() {
   };
 
   const paths = series.map((s) => ({ ...s, d: makeSmoothPath(s.values) }));
+
+  // Stroke-draw animation
   const pathRefs = useRef([]);
   useEffect(() => {
     pathRefs.current.forEach((el, i) => {
@@ -429,14 +301,15 @@ export default function Dashboard() {
       const len = el.getTotalLength();
       el.style.strokeDasharray = `${len}`;
       el.style.strokeDashoffset = `${len}`;
+      // reflow then animate
       el.getBoundingClientRect();
       el.style.transition = `stroke-dashoffset 900ms ease ${i * 140}ms`;
       el.style.strokeDashoffset = "0";
     });
   }, [paths.map((p) => p.d).join("|")]);
 
-  // ------------------------- TIME -------------------------
-  const [now, setNow] = useState(new Date());
+  // "Updated" timestamp
+  const [now, setNow] = useState(() => new Date());
   useEffect(() => {
     const id = setInterval(() => setNow(new Date()), 1000);
     return () => clearInterval(id);
@@ -445,27 +318,32 @@ export default function Dashboard() {
   const mm = String(now.getMinutes()).padStart(2, "0");
   const ss = String(now.getSeconds()).padStart(2, "0");
 
-  // ------------------------- PAGINATION -------------------------
   const [currentPage, setCurrentPage] = useState(1);
-  const rowsPerPage = 5;
+  const rowsPerPage = 5; // change this to show more/less per page
+
+  // Calculate indexes
   const totalPages = Math.ceil(requests.length / rowsPerPage);
   const startIndex = (currentPage - 1) * rowsPerPage;
   const endIndex = startIndex + rowsPerPage;
   const currentRows = requests.slice(startIndex, endIndex);
 
-  const handlePrev = () => currentPage > 1 && setCurrentPage(currentPage - 1);
-  const handleNext = () => currentPage < totalPages && setCurrentPage(currentPage + 1);
+  // Page change handlers
+  const handlePrev = () => {
+    if (currentPage > 1) setCurrentPage(currentPage - 1);
+  };
 
-  // ------------------------- RENDER -------------------------
+  const handleNext = () => {
+    if (currentPage < totalPages) setCurrentPage(currentPage + 1);
+  };
+  
+   
   return (
     <div className="min-h-screen flex bg-gray-100">
+      {/* Sidebar */}
       <Sidebar />
-<<<<<<< HEAD
-=======
      
 
       {/* Main */}
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
       <main className="flex-1 p-6 space-y-6">
         {/* Top Stats */}
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
@@ -477,13 +355,15 @@ export default function Dashboard() {
           ))}
         </div>
 
-        {/* Graph + Overdue + Borrow Requests */}
-        {/* ... Keep all UI exactly as in your code above ... */}
-        {/* The code you provided for chart, overdue table, borrow requests table, modals, toast, pagination is unchanged */}
+        {/* Graph + Overdue */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          {/* ---------------------- CHECK-OUT STATISTICS (Weekly Line Chart; legend BELOW) ---------------------- */}
+          <div className="bg-white rounded shadow p-4">
+            <div className="flex items-center justify-between">
+              <h3 className="font-semibold mb-2">Check-Out Statistics</h3>
+              <span className="text-xs text-gray-500">Updated {hh}:{mm}:{ss}</span>
+            </div>
 
-<<<<<<< HEAD
-      </main>
-=======
             {/* Chart centered */}
             <div className="w-full flex justify-center">
               <svg
@@ -812,7 +692,12 @@ export default function Dashboard() {
         @keyframes popIn { to { opacity: 1; transform: translateY(0) } }
         @keyframes toastIn { from { opacity: 0; transform: translateY(8px) scale(.98) } to { opacity: 1; transform: translateY(0) scale(1) } }
       `}</style>
->>>>>>> ac9fbe620e321eae6450e2318702cf1200bffae0
     </div>
   );
 }
+
+
+
+
+
+
