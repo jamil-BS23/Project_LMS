@@ -13,8 +13,8 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 
 ### 🎯 Goals
 
-- **Users:** Search, borrow, return books, submit reviews.  
-- **Admins:** Manage inventory, users, and assets.  
+- **Users:** Search, borrow, return books, submit reviews  
+- **Admins:** Manage inventory, users, and assets  
 - **Libraries:** Maintain accurate tracking and reporting for circulation data
   
 ---
