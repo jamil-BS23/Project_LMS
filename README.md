@@ -168,9 +168,7 @@ Run backend:uvicorn app.main:app --reload
 Run frontend:npm run dev
 Build frontend	npm run build
 
-
-```markdown
-🔹 System Architecture
+## 🔹 System Architecture
 
 +-------------------+      HTTP/API       +-------------------+
 |   React Frontend  | <----------------> |   FastAPI Backend |
