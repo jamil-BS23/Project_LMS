@@ -29,7 +29,7 @@ Supports patrons (users) and administrators (library staff) with full role-based
 ## 🔹 Project Overview
 The Library Management System (LMS) is a web-based platform that simplifies management of both physical and digital library resources.
 
-**Goals**
+### 🎯 Goals
 - **Users:** Search, borrow, return books, submit reviews.  
 - **Admins:** Manage inventory, users, and assets.  
 - **Libraries:** Maintain accurate tracking and reporting for circulation data.
@@ -58,7 +58,7 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 - Node.js v18+
 - npm or yarn
 - Python v3.8+
-- PostgreSQL (or SQLite for dev)
+- PostgreSQL (or SQLite for development)
 
 ### ⚙️ Backend Setup
 ```bash
@@ -66,7 +66,7 @@ cd backend
 python -m venv .venv
 source .venv/bin/activate  # macOS/Linux
 pip install -r requirements.txt
-cp .env.example .env
+cp .env.example .env  # Edit DB & MinIO credentials
 alembic upgrade head
 uvicorn app.main:app --reload
 
@@ -76,8 +76,9 @@ cd frontend
 npm install
 npm run dev
 
-Access:
-Frontend → http://localhost:5173
+Access URLs:
+
+    Frontend → http://localhost:5173
 
 Backend → http://localhost:8000/docs
 🔹 Frontend Overview
@@ -88,7 +89,7 @@ Backend → http://localhost:8000/docs
 
     Global auth via Context API
 
-    Responsive UI
+    Responsive, mobile-first UI
 
     Axios for API communication
 
@@ -96,88 +97,114 @@ Backend → http://localhost:8000/docs
 
     FastAPI + Async SQLAlchemy ORM
 
-    PostgreSQL for DB
+    PostgreSQL database
 
-    MinIO (S3-compatible) for files
+    MinIO (S3-compatible) file storage
 
-    JWT-based auth + RBAC
+    Modular service-repository architecture
 
-    Modular service-repository structure
+    JWT-based authentication & RBAC
 
 🔹 Core Features
-🧑‍💻 User
+👥 User Features
 
-    Browse/search books
+    Search/browse books by title, author, or ISBN
 
-    Borrow/return books
+    Borrow and return books
 
-    Review and rate books
+    Rate and review titles
 
-    View loan history
+    Track personal loan history
 
-🛠️ Admin
+🛠️ Admin Features
 
-    Manage books and categories
+    Add, edit, delete books and categories
 
-    Manage loans and users
+    Manage user loans and assets
 
-    Upload digital assets (PDFs, covers)
+    Upload and organize digital media (PDFs, covers)
 
 🔹 Technical Stack
 Layer	Technology
 Frontend	React + Vite + Tailwind CSS + DaisyUI
 Routing	React Router DOM v6
-State	React Context API
-HTTP	Axios
+State Management	React Context API
+HTTP Client	Axios
 Backend	FastAPI
 ORM	SQLAlchemy (Async)
 Database	PostgreSQL
 File Storage	MinIO
-Auth	JWT, RBAC
+Authentication	JWT, RBAC
 🔹 Routing & State Management
 
-    Role-based protected routes
+    Role-based route protection
 
     AuthProvider manages login state
 
-    Layouts for each role (Admin/User)
+    Layout shells for each role (Admin/User)
 
 🔹 API Endpoints
 📦 Authentication & User Interaction
-Endpoint	Method	Body / Query	Response	Notes
-auth/register	POST	email, password	201 Created	409 if exists
-auth/login	POST	email, password	200 OK (JWT)	401 Unauthorized
-books/rate/{id}	POST	rating, review_text	201 Created	400 if already rated
+
++----------------+--------+------------------------+---------------+---------------------------+
+| Endpoint       | Method | Body / Query           | Response      | Notes                     |
++----------------+--------+------------------------+---------------+---------------------------+
+| auth/register  | POST   | email, password        | 201 Created   | 409 if email exists       |
+| auth/login     | POST   | email, password        | 200 OK (JWT)  | 401 Unauthorized          |
+| books/rate/{id}| POST   | rating, review_text    | 201 Created   | 400 if already rated      |
++----------------+--------+------------------------+---------------+---------------------------+
+
 📦 Catalog & Borrowing
-Endpoint	Method	Notes
-books	GET	Query: category, search, pagination
-books/{id}	GET	Book details
-books/borrow/{id}	POST	Borrow a book (auth)
-books/return/{id}	POST	Return a book (auth)
+
++------------------+--------+-----------------------------------+
+| Endpoint         | Method | Notes                             |
++------------------+--------+-----------------------------------+
+| books            | GET    | Query: category, search, pagination|
+| books/{id}       | GET    | Detailed book info                 |
+| books/borrow/{id}| POST   | Borrow a book (auth only)          |
+| books/return/{id}| POST   | Return a book (auth only)          |
++------------------+--------+-----------------------------------+
+
 📦 Admin Operations
-Endpoint	Method	Notes
-admin/books	POST	Add book (MinIO upload)
-admin/books/{id}	PUT	Update book
-admin/books/{id}	DELETE	Delete if not borrowed
-admin/loans	GET	View all loans
+
++-------------------+--------+--------------------------------------+
+| Endpoint          | Method | Notes                                |
++-------------------+--------+--------------------------------------+
+| admin/books       | POST   | Add book with MinIO upload           |
+| admin/books/{id}  | PUT    | Update book                          |
+| admin/books/{id}  | DELETE | Delete book (if not borrowed)        |
+| admin/loans       | GET    | View all loans                       |
++-------------------+--------+--------------------------------------+
+
 🔹 Security & Error Handling
 
-    JWT auth and RBAC
+    JWT authentication and RBAC
 
-    Standard responses:
-    400, 401, 403, 404, 409, 422
+    Standard HTTP responses:
+
+        400 – Bad Request
+
+        401 – Unauthorized
+
+        403 – Forbidden
+
+        404 – Not Found
+
+        409 – Conflict
+
+        422 – Validation error
 
 🔹 Project Structure
 
 Project_LMS
 ├── backend
 │   ├── app
-│   │   ├── api
-│   │   ├── core
-│   │   ├── models
+│   │   ├── api     
+│   │   ├── core  
+│   │   ├── models    
 │   │   ├── services
 │   │   └── main.py
-│   ├── alembic
+│   ├── alembic       
 │   ├── requirements.txt
 │   └── .env
 ├── frontend
@@ -205,7 +232,7 @@ Format code	npx prettier --write .
 
     Fork the repo
 
-    Create a branch feature/your-feature
+    Create a new branch (feature/your-feature)
 
     Commit & push changes
 
@@ -224,13 +251,14 @@ Format code	npx prettier --write .
 |  Books & Loans    |                    |  PDF/Cover Files  |
 +-------------------+                    +-------------------+
 
+System Architecture
 🔹 User Flow Diagram
 
-User (Patron):
-Login → Browse → Borrow → Return → Review
+Standard User (Patron)
+Login/Register → Browse/Search Books → Borrow/Return → Rate/Review
 
-Admin (Librarian):
-Login → Dashboard → Manage Books → Manage Loans
+Administrator (Librarian/Staff)
+Login/Register → Admin Dashboard → Manage Books → Manage Loans → Manage Assets
 🔹 Database / ERD (Simplified)
 
 +---------+       +---------+       +---------+
