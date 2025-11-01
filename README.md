@@ -180,9 +180,7 @@ Build frontend	npm run build
 |   PostgreSQL DB   | <----------------> |      MinIO        |
 |  Books & Loans    |                    |  PDF/Cover Files  |
 +-------------------+                    +-------------------+
----
 ![System Architecture](assets/Diagram.png)
----
 System Architecture
 🔹 User Flow Diagram
 
