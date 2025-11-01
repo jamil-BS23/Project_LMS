@@ -36,6 +36,10 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 - Python v3.8+
 - PostgreSQL
 ### ⚙️ Backend Setup
+```html
+<h3>⚙️ Backend Setup</h3>
+
+<pre style="background:#0d1117;color:#fff;padding:10px;border-radius:10px;font-family:monospace;">
 +-------------------------------+
 | cd backend                    |
 | python -m venv .venv          |
@@ -44,7 +48,7 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 | alembic upgrade head          |
 | uvicorn app.main:app --reload |
 +-------------------------------+
-
+</pre>
 
 💻 Frontend Setup
 +-------------------------------+
