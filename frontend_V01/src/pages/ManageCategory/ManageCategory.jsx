@@ -1,4 +1,3 @@
-
 // ManageCategory.jsx
 
 import { useEffect, useState, useMemo } from "react";
@@ -15,18 +14,11 @@ import {
   Pencil,
   Trash2,
   CheckCircle2,
-  AlertTriangle, // NEW: for delete confirm
+  AlertTriangle,
 } from "lucide-react";
 import sectionedBooks from "../../data/sampleBooks";
 import Sidebar from "../../components/DashboardSidebar/DashboardSidebar";
 import axios from "axios";
-// seed (only used if no categories found) — status removed
-const seedCategories = [
-  { id: 1, name: "Web Design", slug: "web-design" },
-  { id: 2, name: "Web Development", slug: "web-development" },
-  { id: 3, name: "Programming", slug: "programming" },
-  { id: 4, name: "Commerce", slug: "commerce" },
-];
 
 // helper: slugify category names
 const slugify = (s = "") =>
@@ -38,55 +30,7 @@ const slugify = (s = "") =>
     .replace(/[^a-z0-9]+/g, "-")
     .replace(/(^-|-$)+/g, "");
 
-/*export default function ManageCategory() {
-  useEffect(() => {
-    document.title = "Manage Category";
-  }, []);
-
-  // Load books.json (public)
-  const [booksJson, setBooksJson] = useState([]);
-  useEffect(() => {
-    const url = `${import.meta.env.BASE_URL}books.json`;
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data) => setBooksJson(Array.isArray(data) ? data : []))
-      .catch(() => setBooksJson([]));
-  }, []);
-
-  // Build unique category list from sampleBooks + books.json
-  const computedCategories = useMemo(() => {
-    const set = new Set();
-
-    if (sectionedBooks && typeof sectionedBooks === "object") {
-      Object.values(sectionedBooks).forEach((arr) => {
-        if (Array.isArray(arr)) {
-          arr.forEach((item) => {
-            if (item && item.category) set.add(String(item.category).trim());
-          });
-        }
-      });
-    }
-
-    booksJson.forEach((b) => {
-      if (b && b.category) set.add(String(b.category).trim());
-    });
-
-    const list = Array.from(set).sort((a, b) => a.localeCompare(b));
-    if (list.length === 0) return seedCategories;
-
-    return list.map((name, i) => ({
-      id: i + 1,
-      name,
-      slug: slugify(name),
-    }));
-  }, [booksJson]);
-
-  // Local rows (so add/edit/delete reflect immediately)
-  const [categories, setCategories] = useState(seedCategories);
-  useEffect(() => setCategories(computedCategories), [computedCategories]);*/
-
-
-  export default function ManageCategory() {
+export default function ManageCategory() {
   useEffect(() => {
     document.title = "Manage Category";
   }, []);
@@ -98,7 +42,7 @@ const slugify = (s = "") =>
   useEffect(() => {
     const fetchCategories = async () => {
       try {
-        const token = localStorage.getItem("token"); // if auth is needed
+        const token = localStorage.getItem("token");
         const res = await axios.get("http://localhost:8000/categories/all", {
           headers: token ? { Authorization: `Bearer ${token}` } : {},
         });
@@ -126,9 +70,10 @@ const slugify = (s = "") =>
 
   // Modal state (Add / Edit)
   const [open, setOpen] = useState(false);
-  const [mode, setMode] = useState("create"); // 'create' | 'edit'
+  const [mode, setMode] = useState("create");
   const [editingIndex, setEditingIndex] = useState(-1);
-  const [form, setForm] = useState({ name: "" }); // status removed
+  const [form, setForm] = useState({ name: "" });
+  const [saving, setSaving] = useState(false);
 
   const onOpenCreate = () => {
     setMode("create");
@@ -136,12 +81,14 @@ const slugify = (s = "") =>
     setForm({ name: "" });
     setOpen(true);
   };
+
   const onOpenEdit = (row, index) => {
     setMode("edit");
     setEditingIndex(index);
     setForm({ name: row.name || "" });
     setOpen(true);
   };
+
   const onClose = () => setOpen(false);
 
   const handleChange = (e) => {
@@ -149,89 +96,72 @@ const slugify = (s = "") =>
     setForm((f) => ({ ...f, [name]: value }));
   };
 
-  // Saved toast (2s)
+  // Saved toast
   const [savedToast, setSavedToast] = useState(false);
-  const [saving, setSaving] = useState(false);
-  /*const handleSave = () => {
+
+  const handleSave = async () => {
     if (!form.name.trim()) {
       alert("Please enter a category name.");
       return;
     }
-    const row = {
-      id:
-        mode === "edit" && editingIndex > -1
-          ? categories[editingIndex]?.id ?? editingIndex + 1
-          : (categories[categories.length - 1]?.id || 0) + 1,
-      name: form.name.trim(),
-      slug: slugify(form.name),
-    };
 
-    if (mode === "edit" && editingIndex > -1) {
-      setCategories((prev) => {
-        const next = [...prev];
-        next[editingIndex] = row;
-        return next;
-      });
-    } else {
-      setCategories((prev) => [...prev, row]);
-    }
+    setSaving(true);
+    try {
+      const token = localStorage.getItem("token");
+      const payload = {
+        category_title: form.name.trim(),
+        slug: slugify(form.name),
+      };
 
-    setOpen(false);
-    setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 2000);
-  };*/
+      let res;
+      if (mode === "edit" && editingIndex > -1) {
+        // ✅ Update existing category
+        const categoryId = categories[editingIndex].id;
+        res = await axios.patch(
+          `http://localhost:8000/categories/${categoryId}`,
+          payload,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
 
-  const handleSave = async () => {
-  if (!form.name.trim()) {
-    alert("Please enter a category name.");
-    return;
-  }
+        // Update frontend state
+        const normalizedCategory = {
+          id: res.data.category_id,
+          name: res.data.category_title,
+          slug: res.data.slug,
+        };
 
-  setSaving(true);
-  try {
-    const token = localStorage.getItem("token");
-    const payload = {
-      category_title: form.name.trim(),
-      slug: slugify(form.name),
-    };
-
-    let res;
-    if (mode === "edit" && editingIndex > -1) {
-      // ✅ Update existing category
-      const categoryId = categories[editingIndex].id;
-      res = await axios.patch(
-        `http://localhost:8000/categories/${categoryId}`,
-        payload,
-        {
+        setCategories((prev) => {
+          const next = [...prev];
+          next[editingIndex] = normalizedCategory;
+          return next;
+        });
+      } else {
+        // ✅ Add new category
+        res = await axios.post("http://localhost:8000/categories", payload, {
           headers: { Authorization: `Bearer ${token}` },
-        }
-      );
+        });
 
-      // Update frontend state
-      setCategories((prev) => {
-        const next = [...prev];
-        next[editingIndex] = res.data;
-        return next;
-      });
-    } else {
-      // ✅ Add new category
-      res = await axios.post("http://localhost:8000/categories", payload, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+        const normalizedCategory = {
+          id: res.data.category_id,
+          name: res.data.category_title,
+          slug: res.data.slug,
+        };
 
-      setCategories((prev) => [...prev, res.data]);
+        setCategories((prev) => [...prev, normalizedCategory]);
+      }
+
+      setOpen(false);
+      setSavedToast(true);
+      setTimeout(() => setSavedToast(false), 2000);
+    } catch (err) {
+      console.error("Failed to save category:", err);
+      alert("Error saving category!");
+    } finally {
+      setSaving(false);
     }
-
-    setOpen(false);
-    setSavedToast(true);
-    setTimeout(() => setSavedToast(false), 2000);
-  } catch (err) {
-    console.error("Failed to save category:", err);
-    alert("Error saving category!");
-  } finally {
-    setSaving(false);
-  }
-};
+  };
 
   // Delete confirmation
   const [confirmOpen, setConfirmOpen] = useState(false);
@@ -241,114 +171,38 @@ const slugify = (s = "") =>
     setPendingDeleteIndex(index);
     setConfirmOpen(true);
   };
+
   const onCloseConfirm = () => {
     setPendingDeleteIndex(-1);
     setConfirmOpen(false);
   };
-  /*const confirmDelete = () => {
-    if (pendingDeleteIndex < 0) return;
-    setCategories((prev) => prev.filter((_, i) => i !== pendingDeleteIndex));
-    setPendingDeleteIndex(-1);
-    setConfirmOpen(false);
-  };*/
 
   const confirmDelete = async () => {
-  if (pendingDeleteIndex < 0) return;
+    if (pendingDeleteIndex < 0) return;
 
-  try {
-    const token = localStorage.getItem("token");
-    const categoryId = categories[pendingDeleteIndex].id;
+    try {
+      const token = localStorage.getItem("token");
+      const categoryId = categories[pendingDeleteIndex].id;
 
-    // ✅ Call API
-    await axios.delete(`http://localhost:8000/categories/${categoryId}`, {
-      headers: { Authorization: `Bearer ${token}` },
-    });
+      // ✅ Call API
+      await axios.delete(`http://localhost:8000/categories/${categoryId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
 
-    // ✅ Update frontend state
-    setCategories((prev) => prev.filter((_, i) => i !== pendingDeleteIndex));
-    setPendingDeleteIndex(-1);
-    setConfirmOpen(false);
-  } catch (err) {
-    console.error("Failed to delete category:", err);
-    alert("Error deleting category!");
-  }
-};
+      // ✅ Update frontend state
+      setCategories((prev) => prev.filter((_, i) => i !== pendingDeleteIndex));
+      setPendingDeleteIndex(-1);
+      setConfirmOpen(false);
+    } catch (err) {
+      console.error("Failed to delete category:", err);
+      alert("Error deleting category!");
+    }
+  };
 
   return (
     <div className="min-h-screen flex bg-gray-100">
-      {/* Sidebar — identical styling */}
+      {/* Sidebar */}
       <Sidebar />
-      {/* <aside className="w-64 bg-white shadow-md px-4 py-6 flex flex-col justify-between">
-        <div>
-          <h2 className="text-xl font-bold mb-6">Library</h2>
-          <ul className="space-y-3">
-            <li>
-              <Link
-                to="/dashboard"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <CalendarDays size={18} /> Dashboard
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/manage-books"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <BookOpen size={18} /> Manage Books
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/manage-category"
-                className="flex items-center gap-2 text-sky-600 font-medium"
-              >
-                <Layers size={18} /> Manage Category
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link
-                to="/upload"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <Upload size={18} /> Upload Books
-              </Link>
-            </li> */}
-            {/* <li>
-              <Link
-                to="/members"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <Users size={18} /> Member
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <BookOpen size={18} /> Check-out Books
-              </Link>
-            </li>
-            <li>
-              <Link
-                to="/Setting"
-                className="flex items-center gap-2 text-gray-700 hover:text-sky-500 transition-colors"
-              >
-                <HelpCircle size={18} /> Settings
-              </Link>
-            </li>
-          </ul>
-        </div>
-        <div>
-          <Link
-            to="/logout"
-            className="flex items-center gap-2 text-red-600 font-medium hover:underline underline-offset-4"
-          >
-            <LogOut size={18} /> Logout
-          </Link>
-        </div>
-      </aside> */}
 
       {/* Main */}
       <main className="flex-1 p-6 space-y-6">
@@ -386,14 +240,14 @@ const slugify = (s = "") =>
                       <div className="flex items-center gap-2">
                         <button
                           type="button"
-                          onClick={() => onOpenEdit(c, idx)}  // EDIT FORM
+                          onClick={() => onOpenEdit(c, idx)}
                           className="inline-flex items-center gap-1 rounded-md bg-amber-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-amber-400 focus:outline-none focus:ring-2 focus:ring-amber-300"
                         >
                           <Pencil size={14} /> Edit
                         </button>
                         <button
                           type="button"
-                          onClick={() => requestDelete(idx)}  // DELETE POPUP
+                          onClick={() => requestDelete(idx)}
                           className="inline-flex items-center gap-1 rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300"
                         >
                           <Trash2 size={14} /> Delete
@@ -412,7 +266,7 @@ const slugify = (s = "") =>
         </div>
       </main>
 
-      {/* -------- Modal: Add/Edit Category (matches your screenshot) -------- */}
+      {/* Modal: Add/Edit Category */}
       {open && (
         <div
           className="fixed inset-0 z-50"
@@ -422,13 +276,10 @@ const slugify = (s = "") =>
             if (e.target === e.currentTarget) setOpen(false);
           }}
         >
-          {/* Backdrop */}
           <div className="absolute inset-0 bg-black/50 opacity-0 animate-[fadeIn_.2s_ease-out_forwards]" />
-          {/* Panel */}
           <div className="absolute inset-0 flex items-start justify-center pt-10">
             <div className="w-full max-w-2xl mx-4 rounded-lg bg-white shadow-lg border border-gray-200 opacity-0 translate-y-2 animate-[popIn_.22s_ease-out_forwards]">
               <div className="px-6 py-4 border-b flex items-center gap-2">
-                {/* Screenshot shows plus icon even on Edit, so we keep Plus */}
                 <Plus size={20} className="text-gray-700" />
                 <h3 className="text-lg font-semibold text-gray-800">
                   {mode === "edit" ? "Edit category" : "Add category"}
@@ -451,13 +302,13 @@ const slugify = (s = "") =>
               </div>
 
               <div className="px-6 py-4 border-t bg-white flex justify-end gap-3">
-                {/* Order per screenshot: Save first, then Close */}
                 <button
                   type="button"
                   onClick={handleSave}
-                  className="rounded-md px-5 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500"
+                  disabled={saving}
+                  className="rounded-md px-5 py-2 text-sm font-semibold text-white bg-sky-600 hover:bg-sky-500 disabled:opacity-50"
                 >
-                  Save
+                  {saving ? "Saving..." : "Save"}
                 </button>
                 <button
                   type="button"
@@ -472,7 +323,7 @@ const slugify = (s = "") =>
         </div>
       )}
 
-      {/* -------- Delete Confirmation Modal (wired up) -------- */}
+      {/* Delete Confirmation Modal */}
       {confirmOpen && (
         <div
           className="fixed inset-0 z-50"
@@ -527,7 +378,7 @@ const slugify = (s = "") =>
         </div>
       )}
 
-      {/* -------- Saved Toast (2s) -------- */}
+      {/* Saved Toast */}
       {savedToast && (
         <div className="fixed bottom-6 right-6 z-[60] pointer-events-none animate-[toastIn_.25s_ease-out]">
           <div className="pointer-events-auto flex items-start gap-3 rounded-xl bg-white shadow-lg ring-1 ring-black/5 px-4 py-3">
