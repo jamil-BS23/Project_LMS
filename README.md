@@ -82,6 +82,7 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
   -Database	PostgreSQL
   -File Storage	MinIO
   -Authentication	JWT, RBAC
+
 🔹 Routing & State Management
   -Role-based route protection
   -AuthProvider manages login state
