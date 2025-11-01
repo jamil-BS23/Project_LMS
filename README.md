@@ -168,6 +168,8 @@ Run backend:uvicorn app.main:app --reload
 Run frontend:npm run dev
 Build frontend	npm run build
 
+
+```markdown
 🔹 System Architecture
 
 +-------------------+      HTTP/API       +-------------------+
@@ -181,8 +183,7 @@ Build frontend	npm run build
 |  Books & Loans    |                    |  PDF/Cover Files  |
 +-------------------+                    +-------------------+
 
-![System Architecture](/home/tanzil/Project_LMS/frontend_V01/assets/Diagram.png)
-
+![System Architecture](assets/Diagram.png)
 
 System Architecture
 🔹 User Flow Diagram
