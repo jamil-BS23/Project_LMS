@@ -12,26 +12,22 @@ Supports patrons (users) and administrators (library staff) with full role-based
 The Library Management System (LMS) is a web-based platform that simplifies management of both physical and digital library resources.
 
 ### 🎯 Goals
-
-- **Users:** Search, borrow, return books, submit reviews  
-- **Admins:** Manage inventory, users, and assets  
-- **Libraries:** Maintain accurate tracking and reporting for circulation data
-  
+- **Users:** Search, borrow, return books, submit reviews.  
+- **Admins:** Manage inventory, users, and assets.  
+- **Libraries:** Maintain accurate tracking and reporting for circulation data.
 ---
 ## 🔹 User Roles & Access
 ### 👤 Standard User (Patron)
 - Search and browse books  
 - Borrow and return books  
 - View borrowing history  
-- Submit ratings and reviews
-   
+- Submit ratings and reviews  
 
 ### 🧭 Administrator (Librarian / Staff)
 - All standard user permissions  
 - Add, update, delete books  
 - Manage categories & digital assets  
-- View all loans and user activity
-  
+- View all loans and user activity  
 ---
 ## 🔹 Getting Started
 ### ✅ Prerequisites
@@ -40,21 +36,25 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 - Python v3.8+
 - PostgreSQL
 ### ⚙️ Backend Setup
- -cd backend
- -python -m venv .venv
- -source .venv/bin/activate
- -pip install -r requirements.txt
- -alembic upgrade head
- -uvicorn app.main:app --reload
-  
++-------------------------------+
+| cd backend                    |
+| python -m venv .venv          |
+| source .venv/bin/activate     |
+| pip install -r requirements.txt|
+| alembic upgrade head          |
+| uvicorn app.main:app --reload |
++-------------------------------+
 
 💻 Frontend Setup
- -cd frontend 
- -npm install 
- -npm run dev
-Access URLs:
- -Frontend → http://localhost:5173
- -Backend  → http://localhost:8000/docs
++-------------------------------+
+| cd frontend                   |
+| npm install                   |
+| npm run dev                    |
+|                               |
+| Access URLs:                   |
+| Frontend → http://localhost:5173 |
+| Backend  → http://localhost:8000/docs |
++-------------------------------+
 🔹 Core Features
 👥 User Features
    -Search/browse books by title, author, or ISBN
@@ -175,8 +175,7 @@ Build frontend	npm run build
 |   PostgreSQL DB   | <----------------> |      MinIO        |
 |  Books & Loans    |                    |  PDF/Cover Files  |
 +-------------------+                    +-------------------+
-
-
+![System Architecture](assets/Diagram.png)
 System Architecture
 🔹 User Flow Diagram
 
@@ -207,4 +206,3 @@ Administrator (Librarian/Staff)
 | rating  |
 | text    |
 +---------+
-
