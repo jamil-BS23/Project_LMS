@@ -45,6 +45,7 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 | uvicorn app.main:app --reload |
 +-------------------------------+
 
+
 💻 Frontend Setup
 +-------------------------------+
 | cd frontend                   |
