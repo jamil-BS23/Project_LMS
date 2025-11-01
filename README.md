@@ -1,37 +1,42 @@
-📚 Library Management System (LMS)
-Full-Stack Web Application – A modern digital library platform for managing physical and digital books.
+# 📚 Library Management System (LMS)
+
+Full-Stack Web Application – A modern digital library platform for managing physical and digital books.  
 Supports patrons (users) and administrators (library staff) with full role-based access control (RBAC).
-🔹 Table of Contents
-Project Overview
-User Roles & Access
-Getting Started
-🔹 Project Overview
+---
+## 🔹 Table of Contents
+- [Project Overview](#-project-overview)
+- [User Roles & Access](#-user-roles--access)
+- [Getting Started](#-getting-started)
+---
+## 🔹 Project Overview
 The Library Management System (LMS) is a web-based platform that simplifies management of both physical and digital library resources.
 
-🎯 Goals
-Users: Search, borrow, return books, submit reviews.
-Admins: Manage inventory, users, and assets.
+### 🎯 Goals
+- **Users:** Search, borrow, return books, submit reviews.  
+- **Admins:** Manage inventory, users, and assets.  
+- **Libraries:** Maintain accurate tracking and reporting for circulation data.
+---
+## 🔹 User Roles & Access
+### 👤 Standard User (Patron)
+- Search and browse books  
+- Borrow and return books  
+- View borrowing history  
+- Submit ratings and reviews  
 
-🔹 User Roles & Access
-👤 Standard User (Patron)
- -Search and browse books
- -Borrow and return books
- -View borrowing history
- -Submit ratings and reviews
- 
-🧭 Administrator (Librarian / Staff)
- -All standard user permissions
- -Add, update, delete books
- -Manage categories 
- -View all loans and user activity
-🔹 Getting Started
-✅ Prerequisites
-Node.js v18+
-npm or yarn
-Python v3.8+
-PostgreSQL
-
-⚙️ Backend Setup
+### 🧭 Administrator (Librarian / Staff)
+- All standard user permissions  
+- Add, update, delete books  
+- Manage categories & digital assets  
+- View all loans and user activity  
+---
+## 🔹 Getting Started
+### ✅ Prerequisites
+- Node.js v18+
+- npm or yarn
+- Python v3.8+
+- PostgreSQL
+### ⚙️ Backend Setup
+```html
 <h3>⚙️ Backend Setup</h3>
 
 <pre style="background:#0d1117;color:#fff;padding:10px;border-radius:10px;font-family:monospace;">
@@ -56,19 +61,18 @@ PostgreSQL
 | Backend  → http://localhost:8000/docs |
 +-------------------------------+
 🔹 Core Features
-👥 User Features:
+👥 User Features
    -Search/browse books by title, author, or ISBN
    -Borrow and return books
    -Rate and review titles
    -personal loan history
 
-🛠️ Admin Features:
+🛠️ Admin Features
    -Add, edit, delete books and categories
    -Manage user loans and assets
    -Upload and organize digital media (PDFs, covers)
-   
 
-🔹 Technical Stack:
+🔹 Technical Stack
   -Frontend	React + Vite + Tailwind CSS + DaisyUI
   -Routing	React Router DOM v6
   -State Management	React Context API
@@ -78,8 +82,7 @@ PostgreSQL
   -Database	PostgreSQL
   -File Storage	MinIO
   -Authentication	JWT, RBAC
-  
-🔹 Routing & State Management:
+🔹 Routing & State Management
   -Role-based route protection
   -AuthProvider manages login state
   -Layout shells for each role (Admin/User)
@@ -210,3 +213,4 @@ Administrator (Librarian/Staff)
 | rating  |
 | text    |
 +---------+
+
