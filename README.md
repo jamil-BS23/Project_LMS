@@ -13,7 +13,7 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 
 ### 🎯 Goals
 
-- **Users:** Search, borrow, return books, submit reviews.  
+- **Users:** Search, borrow, return books, submit reviews  
 - **Admins:** Manage inventory, users, and assets  
 - **Libraries:** Maintain accurate tracking and reporting for circulation data
   
@@ -175,8 +175,6 @@ Build frontend	npm run build
 |   PostgreSQL DB   | <----------------> |      MinIO        |
 |  Books & Loans    |                    |  PDF/Cover Files  |
 +-------------------+                    +-------------------+
-
-![System Architecture](assets/Diagram.png)
 
 
 System Architecture
