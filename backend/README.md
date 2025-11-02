@@ -85,77 +85,58 @@ Example:
 
 🧩 Core Features
 👥 Authentication & Roles
-Register and login using JWT
-
-Two roles: User (Patron) and Admin (Librarian)
-
-Role-Based Access Control (RBAC) using FastAPI dependencies
+-Register and login using JWT
+-Two roles: User (Patron) and Admin (Librarian)
+-Role-Based Access Control (RBAC) using FastAPI dependencies
 
 📚 User Operations
-Browse and search books by title, author, ISBN, or category
-
-Borrow and return books
-
-Submit ratings and reviews
+-Browse and search books by title, author, ISBN, or category
+-Borrow and return books
+-Submit ratings and reviews
 
 🧑‍💼 Admin Operations
-Add, edit, and delete books
+-Add, edit, and delete books
+-Manage loans and track user activity
+-Upload digital assets (book covers, PDFs) to MinIO
 
-Manage loans and track user activity
-
-Upload digital assets (book covers, PDFs) to MinIO
-
-📦 API Endpoints
+📦 API Endpoints:
 Authentication
 Endpoint	Method	Description
-/auth/register	POST	Register a new user
-/auth/login	POST	Login and receive JWT token
+-auth/register	POST	Register a new user
+-auth/login	POST	Login and receive JWT token
 
-Books
+Books:
 Endpoint	Method	Description
-/books	GET	Browse catalog
-/books/{id}	GET	Get book details
-/books/borrow/{id}	POST	Borrow a book
-/books/return/{id}	POST	Return borrowed book
-/books/rate/{id}	POST	Submit rating/review
+-books	GET	Browse catalog
+-books/{id}	GET	Get book details
+-books/borrow/{id}	POST	Borrow a book
+-books/return/{id}	POST	Return borrowed book
+-books/rate/{id}	POST	Submit rating/review
 
-Admin
+Admin:
 Endpoint	Method	Description
-/admin/books	POST	Add a new book (with MinIO upload)
-/admin/books/{id}	PUT	Update book details
-/admin/books/{id}	DELETE	Remove a book
-/admin/loans	GET	View all loan records
+-admin/books	POST	Add a new book (with MinIO upload)
+-admin/books/{id}	PUT	Update book details
+-admin/books/{id}	DELETE	Remove a book
+-admin/loans	GET	View all loan records
 
-🛠️ Error Handling & Security
+🛠️ Error Handling & Security:
 Status	Meaning	Example
-400	Bad Request	Invalid input or duplicate action
-401	Unauthorized	Missing/invalid JWT
-403	Forbidden	Role access denied
-404	Not Found	Resource not found
-409	Conflict	Duplicate email or business rule
-422	Validation Error	Invalid request payload
+-400	Bad Request	Invalid input or duplicate action
+-401	Unauthorized	Missing/invalid JWT
+-403	Forbidden	Role access denied
+-404	Not Found	Resource not found
+-409	Conflict	Duplicate email or business rule
+-422	Validation Error	Invalid request payload
 
-Security
+Security:
+-JWT token authentication
+-Role-based authorization
+-Input validation via Pydantic
+-Secure file uploads with MinIO
 
-JWT token authentication
-
-Role-based authorization
-
-Input validation via Pydantic
-
-Secure file uploads with MinIO
-
-💻 Developer Commands
+💻 Developer Commands:
 Action	Command
-Run server	uvicorn app.main:app --reload
-Format code	black .
-
-📝 Contributing
-Fork the repository
-
-Create a branch for your feature or bug fix
-
-Submit a pull request
-
-Open issues for bugs or suggestions
+-Run server-	uvicorn app.main:app --reload
+-Format code	black .
 
