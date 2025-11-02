@@ -29,66 +29,59 @@ It provides secure **user authentication**, **role-based access control (RBAC)**
 📂 Project Structure
 
 ```text
-backend/
-├── app/
-│   ├── api/               # Routers and endpoints (auth, books, admin)
-│   ├── core/              # Configurations, security, dependencies
-│   ├── models/            # SQLAlchemy models
-│   ├── schemas/           # Pydantic schemas (DTOs)
-│   ├── services/          # Business logic
-│   ├── repository/        # Database access layer
-│   ├── utils/             # Helper functions
-│   └── main.py            # FastAPI application entry point
+backend
+├── app
+│   ├── api               
+│   ├── core            
+│   ├── models           
+│   ├── schemas          
+│   ├── services          
+│   ├── repository        
+│   ├── utils           
+│   └── main.py          
 ├── requirements.txt
 └── .env.example
 
-🚀 Installation
-1️⃣ Clone the Repository
-bash
-Copy code
-git clone https://github.com/<your-username>/library-management-system.git
-cd library-management-system/backend
-2️⃣ Create and Activate Virtual Environment
-bash
-Copy code
-python -m venv venv
-source venv/bin/activate   # Linux/Mac
-venv\Scripts\activate      # Windows
-3️⃣ Install Dependencies
+1. Create and Activate Virtual Environment
+-bash
+-Copy code
+-python -m venv venv
+-source venv/bin/activate  
+-venv\Scripts\activate
+     
+2. Install Dependencies:
 bash
 Copy code
 pip install -r requirements.txt
-4️⃣ Configure Environment Variables
-Create a .env file in the backend/ directory with the following:
+3. Configure Environment Variables
+ -Create a .env file in the backend/ directory with the following:
 
-Variable	Description
-DATABASE_URL	PostgreSQL connection string
-SECRET_KEY	JWT secret key
-ALGORITHM	JWT algorithm (e.g., HS256)
-ACCESS_TOKEN_EXPIRE_MINUTES	Token expiration time
-MINIO_ENDPOINT	MinIO server URL
+-Variable	Description
+-DATABASE_URL	PostgreSQL connection string
+-SECRET_KEY	JWT secret key
+-ALGORITHM	JWT algorithm (e.g., HS256)
+-ACCESS_TOKEN_EXPIRE_MINUTES	Token expiration time
+-MINIO_ENDPOINT	MinIO server URL
 
 Example:
 
-env
-Copy code
-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/library_db=??
-SECRET_KEY=your_secret_key
-ALGORITHM=HS256
-ACCESS_TOKEN_EXPIRE_MINUTES=60
-MINIO_ENDPOINT=http://localhost:9000
-MINIO_ACCESS_KEY=minioadmin
-MINIO_SECRET_KEY=minioadmin
-MINIO_BUCKET_NAME=book-assets
-5️⃣ Run the Server
-bash
-Copy code
-uvicorn app.main:app --reload
-Server runs at: http://127.0.0.1:8000
+-env
+-Copy code
+-DATABASE_URL=postgresql+asyncpg://user:password@localhost:5432/library_db=??
+-SECRET_KEY=your_secret_key
+-ALGORITHM=HS256
+-ACCESS_TOKEN_EXPIRE_MINUTES=60
+-MINIO_ENDPOINT=http://localhost:9000
+-MINIO_ACCESS_KEY=minioadmin
+-MINIO_SECRET_KEY=minioadmin
+-MINIO_BUCKET_NAME=book-assets
 
-Swagger UI: http://127.0.0.1:8000/docs
-
-ReDoc: http://127.0.0.1:8000/redoc
+4. Run the Server:
+-bash
+-Copy code
+-uvicorn app.main:app --reload
+-Server runs at: http://127.0.0.1:8000
+-Swagger UI: http://127.0.0.1:8000/docs
 
 🧩 Core Features
 👥 Authentication & Roles
