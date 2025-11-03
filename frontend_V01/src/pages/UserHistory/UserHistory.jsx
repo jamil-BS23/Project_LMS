@@ -226,15 +226,15 @@ export default function UserHistory() {
             <div className="overflow-x-auto">
               <table className="min-w-full text-sm">
                 <thead className="bg-white">
-                  <tr className="text-left">
-                    <th className="py-3 px-4">#</th>
-                    <th className="py-3 px-4 min-w-[220px]">Book</th>
-                    <th className="py-3 px-4 min-w-[160px]">User</th>
-                    <th className="py-3 px-4 min-w-[130px]">Borrowed On</th>
-                    <th className="py-3 px-4 min-w-[120px]">Due Date</th>
-                    <th className="py-3 px-4 min-w-[130px]">Returned On</th>
-                    <th className="py-3 px-4 min-w-[120px]">Type</th>
-                    <th className="py-3 px-4 min-w-[140px] text-center">Action</th>
+                  <tr className="text-left border-b border-gray-700">
+                    <th className="py-2 px-3 text-gray-900">#</th>
+                    <th className="py-2 px-3 min-w-[180px] text-gray-900">Book</th>
+                    <th className="py-2 px-3 min-w-[160px] text-gray-900">User</th>
+                    <th className="py-2 px-3 min-w-[130px] text-gray-900">Borrowed On</th>
+                    <th className="py-2 px-3 min-w-[120px] text-gray-900">Due Date</th>
+                    <th className="py-2 px-3 min-w-[130px] text-gray-900">Returned On</th>
+                    <th className="py-2 px-3 min-w-[120px] text-gray-900">Type</th>
+                    <th className="py-2 px-3 min-w-[140px] text-center text-gray-900">Action</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-gray-200">

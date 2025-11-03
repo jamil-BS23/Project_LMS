@@ -357,19 +357,20 @@ useEffect(() => {
                         Category / Genre
                       </label>
 
-                      <select
-                        name="mainCategory"
-                        value={bookData.mainCategory}
-                        onChange={handleChange}
-                        className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
-                      >
-                        <option value="">Select a category</option>
-                        {categories.map((c) => (
-                          <option key={c.id} value={c.name}>
-                            {c.category_title}
-                          </option>
-                        ))}
-                      </select>
+                    <select
+                      name="mainCategory"
+                      value={bookData.mainCategory}
+                      onChange={handleChange}
+                      className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    >
+                      <option value="">Select a category</option>
+                      {categories.map((c) => (
+                        <option key={c.id} value={c.name} className="text-gray-900">
+                          {c.category_title}
+                        </option>
+                      ))}
+                    </select>
+
                     </div>
 
 
@@ -385,7 +386,7 @@ useEffect(() => {
                       placeholder="e.g.,3"
                       value={bookData.quantity}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
                 </div>
@@ -400,7 +401,7 @@ useEffect(() => {
                     placeholder="e.g.,Author Name"
                     value={bookData.author}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
 
@@ -416,7 +417,7 @@ useEffect(() => {
                       placeholder="e.g., user@brainstation-23.com"
                       value={bookData.bsEmail}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                   </div>
 
@@ -430,7 +431,7 @@ useEffect(() => {
                       placeholder="e.g., BS-0000"
                       value={bookData.bsIdNo}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     />
                     <p
                       className={`mt-1 text-xs ${
@@ -474,7 +475,7 @@ useEffect(() => {
                     placeholder="Add a short summary, edition info, condition notes, etc."
                     value={bookData.description}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                     maxLength={600}
                   />
                 </div>
