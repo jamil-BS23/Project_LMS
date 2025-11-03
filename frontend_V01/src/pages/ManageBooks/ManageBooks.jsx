@@ -613,11 +613,11 @@ useEffect(() => {
               </button>
             </div>
           </div>
-          <div className="px-4 pb-4">
-            <div className="overflow-x-auto">
-              <table className="w-full text-sm border-collapse">
-                <thead className="bg-gray-50">
-                  <tr className="text-left">
+          <div className="bg-white rounded shadow">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="text-left border-b text-gray-700">
                     <th className="py-3 px-4">Book</th>
                     <th className="py-3 px-4">Author</th>
                     <th className="py-3 px-4">Category</th>

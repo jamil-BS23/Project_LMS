@@ -224,11 +224,11 @@ export default function UserHistory() {
           </ul>
 
           {/* Desktop: table (always inside card; card grows with rows) */}
-          <div className="hidden md:block">
-            <div className="overflow-x-auto">
-              <table className="min-w-full text-sm">
+          <div className="bg-white rounded shadow">
+            <div className="w-full overflow-x-auto">
+              <table className="w-full text-sm">
                 <thead className="bg-white">
-                  <tr className="text-left">
+                  <tr className="text-left border-b text-gray-700">
                     <th className="py-3 px-4">#</th>
                     <th className="py-3 px-4 min-w-[220px]">Book</th>
                     <th className="py-3 px-4 min-w-[160px]">User</th>

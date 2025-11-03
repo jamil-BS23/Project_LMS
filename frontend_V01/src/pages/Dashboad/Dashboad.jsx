@@ -451,140 +451,142 @@ export default function Dashboard() {
 
           {/* ---------------------- Overdue’s History (email centered with icon) ---------------------- */}
           <div className="bg-white rounded shadow p-4">
-            <h3 className="font-semibold mb-2">Overdue’s History</h3>
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left border-b border-gray-200">
-                  <th className="w-10">#</th>
-                  <th className="w-25">Book name</th>
-                  <th className="w-10">User name</th>
-                  <th className="text-center">Email</th>
-                  <th className="w-10">Returned Date</th>
-                </tr>
-              </thead>
-              <tbody>
-                {rows.length > 0 ? (
-            rows.map((r, idx) => (
-              <tr key={r.id} className="border-b border-gray-200">
-                <td>{idx + 1}</td>
-                <td className="font-semibold">{r.book_title?r.book_title : "—"}</td>
-                <td>{r.user_name?r.user_name : "—"}</td>
-                <td className="text-center">
-                  <span className="inline-flex items-center justify-center gap-1 text-gray-700">
-                    <Mail size={16} className="text-gray-500" />
-                    <span>{r.user_email? r.user_email : "—"}</span>
-                  </span>
-                </td>
-                <td className="text-red-600 font-medium">
-                  {r.return_date ? r.return_date.split("T")[0] : "—"}
-                </td>
-              </tr>
-            ))
-          ) : (
-            <tr>
-              <td colSpan={5} className="text-center text-gray-500 py-4">
-                 No overdue records found
-              </td>
-            </tr>
-          )}
-              </tbody>
-            </table>
-          </div>
+  <h3 className="font-semibold mb-2 text-gray-900">Overdue’s History</h3>
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="text-left border-b border-gray-200 text-gray-700">
+        <th className="w-10">#</th>
+        <th className="w-25">Book name</th>
+        <th className="w-10">User name</th>
+        <th className="text-center">Email</th>
+        <th className="w-10">Returned Date</th>
+      </tr>
+    </thead>
+    <tbody>
+      {rows.length > 0 ? (
+        rows.map((r, idx) => (
+          <tr key={r.id} className="border-b border-gray-200 text-gray-900">
+            <td>{idx + 1}</td>
+            <td className="font-semibold">{r.book_title ? r.book_title : "—"}</td>
+            <td>{r.user_name ? r.user_name : "—"}</td>
+            <td className="text-center">
+              <span className="inline-flex items-center justify-center gap-1 text-gray-900">
+                <Mail size={16} className="text-gray-500" />
+                <span>{r.user_email ? r.user_email : "—"}</span>
+              </span>
+            </td>
+            <td className="text-red-600 font-medium">
+              {r.return_date ? r.return_date.split("T")[0] : "—"}
+            </td>
+          </tr>
+        ))
+      ) : (
+        <tr>
+          <td colSpan={5} className="text-center text-gray-500 py-4">
+            No overdue records found
+          </td>
+        </tr>
+      )}
+    </tbody>
+  </table>
+</div>
+
         </div>
 
         {/* Borrow Request (functional) */}
         <div className="bg-white rounded shadow p-4">
-          <div className="flex justify-between items-center mb-2">
-            <h3 className="font-semibold">Borrow Request</h3>
-            {/* <Link to="#" className="text-xs text-green-600 hover:underline">
-              View All
-            </Link> */}
-          </div>
-          <table className="w-full text-sm">
-            <thead>
-              <tr className="text-left border-b border-gray-200">
-                <th className="w-10">#</th>
-                <th>Book name</th>
-                <th>User name</th>
-                <th>Borrowed Date</th>
-                <th>Returned Date</th>
-                <th className="text-center">Action</th>
-              </tr>
-            </thead>
-            <tbody>
-              {currentRows.map((r, i) => (
-                <tr key={`${r.book}__${r.user}__${i}`} className="border-b border-gray-200">
-                  <td>{startIndex + i + 1}</td>
-                  <td className="font-medium">{r.book_title}</td>
-                  <td>{r.user_name}</td>
-                  <td>{r.borrow_date.split('T')[0]}</td>
-                  <td>{r.return_date.split('T')[0]}</td>
-                  <td className="text-center">
-                    <div className="flex items-center justify-center gap-2">
-                      <button
-                        type="button"
-                        onClick={() => openConfirm("accept", i, r.borrow_id)}
-                        className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
-                      >
-                        Accept
-                      </button>
-                      <button
-                        type="button"
-                        onClick={() => openConfirm("reject", i, r.borrow_id)}
-                        className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300"
-                      >
-                        Reject
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+  <div className="flex justify-between items-center mb-2">
+    <h3 className="font-semibold text-gray-900">Borrow Request</h3>
+    {/* <Link to="#" className="text-xs text-green-600 hover:underline">
+      View All
+    </Link> */}
+  </div>
+  <table className="w-full text-sm">
+    <thead>
+      <tr className="text-left border-b border-gray-200 text-gray-700">
+        <th className="w-10">#</th>
+        <th>Book name</th>
+        <th>User name</th>
+        <th>Borrowed Date</th>
+        <th>Returned Date</th>
+        <th className="text-center">Action</th>
+      </tr>
+    </thead>
+    <tbody>
+      {currentRows.map((r, i) => (
+        <tr key={`${r.book}__${r.user}__${i}`} className="border-b border-gray-200 text-gray-900">
+          <td>{startIndex + i + 1}</td>
+          <td className="font-medium">{r.book_title || "—"}</td>
+          <td>{r.user_name || "—"}</td>
+          <td>{r.borrow_date ? r.borrow_date.split('T')[0] : "—"}</td>
+          <td>{r.return_date ? r.return_date.split('T')[0] : "—"}</td>
+          <td className="text-center">
+            <div className="flex items-center justify-center gap-2">
+              <button
+                type="button"
+                onClick={() => openConfirm("accept", i, r.borrow_id)}
+                className="rounded-md bg-green-600 px-3 py-1.5 text-xs font-semibold text-white hover:bg-green-500 focus:outline-none focus:ring-2 focus:ring-green-400"
+              >
+                Accept
+              </button>
+              <button
+                type="button"
+                onClick={() => openConfirm("reject", i, r.borrow_id)}
+                className="rounded-md bg-red-500 px-3 py-1.5 text-xs font-semibold text-white hover:bg-red-400 focus:outline-none focus:ring-2 focus:ring-red-300"
+              >
+                Reject
+              </button>
+            </div>
+          </td>
+        </tr>
+      ))}
 
-              {requests.length === 0 && (
-                <tr>
-                  <td colSpan={6} className="py-6 text-center text-gray-500">
-                    No pending borrow requests.
-                  </td>
-                </tr>
-              )}
-            </tbody>
-            {requests.length > rowsPerPage && (
-        <tfoot>
-          <tr>
-            <td colSpan={6} className="py-4 text-center">
-              <div className="flex justify-center items-center gap-4">
-                <button
-                  onClick={handlePrev}
-                  disabled={currentPage === 1}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    currentPage === 1
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-sky-500 text-white hover:bg-sky-600"
-                  }`}
-                >
-                  Prev
-                </button>
-                <span className="text-gray-600 text-sm">
-                  Page {currentPage} of {totalPages}
-                </span>
-                <button
-                  onClick={handleNext}
-                  disabled={currentPage === totalPages}
-                  className={`px-3 py-1 rounded-md text-sm font-medium ${
-                    currentPage === totalPages
-                      ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                      : "bg-sky-500 text-white hover:bg-sky-600"
-                  }`}
-                >
-                  Next
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tfoot>
+      {requests.length === 0 && (
+        <tr>
+          <td colSpan={6} className="py-6 text-center text-gray-500">
+            No pending borrow requests.
+          </td>
+        </tr>
       )}
-          </table>
-        </div>
+    </tbody>
+    {requests.length > rowsPerPage && (
+      <tfoot>
+        <tr>
+          <td colSpan={6} className="py-4 text-center">
+            <div className="flex justify-center items-center gap-4">
+              <button
+                onClick={handlePrev}
+                disabled={currentPage === 1}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  currentPage === 1
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-sky-500 text-white hover:bg-sky-600"
+                }`}
+              >
+                Prev
+              </button>
+              <span className="text-gray-600 text-sm">
+                Page {currentPage} of {totalPages}
+              </span>
+              <button
+                onClick={handleNext}
+                disabled={currentPage === totalPages}
+                className={`px-3 py-1 rounded-md text-sm font-medium ${
+                  currentPage === totalPages
+                    ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                    : "bg-sky-500 text-white hover:bg-sky-600"
+                }`}
+              >
+                Next
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tfoot>
+    )}
+  </table>
+</div>
+
       </main>
 
       {/* ---- Confirm Modal (Accept / Reject) ---- */}

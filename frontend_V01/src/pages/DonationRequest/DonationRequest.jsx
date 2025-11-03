@@ -169,41 +169,6 @@ export default function DonationRequest() {
 
 
 
-  // Load from LS (or seed)
- /* useEffect(() => {
-    try {
-      const raw = localStorage.getItem(LS_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        const withFixes = attachUserIdsAndAuthor(Array.isArray(parsed.items) ? parsed.items : []);
-        setItems(withFixes);
-        setHistory(Array.isArray(parsed.history) ? parsed.history : []);
-        localStorage.setItem(LS_KEY, JSON.stringify({ items: withFixes, history: parsed.history || [] }));
-      } else {
-        const seeded = attachUserIdsAndAuthor(SEED);
-        const initialHistory = seeded
-          .filter((it) => it.status !== "pending")
-          .map((it, idx) => ({
-            id: `${it.id}-INIT-${idx}`,
-            requestId: it.id,
-            action: it.status, // accepted | rejected
-            at: new Date().toISOString(),
-            amount: it.amount,
-            donorName: it.donorName,
-            bookTitle: it.bookTitle,
-          }));
-        localStorage.setItem(LS_KEY, JSON.stringify({ items: seeded, history: initialHistory }));
-        setItems(seeded);
-        setHistory(initialHistory);
-      }
-    } catch {
-      const seeded = attachUserIdsAndAuthor(SEED);
-      localStorage.setItem(LS_KEY, JSON.stringify({ items: seeded, history: [] }));
-      setItems(seeded);
-      setHistory([]);
-    }
-  }, []);*/
-
   // Keep multiple tabs in sync
   useEffect(() => {
     const onStorage = (e) => {
@@ -293,31 +258,7 @@ export default function DonationRequest() {
   const totalAccepted = items.filter((x) => x.donation_status === "accepted").length; // Collected
   const totalRejected = items.filter((x) => x.donation_status === "rejected").length;
 
-  // ---------- Actions ----------
-  /*const actOn = (id, action) => {
-    if (action !== "accepted" && action !== "rejected") return;
-    const src = items.find((x) => x.id === id);
-
-    const nextItems = items.map((it) => (it.id === id ? { ...it, status: action } : it));
-    const entry = src
-      ? {
-          id: `${id}-${Date.now()}`,
-          requestId: id,
-          action,
-          at: new Date().toISOString(),
-          amount: src.amount,
-          donorName: src.username,
-          bookTitle: src.title,
-        }
-      : null;
-    const nextHistory = entry ? [entry, ...history] : history;
-
-    persist(nextItems, nextHistory);
-
-    showToast(action, `${action === "accepted" ? "Accepted" : "Rejected"}: ${src?.username || "Request"}`);
-    setPage(2);
-    setHistoryTablePage(1);
-  };*/
+  
 
   const actOn = async (id, action) => {
   if (action !== "accepted" && action !== "rejected") return;

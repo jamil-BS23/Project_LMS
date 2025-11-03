@@ -33,7 +33,7 @@ function SettingRow({ icon, title, help, value, onChange, id }) {
             step={1}
             value={value}
             onChange={(e) => onChange(Math.max(0, Number(e.target.value || 0)))}
-            className="w-full rounded-md border border-gray-300 px-3 py-2 pr-10 text-right focus:outline-none focus:ring-2 focus:ring-sky-400"
+            className="w-full border border-gray-300 rounded px-3 py-2 text-gray-900 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-cyan-500 focus:border-transparent"
           />
           <span className="pointer-events-none absolute inset-y-0 right-3 flex items-center text-xs text-gray-500">
             days
