@@ -30,6 +30,20 @@ The frontend of the **Library Management System (LMS)** is a **Single-Page Appli
 ![Admin Dashboard](./screenshots/admin_dashboard.png)
 
 ---
+### 🔹 Technical Stack
+
+| Layer | Technology |
+|-------|-------------|
+| **Frontend** | React + Vite + Tailwind CSS + DaisyUI |
+| **Routing** | React Router DOM v6 |
+| **State** | React Context API |
+| **HTTP Client** | Axios |
+| **Backend** | FastAPI |
+| **ORM** | SQLAlchemy (Async) |
+| **Database** | PostgreSQL |
+| **File Storage** | MinIO |
+| **Authentication** | JWT + RBAC |
+
 
 ## 🔹 Features
 - Browse and search books by **title, author, ISBN, or category**
