@@ -6,6 +6,7 @@ Supports patrons (users) and administrators (library staff) with full role-based
 ## 🔹 Table of Contents
 - [Project Overview](#-project-overview)
 - [User Roles & Access](#-user-roles--access)
+- [Docker Setup (Recommended)](#-docker-setup-recommended)
 - [Getting Started](#-getting-started)
 ---
 ## 🔹 Project Overview
@@ -29,12 +30,44 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 - Manage categories & digital assets  
 - View all loans and user activity  
 ---
+## 🔹 Docker Setup
+### ✅ Prerequisites
+- [Docker](https://docs.docker.com/get-docker/)
+- [Docker Compose](https://docs.docker.com/compose/)
+
+### ⚙️ Setup Steps
+```bash
+# Clone the project
+git clone <https://github.com/jamil-BS23/Project_LMS.git>
+cd LMS
+
+# Copy example environment
+cp backend/.env.example backend/.env
+
+# Build and start all services
+docker compose up --build
+
+## 🚀 Access URLs
+
+| Service                  | URL                           |
+|--------------------------|-------------------------------|
+| Frontend                 | http://localhost:5174         |
+| Backend (FastAPI Docs)   | http://localhost:8000/docs    |
+| PostgreSQL               | localhost:5433                |
+| MinIO Console            | http://localhost:9001         |
+| PgAdmin                  | http://localhost:8080         |
+
+
+🪣 Default MinIO Credentials: minioadmin / minioadmin
+🗄️ Default PgAdmin Credentials: admin@admin.com / admin123
+
 ## 🔹 Getting Started
 ### ✅ Prerequisites
 - Node.js v18+
 - npm or yarn
 - Python v3.8+
 - PostgreSQL
+
 ### ⚙️ Backend Setup
 ```html
 <h3>⚙️ Backend Setup</h3>
@@ -138,17 +171,17 @@ The Library Management System (LMS) is a web-based platform that simplifies mana
 Project_LMS
 ├── backend
 │   ├── app
-│   │   ├── api 
-|   |   ├── crud
-│   │   ├── core  
-│   │   ├── models    
+│   │   ├── api
+│   │   ├── crud
+│   │   ├── core
+│   │   ├── models
 │   │   ├── services
-|   |   ├── schema
+│   │   ├── schema
 │   │   └── main.py
-│   ├── alembic       
+│   ├── alembic
 │   ├── requirements.txt
 │   └── .env
-├── frontend
+├── frontend_V01
 │   ├── public
 │   ├── src
 │   │   ├── api
@@ -160,13 +193,16 @@ Project_LMS
 │   │   └── main.jsx
 │   ├── package.json
 │   └── vite.config.js
+├── docker-compose.yml
 └── README.md
+
 
 🔹 Developer Commands
 Action	Command
 Run backend:uvicorn app.main:app --reload
 Run frontend:npm run dev
 Build frontend	npm run build
+Run Docker:docker compose up --build
 
 ## 🔹 System Architecture
 
@@ -213,4 +249,120 @@ Administrator (Librarian/Staff)
 | rating  |
 | text    |
 +---------+
+# Environment Variables
+
+## 🟦 Backend `.env`
+
+```env
+DATABASE_URL=postgresql+asyncpg://postgres:123456@localhost:5432/lmsv01
+SECRET_KEY=9YtQ4rK2vH0ePq3xF7gWjZlA6bN1uV8o
+ALGORITHM=HS256
+ACCESS_TOKEN_EXPIRE_MINUTES=30
+MAX_BORROW_LIMIT=5
+ADMIN_EMAIL=admin@library.com
+ADMIN_PASSWORD=admin123
+
+MINIO_ENDPOINT=localhost:9000
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=media
+
+🟦 Frontend .env
+VITE_API_BASE_URL=http://localhost:8000
+🟦 Root .env
+POSTGRES_USER=postgres
+POSTGRES_PASSWORD=123456
+POSTGRES_DB=lmsv01
+DATABASE_URL=postgresql+asyncpg://postgres:123456@db:5432/lmsv01
+
+MINIO_ACCESS_KEY=minioadmin
+MINIO_SECRET_KEY=minioadmin
+MINIO_BUCKET=media
+
+PGADMIN_DEFAULT_EMAIL=jamilahmediiuc@gmail.com
+PGADMIN_DEFAULT_PASSWORD=123456
+
+## 🔹 Docker Compose Setup
+
+Here is the `docker-compose.yml` for running the LMS project with Docker:
+
+```yaml
+version: "3.8"
+
+services:
+  db:
+    image: postgres:15
+    container_name: postgres
+    restart: unless-stopped
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-postgres}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-123456}
+      POSTGRES_DB: ${POSTGRES_DB:-lmsv01}
+    volumes:
+      - db_data:/var/lib/postgresql/data
+    ports:
+      - "5433:5432"
+
+  minio:
+    image: minio/minio:latest
+    container_name: minio
+    restart: unless-stopped
+    environment:
+      MINIO_ROOT_USER: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_ROOT_PASSWORD: ${MINIO_SECRET_KEY:-minioadmin}
+    volumes:
+      - minio_data:/data
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    command: server /data --console-address ":9001"
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    depends_on:
+      - db
+      - minio
+    env_file:
+      - ./backend/.env
+    environment:
+      DATABASE_URL: postgresql+asyncpg://${POSTGRES_USER:-postgres}:${POSTGRES_PASSWORD:-123456}@db:5432/${POSTGRES_DB:-lmsv01}
+      MINIO_ENDPOINT: minio:9000
+      MINIO_ACCESS_KEY: ${MINIO_ACCESS_KEY:-minioadmin}
+      MINIO_SECRET_KEY: ${MINIO_SECRET_KEY:-minioadmin}
+      MINIO_BUCKET: media
+    volumes:
+      - ./backend:/app
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+
+  frontend:
+    build:
+      context: ./frontend_V01
+      dockerfile: Dockerfile
+      args:
+        VITE_API_BASE_URL: ${VITE_API_BASE_URL:-http://localhost:8000}
+    depends_on:
+      - backend
+    ports:
+      - "5174:80"
+    restart: unless-stopped
+
+  pgadmin:
+    image: dpage/pgadmin4
+    container_name: pgadmin
+    environment:
+      PGADMIN_DEFAULT_EMAIL: ${PGADMIN_DEFAULT_EMAIL}
+      PGADMIN_DEFAULT_PASSWORD: ${PGADMIN_DEFAULT_PASSWORD}
+    ports:
+      - "8080:80"
+    depends_on:
+      - db
+
+volumes:
+  db_data:
+  minio_data:
 
