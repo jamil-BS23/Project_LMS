@@ -194,7 +194,7 @@ const handleSubmit = async () => {
                       <label className="block text-sm font-medium text-gray-700 mb-1">
                         Borrowing Days
                       </label>
-                      <div className="w-full border rounded px-3 py-2 bg-gray-50">
+                      <div className="text-base font-semibold mb-2 text-gray-900">
                         {formData[book.id]?.days ?? "—"}
                       </div>
                     </div>
@@ -207,10 +207,11 @@ const handleSubmit = async () => {
                       <input
                         type="date"
                         name="returnDate"
-                        className="w-full border rounded px-3 py-2"
+                        className="text-base font-semibold mb-2 text-gray-900 border border-gray-300 rounded-md px-3 py-2 focus:ring-2 focus:ring-sky-500 focus:outline-none appearance-auto"
                         value={formData[book.id]?.returnDate || ""}
                         onChange={(e) => handleChange(e, book.id)}
                       />
+
                     </div>
 
                     {/* Booked Timeline — comments (optional, left as comment as in your code) */}

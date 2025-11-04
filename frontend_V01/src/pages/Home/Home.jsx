@@ -221,14 +221,14 @@ export default function Home() {
                     <div className="hidden sm:flex gap-2">
                       <button
                         onClick={() => scrollByAmount(recRowRef, -1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+                        className="w-full rounded-md border border-gray-400 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                         aria-label="Scroll left"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => scrollByAmount(recRowRef, 1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+                        className="w-full rounded-md border border-gray-400 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                         aria-label="Scroll right"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -294,14 +294,14 @@ export default function Home() {
                     <div className="hidden sm:flex gap-2">
                       <button
                         onClick={() => scrollByAmount(popRowRef, -1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+                        className="w-full rounded-md border border-black-400 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                         aria-label="Scroll left"
                       >
                         <ChevronLeft className="w-4 h-4" />
                       </button>
                       <button
                         onClick={() => scrollByAmount(popRowRef, 1)}
-                        className="p-2 rounded-md border border-gray-300 bg-white hover:bg-gray-50"
+                        className="w-full rounded-md border border-gray-400 bg-white pl-10 pr-3 py-2 text-sm text-gray-900 placeholder-gray-500 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:border-sky-500"
                         aria-label="Scroll right"
                       >
                         <ChevronRight className="w-4 h-4" />
@@ -373,7 +373,7 @@ export default function Home() {
                   </h2>
                   <button
                     onClick={() => setFilter(null)}
-                    className="text-sm text-gray-600 hover:text-sky-600"
+                    className="text-sm text-gray-600 hover:text-black-600"
                   >
                     Clear
                   </button>

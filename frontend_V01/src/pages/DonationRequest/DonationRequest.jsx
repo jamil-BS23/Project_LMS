@@ -63,7 +63,7 @@ function StatusFilterBar({
 }) {
   return (
     <section className="bg-white rounded-lg shadow border border-gray-300">
-      <div className="px-4 py-3 flex items-center gap-3 flex-wrap">
+      <div className="px-4 py-3 flex items-center gap-3 flex-wrap text-gray-900">
         {/* General search: donor, author, book (no ID here) */}
         <div className="relative">
           <Search className="absolute left-3 top-2.5 text-gray-400" size={16} />
@@ -94,7 +94,7 @@ function StatusFilterBar({
         )}
 
         {/* Status select */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 bg-white-800 text-black p-2 rounded-md shadow-sm">
           <Filter size={16} className="text-gray-500" />
           <select
             value={statusFilter}
@@ -348,21 +348,21 @@ export default function DonationRequest() {
           ) : (
             rows.map((r, idx) => (
               <tr key={r.id} className="border-t border-gray-300">
-                <td className="px-4 py-2 font-medium">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   {idx + 1 + (pageForCalc - 1) * PAGE_SIZE}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   <div className="font-medium">{r.donor_name}</div>
                   {r.BS_ID && <div className="text-[11px] text-gray-500 mt-0.5">BSID: {r.BS_ID}</div>}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   <div className="font-medium">{r.book_title}</div>
                   <div className="text-xs text-gray-500">
                     Author: {r.book_author || "Unknown Author"}
                   </div>
                   {r.book_description && <div className="text-xs text-gray-500">{r.book_description}</div>}
                 </td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold border
                       ${
@@ -384,7 +384,7 @@ export default function DonationRequest() {
                   </span>
                 </td>
                 {showActions && (
-                  <td className="px-4 py-2">
+                  <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                     <div className="flex justify-end gap-2">
                       <button
                         onClick={() => actOn(r.donation_book_id, "accepted")}
@@ -424,19 +424,19 @@ export default function DonationRequest() {
         <tbody>
           {rows.length === 0 ? (
             <tr>
-              <td colSpan={4} className="px-4 py-6 text-center text-gray-500">
+              <td colSpan={4} className="px-4 py-2 font-medium text-gray-900 text-sm">
                 No history yet.
               </td>
             </tr>
           ) : (
             rows.map((h, idx) => (
               <tr key={h.id} className="border-t border-gray-300">
-                <td className="px-4 py-2 font-medium">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   {idx + 1 + (pageForCalc - 1) * PAGE_SIZE}
                 </td>
-                <td className="px-4 py-2">{h.donor_name}</td>
-                <td className="px-4 py-2">{h.book_title}</td>
-                <td className="px-4 py-2">
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">{h.donor_name}</td>
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">{h.book_title}</td>
+                <td className="px-4 py-2 font-medium text-gray-900 text-sm">
                   <span
                     className={`inline-flex items-center gap-1 rounded-full px-2 py-0.5 text-xs font-semibold border
                       ${

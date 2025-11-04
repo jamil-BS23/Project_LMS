@@ -44,3 +44,11 @@ async def get_book_reviews(book_id: int, db: AsyncSession = Depends(get_db)):
         traceback.print_exc()  
         raise HTTPException(status_code=500, detail=f"Failed to fetch reviews: {str(e)}")
 
+
+
+async def get_user_from_api(user_id: str, db: AsyncSession):
+    user = await UserCRUD.get_user_by_id(db, user_id)
+    if not user:
+        return None
+    return user
+

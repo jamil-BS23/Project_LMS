@@ -308,7 +308,7 @@ export default function ManageFeature() {
 
         {/* Toolbar */}
         <section className="bg-white rounded-lg shadow border border-gray-200 p-4 md:p-6">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
+          <div className="px-4 py-3 flex items-center gap-3 flex-wrap text-gray-900">
             <div className="flex-1">
               <div className="relative">
                 <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />

@@ -30,7 +30,8 @@ app.include_router(borrow.router, prefix="", tags=["Borrow"])
 app.include_router(admin.router, prefix="/admin", tags=["Admin"])
 app.include_router(settings.router, prefix="/settings", tags=["Settings"])
 app.include_router(donation_book.router, prefix="/donation", tags=["Donation Book"])
- 
+app.include_router(rate_book.router, prefix="/rate_book", tags=["Rate Book"])
+app.include_router(book_review.router, prefix="/book_review", tags=["Book Review"])
  
 @app.get("/")
 async def root():

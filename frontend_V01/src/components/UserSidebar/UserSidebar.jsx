@@ -38,7 +38,7 @@ export default function UserSidebar({ active = "dashboard" }) {
   return (
     <aside className="w-60 bg-white shadow-md px-4 py-6 flex flex-col justify-between">
       <div>
-        <h2 className="text-xl font-bold mb-6">My Library</h2>
+        <h2 className="text-xl font-bold text-black">My Library</h2>
         <ul className="space-y-3">
           <li>
             <Link to="/user" className={isDashboard ? on : off}>

@@ -151,7 +151,7 @@ export default function BookDetails() {
           coverImage: b.book_image,
           rating: b.book_rating ?? 0,
           ratingCount: b.ratingCount ?? 0,
-          publisher: b.author ?? "—",
+          publisher: b.book_author ?? "—",
           publishDate: b.created_at ?? "",
           category: b.book_category ?? "General",
           pdfLink: b.book_pdf? 
@@ -900,12 +900,13 @@ const fetchReviews = async () => {
               />
             ))}
           </div>
-        <textarea
-            value={comment}
-            onChange={(e) => setComment(e.target.value)}
-            className="w-full border rounded p-2 mt-2"
-            placeholder="Write your review..."
-          />
+            <textarea
+              value={comment}
+              onChange={(e) => setComment(e.target.value)}
+              className="w-full border border-gray-300 rounded p-2 mt-2 text-gray-900 bg-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-sky-400"
+              placeholder="Write your review..."
+            />
+
           <button
             className="mt-3 inline-flex items-center border border-gray-300 text-sky-600 text-sm font-medium px-3 py-1.5 rounded-md hover:bg-sky-50"
             onClick={async () => {
@@ -951,7 +952,7 @@ const fetchReviews = async () => {
                           <span className="text-gray-500 ml-1.5">{r.country}</span>
                         </div>
 
-                         <div className="text-sm">
+                         <div className="text-sm mt-1 text-gray-800">
                           <span>{r.review_text}</span>
                         </div>
                         <div className="flex items-center gap-1 text-xs mt-0.5 text-gray-500">

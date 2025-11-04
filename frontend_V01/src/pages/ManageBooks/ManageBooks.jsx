@@ -583,7 +583,7 @@ useEffect(() => {
       <Sidebar />
 
       {/* Main */}
-      <main className="flex-1 p-6 space-y-6">
+      <main className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none">
         <h1 className="text-xl md:text-2xl font-bold text-gray-800">Manage Books</h1>
 
         {/* Filters */}
@@ -730,7 +730,7 @@ useEffect(() => {
                       value={form.title}
                       onChange={handleChange}
                       placeholder="book name"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
 
@@ -742,7 +742,7 @@ useEffect(() => {
                       value={form.author}
                       onChange={handleChange}
                       placeholder="author name"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
 
@@ -756,7 +756,7 @@ useEffect(() => {
                       name="category"
                       value={form.category}
                       onChange={handleChange}
-                      className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     >
                       <option value="">Select a category</option>
                       {categories.map((c) => (
@@ -776,7 +776,7 @@ useEffect(() => {
                       value={form.copies}
                       onChange={handleChange}
                       placeholder="No of copy"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
 
@@ -790,9 +790,9 @@ useEffect(() => {
                         type="file"
                         accept=".png,.jpg,.jpeg,image/png,image/jpeg,image/*"
                         onChange={(e) => handleFile(e, "image")}
-                        className="w-full rounded border border-gray-300 px-3 py-2 file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                       />
-                      <div className="w-16 h-16 rounded-md bg-gray-100 overflow-hidden flex items-center justify-center">
+                      <div className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none">
                         {form.imageLoading ? (
                           <Loader2 className="animate-spin text-gray-400" size={20} />
                         ) : form.coverUrl ? (
@@ -818,7 +818,7 @@ useEffect(() => {
                         type="file"
                         accept="application/pdf,.pdf"
                         onChange={(e) => handleFile(e, "pdf")}
-                        className="w-full rounded border border-gray-300 px-3 py-2 file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                       />
                       <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center">
                         {form.pdfLoading ? (
@@ -842,7 +842,7 @@ useEffect(() => {
                         type="file"
                         accept=".mp3,.wav,.m4a,audio/*"
                         onChange={(e) => handleFile(e, "audio")}
-                        className="w-full rounded border border-gray-300 px-3 py-2 file:mr-3 file:rounded file:border-0 file:bg-gray-100 file:px-3 file:py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                        className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                       />
                       <div className="w-16 h-16 rounded-md bg-gray-100 flex items-center justify-center">
                         {form.audioLoading ? (
@@ -865,7 +865,7 @@ useEffect(() => {
                       onChange={handleChange}
                       rows={4}
                       placeholder="short description / notes"
-                      className="w-full rounded border border-gray-300 px-3 py-2 focus:outline-none focus:ring-2 focus:ring-sky-400"
+                      className="w-full px-3 py-2 border border-gray-300 rounded-md text-gray-900 placeholder-gray-400 focus:ring-2 focus:ring-sky-500 focus:outline-none"
                     />
                   </div>
                 </div>

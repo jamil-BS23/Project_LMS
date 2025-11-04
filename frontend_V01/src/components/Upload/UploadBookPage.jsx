@@ -347,7 +347,7 @@ useEffect(() => {
                     placeholder="e.g.,Book Title"
                     value={bookData.title}
                     onChange={handleChange}
-                    className="w-full px-3 py-2 border rounded-md bg-gray-50 focus:outline-none focus:ring-2 focus:ring-sky-500"
+                    className="w-full px-3 py-2 border rounded-md bg-gray-50 text-gray-900 focus:outline-none focus:ring-2 focus:ring-sky-500"
                   />
                 </div>
 
