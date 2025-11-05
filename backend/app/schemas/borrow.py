@@ -2,17 +2,15 @@ from pydantic import BaseModel, Field, validator
 from datetime import date
 from typing import Optional, List
 
-# Enums for validation
 BORROW_STATUS = {"borrowed", "returned", "overdue"}
 REQUEST_STATUS = {"accept", "pending", "reject"}
-
 
 
 class BorrowRequestRecord(BaseModel):
     borrow_id: int
     user_id: str
     user_name: Optional[str]
-    user_email: Optional[str]=None
+    user_email: Optional[str] = None
     book_id: int
     book_title: Optional[str]
     borrow_date: date
@@ -21,15 +19,12 @@ class BorrowRequestRecord(BaseModel):
 
     class Config:
         orm_mode = True
-        
 
 
 class BorrowRecord(BaseModel):
     borrow_id: int
     user_id: str
-   # user_name: Optional[str]
     book_id: int
-   # book_title: Optional[str]
     borrow_date: date
     return_date: date
     borrow_status: str
@@ -39,17 +34,9 @@ class BorrowRecord(BaseModel):
 
 
 class BorrowCreate(BaseModel):
-    # user_name: str
-    # borrow_date: date
+
     book_id: int
     return_date: date
-
-    # @validator("return_date")
-    # def check_date_range(cls, v, values):
-    #     borrow_date = values.get("borrow_date")
-    #     if borrow_date and v < borrow_date:
-    #         raise ValueError("return_date cannot be before borrow_date")
-    #     return v
 
 
 class BorrowStatusUpdate(BaseModel):
@@ -78,20 +65,17 @@ class BorrowCountResponse(BaseModel):
     count: int
 
 
-
-
 class BorrowDetailResponse(BaseModel):
 
     borrow_id: int
     user_id: str
-    user_name: Optional[str]=None
+    user_name: Optional[str] = None
     book_id: int
-    book_title: Optional[str]=None
+    book_title: Optional[str] = None
     borrow_date: date
     return_date: date
     borrow_status: str
     returned_at: Optional[date] = None
-   
 
     class Config:
         orm_mode = True

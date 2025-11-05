@@ -9,7 +9,6 @@ class SettingsBase(BaseModel):
     booking_days_limit: int
 
 
-
 class SettingsUpdate(BaseModel):
     borrow_day_limit: int = None
     borrow_day_extension_limit: int = None
@@ -21,4 +20,3 @@ class SettingsUpdate(BaseModel):
 class SettingsResponse(SettingsBase):
     class Config:
         orm_mode = True
-

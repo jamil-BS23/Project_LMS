@@ -11,5 +11,5 @@ class UserRating(Base):
     rating = Column(DECIMAL(2,1), nullable=False)
 
     __table_args__ = (
-        UniqueConstraint('user_id', 'book_id', name='uix_user_book'),  # prevents multiple ratings per user/book
+        UniqueConstraint('user_id', 'book_id', name='uix_user_book'),  
     )

@@ -15,16 +15,6 @@ from typing import Dict
 router = APIRouter(prefix="", tags=["Books"])
 book_crud = BookCRUD()
 
-# @router.get("/", response_model=List[BookDetail])
-# async def get_books(
-#     db: AsyncSession = Depends(get_db),
-#     search: str | None = Query(None),
-#     category: str | None = Query(None),
-#     skip: int = Query(0, ge=0),
-#     limit: int = Query(20, ge=1),
-# ):
-#     books = await book_crud.get_all(db, search=search, category=category, skip=skip, limit=limit)
-#     return books
 
 @router.get("/", response_model=Page[BookDetail])
 async def get_books(
@@ -101,7 +91,6 @@ async def create_book(
     photo_url = upload_file(book_image, folder="books")
     pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
     audio_url = upload_file(book_audio, folder="book_audios") if book_audio else None
-    # Convert form to Pydantic model
     payload = BookCreate(
         book_title=book_title,
         book_category=book_category,
@@ -116,7 +105,6 @@ async def create_book(
         book_audio=audio_url
     )
 
-    # Save files if uploaded
 
     return await book_crud.create(db, payload)
 

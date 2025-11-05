@@ -4,7 +4,11 @@ from typing import Optional, List
 from app.core.security import get_current_user, get_current_admin
 from app.utils.minio_utils import upload_file
 from app.crud.donation_book import DonationBookCRUD
-from app.schemas.donation_book import DonationBookPublic, DonationBookResponse, DonationStatusUpdate
+from app.schemas.donation_book import (
+    DonationBookPublic,
+    DonationBookResponse,
+    DonationStatusUpdate,
+)
 from app.database import get_db
 from app.models.user import User
 
@@ -12,13 +16,15 @@ from app.models.user import User
 router = APIRouter()
 
 
-
 @router.get("/", response_model=List[DonationBookResponse])
-async def get_all_donation_books(db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_admin)):
+async def get_all_donation_books(
+    db: AsyncSession = Depends(get_db), current_user: User = Depends(get_current_admin)
+):
     """
     Fetch all donation book requests for admin review.
     """
     return await DonationBookCRUD.get_all(db)
+
 
 @router.put("/", response_model=DonationBookPublic)
 async def create_donation_book(
@@ -29,11 +35,11 @@ async def create_donation_book(
     BS_ID: str = Form(...),
     book_detail: Optional[str] = Form(None),
     book_copies: int = Form(1),
-    book_photo: UploadFile = File(...),      
+    book_photo: UploadFile = File(...),
     book_pdf: UploadFile = File(None),
     book_audio: UploadFile = File(None),
     db: AsyncSession = Depends(get_db),
-    current_user: User = Depends(get_current_user)
+    current_user: User = Depends(get_current_user),
 ):
     photo_url = upload_file(book_photo, folder="books")
     pdf_url = upload_file(book_pdf, folder="book_pdfs") if book_pdf else None
@@ -45,9 +51,9 @@ async def create_donation_book(
         "book_category": category_title,
         "book_author": book_author,
         "BS_email": BS_mail,
-        "BS_ID": BS_ID,           # Not linked to user_id
+        "BS_ID": BS_ID,
         "book_description": book_detail,
-        "book_image": photo_url,  # stored MinIO URL
+        "book_image": photo_url,
         "book_pdf": pdf_url,
         "book_audio": audio_url,
         "book_copies": book_copies,
@@ -57,43 +63,42 @@ async def create_donation_book(
     return await DonationBookCRUD.create_request(db, payload)
 
 
-
 @router.get("/status", response_model=List[DonationBookResponse])
 async def get_donation_books_by_status(
-    book_approve: str = Query(..., description="Filter by status: pending | accepted | rejected"),
-    db: AsyncSession = Depends(get_db)
+    book_approve: str = Query(
+        ..., description="Filter by status: pending | accepted | rejected"
+    ),
+    db: AsyncSession = Depends(get_db),
 ):
     """
     Fetch donation books filtered by book_approve status.
     """
     book_approve = book_approve.lower()
     if book_approve not in {"pending", "accepted", "rejected"}:
-        raise HTTPException(status_code=400, detail="Invalid status. Must be pending, accepted, or rejected.")
+        raise HTTPException(
+            status_code=400,
+            detail="Invalid status. Must be pending, accepted, or rejected.",
+        )
 
     return await DonationBookCRUD.get_by_status(db, book_approve)
 
 
-
-
-# ➤ PATCH: admin approves donation (moves to books table)
 @router.patch("/{d_book_id}/status", response_model=DonationBookPublic)
 async def update_donation_status(
     d_book_id: int,
     status_update: DonationStatusUpdate,
     db: AsyncSession = Depends(get_db),
-    admin: User = Depends(get_current_admin)
+    admin: User = Depends(get_current_admin),
 ):
-    return await DonationBookCRUD.update_donation_status(db, d_book_id, status_update.status)
+    return await DonationBookCRUD.update_donation_status(
+        db, d_book_id, status_update.status
+    )
 
 
-
-
-
-# ➤ PATCH: admin approves donation (moves to books table)
 @router.patch("/{d_book_id}/reject", response_model=DonationBookPublic)
 async def approve_donation_book(
     d_book_id: int,
     db: AsyncSession = Depends(get_db),
-    admin: User = Depends(get_current_admin)
+    admin: User = Depends(get_current_admin),
 ):
     return await DonationBookCRUD.approve_request(db, d_book_id)

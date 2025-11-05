@@ -12,21 +12,21 @@ from app.models.book import Book
 from app.models.user_rating import UserRating
 from app.schemas.book import BookCreate, BookUpdate
 
+
 class BookCRUD:
     """CRUD operations for Book"""
 
     def __init__(self):
-        pass  # 
-    
+        pass
+
     async def get_all(
         self,
         db: AsyncSession,
         search: Optional[str] = None,
-        category: Optional[str] = None
+        category: Optional[str] = None,
     ) -> List[Book]:
         query = select(Book)
 
-        # ✅ Add optimized search filters
         if search:
             like_pattern = f"%{search.lower()}%"
             query = query.filter(
@@ -38,14 +38,12 @@ class BookCRUD:
                 )
             )
 
-        # ✅ Filter by category
         if category:
             query = query.filter(Book.book_category == category)
 
-        # ✅ Execute efficiently
         result = await db.execute(query)
         return result.scalars().unique().all()
-    
+
     @staticmethod
     async def count_books(db: AsyncSession) -> int:
         """
@@ -65,7 +63,9 @@ class BookCRUD:
         await db.refresh(new_book)
         return new_book
 
-    async def update(self, db: AsyncSession, book_id: int, update_data: BookUpdate) -> Optional[Book]:
+    async def update(
+        self, db: AsyncSession, book_id: int, update_data: BookUpdate
+    ) -> Optional[Book]:
         book = await self.get_by_id(db, book_id)
         if not book:
             return None
@@ -86,66 +86,71 @@ class BookCRUD:
         await db.commit()
         return True
 
-    async def get_featured(self, db: AsyncSession, skip: int = 0, limit: int = 20) -> List[Book]:
+    async def get_featured(
+        self, db: AsyncSession, skip: int = 0, limit: int = 20
+    ) -> List[Book]:
         result = await db.execute(
             select(Book).where(Book.featured == True).offset(skip).limit(limit)
         )
         return result.scalars().all()
 
-    async def get_popular(self, db: AsyncSession, skip: int = 0, limit: int = 20) -> List[Book]:
+    async def get_popular(
+        self, db: AsyncSession, skip: int = 0, limit: int = 20
+    ) -> List[Book]:
         result = await db.execute(
             select(Book).order_by(desc(Book.book_rating)).offset(skip).limit(limit)
         )
         return result.scalars().all()
 
-    async def get_new(self, db: AsyncSession, skip: int = 0, limit: int = 20) -> List[Book]:
+    async def get_new(
+        self, db: AsyncSession, skip: int = 0, limit: int = 20
+    ) -> List[Book]:
         result = await db.execute(
             select(Book).order_by(desc(Book.created_at)).offset(skip).limit(limit)
         )
         return result.scalars().all()
 
-    async def rate_book(self, db: AsyncSession, book_id: int, rating: float, user_id: str) -> Optional[Book]:
-  
+    async def rate_book(
+        self, db: AsyncSession, book_id: int, rating: float, user_id: str
+    ) -> Optional[Book]:
+
         result = await db.execute(select(Book).filter(Book.book_id == book_id))
         book = result.scalar_one_or_none()
         if not book:
             return None
 
-        # 2️⃣ Try to find existing rating
         result = await db.execute(
             select(UserRating).filter(
-                UserRating.user_id == user_id,
-                UserRating.book_id == book_id
+                UserRating.user_id == user_id, UserRating.book_id == book_id
             )
         )
         existing_rating = result.scalar_one_or_none()
         print(existing_rating)
 
         if existing_rating:
-            # Update old rating
-            raise HTTPException(status_code=400, detail="User has already rated this book.")
+            raise HTTPException(
+                status_code=400, detail="User has already rated this book."
+            )
         else:
-            # Create new rating
             new_rating = UserRating(user_id=user_id, book_id=book_id, rating=rating)
             db.add(new_rating)
 
         await db.commit()
 
-        # 3️⃣ Recalculate average rating for this book
         avg_result = await db.execute(
-            select(func.avg(UserRating.rating))
-            .filter(UserRating.book_id == book_id)
+            select(func.avg(UserRating.rating)).filter(UserRating.book_id == book_id)
         )
         avg_rating = float(avg_result.scalar() or 0)
 
-        # 4️⃣ Update book table
         book.book_rating = avg_rating
         await db.commit()
         await db.refresh(book)
 
         return book
 
-    async def toggle_featured(self, db: AsyncSession, book_id: int, featured: bool) -> Optional[Book]:
+    async def toggle_featured(
+        self, db: AsyncSession, book_id: int, featured: bool
+    ) -> Optional[Book]:
         book = await self.get_by_id(db, book_id)
         if not book:
             return None

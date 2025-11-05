@@ -5,6 +5,7 @@ from app.models.book import Book
 from app.schemas.category import CategoryCreate, CategoryUpdate
 from fastapi import HTTPException, status
 
+
 class CategoryCRUD:
 
     @staticmethod
@@ -25,11 +26,14 @@ class CategoryCRUD:
         return db_category
 
     @staticmethod
-    async def update_category(db: AsyncSession, category_id: int, category_update: CategoryUpdate):
+    async def update_category(
+        db: AsyncSession, category_id: int, category_update: CategoryUpdate
+    ):
 
-        print("CategoryUpdate :" ,CategoryUpdate)
-        # Fetch category object first
-        result = await db.execute(select(Category).where(Category.category_id == category_id))
+        print("CategoryUpdate :", CategoryUpdate)
+        result = await db.execute(
+            select(Category).where(Category.category_id == category_id)
+        )
         db_category = result.scalar_one_or_none()
         if not db_category:
             return None
@@ -46,16 +50,18 @@ class CategoryCRUD:
 
     @staticmethod
     async def delete_category(db: AsyncSession, category_id: int):
-        # Fetch category object first
-        result = await db.execute(select(Category).where(Category.category_id == category_id))
+        result = await db.execute(
+            select(Category).where(Category.category_id == category_id)
+        )
         db_category = result.scalar_one_or_none()
         if not db_category:
             return False
 
-        # Check if any available books exist in THIS category
         result_books = await db.execute(
-            select(Book)
-            .where(Book.book_category == db_category.category_title, Book.book_availabity == True)
+            select(Book).where(
+                Book.book_category == db_category.category_title,
+                Book.book_availabity == True,
+            )
         )
         available_books = result_books.scalars().all()
         if available_books:

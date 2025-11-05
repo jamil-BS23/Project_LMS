@@ -1,5 +1,3 @@
-
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy import select, func
 from app.models.user import User
@@ -9,14 +7,13 @@ from fastapi import HTTPException, status
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
 
+
 class UserCRUD:
 
-    
     @staticmethod
     async def get(db: AsyncSession, user_id: int):
         return await db.get(User, user_id)
 
-        
     @staticmethod
     async def count_users(db: AsyncSession) -> int:
         """
@@ -24,7 +21,6 @@ class UserCRUD:
         """
         result = await db.execute(select(func.count()).select_from(User))
         return result.scalar_one()
-
 
     @staticmethod
     async def get_user_by_name(db, user_name: str):
@@ -54,7 +50,7 @@ class UserCRUD:
             user_email=user.user_email,
             password=hashed_password,
             role=user.role,
-            user_photo=user.user_photo
+            user_photo=user.user_photo,
         )
         db.add(db_user)
         await db.commit()

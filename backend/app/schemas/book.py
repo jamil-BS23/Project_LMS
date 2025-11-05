@@ -3,6 +3,8 @@ from typing import Optional
 from pydantic import Field, HttpUrl
 from datetime import datetime
 from fastapi import Form
+
+
 class BookDetail(BaseModel):
     book_id: int
     book_title: str
@@ -21,6 +23,7 @@ class BookDetail(BaseModel):
     class Config:
         orm_mode = True
         allow_population_by_field_name = True
+
 
 class BookDetail2(BaseModel):
     book_id: int
@@ -76,7 +79,6 @@ class BookUpdate(BaseModel):
     class Config:
         orm_mode = True
 
-
     @classmethod
     def as_form(
         cls,
@@ -107,6 +109,7 @@ class RateBook(BaseModel):
 
     class Config:
         orm_mode = True
+
 
 class UpoadateFeatures(BaseModel):
     featured: bool

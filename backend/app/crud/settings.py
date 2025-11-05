@@ -6,16 +6,13 @@ from sqlalchemy import select
 from datetime import date, timedelta, datetime
 
 
-
 class SettingsCRUD:
-
-
 
     @staticmethod
     async def get_borrow_day_limit(db: AsyncSession):
         result = await db.execute(select(Settings.borrow_day_limit))
         return result.scalar_one_or_none()
-    
+
     @staticmethod
     async def get_borrow_max_limit(db: AsyncSession):
         result = await db.execute(select(Settings.borrow_max_limit))
