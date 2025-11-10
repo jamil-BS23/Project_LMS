@@ -2,5 +2,5 @@ projectKey=LMS_Team_Version
 serverUrl=https://sonarqube.brainstation-23.xyz
 serverVersion=25.10.0.114319
 dashboardUrl=https://sonarqube.brainstation-23.xyz/dashboard?id=LMS_Team_Version
-ceTaskId=c7ed1a81-19fc-4148-9fcd-bcd76c68c65e
-ceTaskUrl=https://sonarqube.brainstation-23.xyz/api/ce/task?id=c7ed1a81-19fc-4148-9fcd-bcd76c68c65e
+ceTaskId=ef27c039-f03d-46ce-9f79-04cf5fc3e5bf
+ceTaskUrl=https://sonarqube.brainstation-23.xyz/api/ce/task?id=ef27c039-f03d-46ce-9f79-04cf5fc3e5bf
