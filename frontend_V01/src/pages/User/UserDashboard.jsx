@@ -465,7 +465,7 @@
 import { useEffect, useState } from "react";
 import UserSidebar from "../../components/UserSidebar/UserSidebar";
 import axios from "axios";
-import { parseISO, isBefore } from "date-fns";
+import { parseISO, isBefore, startOfDay } from "date-fns";
 
 export default function UserDashboard() {
   useEffect(() => {
@@ -492,7 +492,7 @@ export default function UserDashboard() {
     const status = loan.status;
     switch (status) {
       case "approved":
-        if (returnDate && isBefore(returnDate, today)) return "Overdue";
+        if (returnDate && isBefore(startOfDay(returnDate), startOfDay(today))) return "Overdue";
         return "Borrowed";
       case "pending":
         return "Booked";
@@ -520,7 +520,6 @@ export default function UserDashboard() {
           overdue: overdueRes.data.count,
           returned: returnedRes.data.count,
         });
-
         // Fetch lists
         const [borrowedListRes, overdueListRes] = await Promise.all([
           axios.get(`${import.meta.env.VITE_API_BASE_URL}/borrow/status/accepted/list/my`, { headers }),

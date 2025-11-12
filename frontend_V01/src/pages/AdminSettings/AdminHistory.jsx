@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from "react";
 import { Search, Filter, Eye, X } from "lucide-react";
 import Sidebar from "../../components/DashboardSidebar/DashboardSidebar";
 import axios from "axios";
+import { startOfDay, isBefore } from "date-fns";
 const badge = (type) => {
   const base = "inline-flex items-center rounded px-2 py-0.5 text-xs font-medium";
   switch (type) {
@@ -65,7 +66,7 @@ export default function UserHistory() {
     case "pending":
       return "Booked";
     case "accepted":
-      if (dueOn && new Date(dueOn) < now) return "Overdue";
+      if (dueOn && isBefore(startOfDay(new Date(dueOn)), startOfDay(new Date()))) return "Overdue";
       return "Borrowed";
     case "returned":
       return "Returned";

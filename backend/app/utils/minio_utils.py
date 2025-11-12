@@ -57,7 +57,7 @@ def upload_file(file: UploadFile, folder: str = "uploads"):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"MinIO upload failed: {str(e)}")
 
-    return f"http://{settings.MINIO_ENDPOINT}/{settings.MINIO_BUCKET}/{object_name}"
+    return f"http://{settings.MINIO_PUBLIC_URL}/{settings.MINIO_BUCKET}/{object_name}"
 
 
 def delete_file(object_name: str):

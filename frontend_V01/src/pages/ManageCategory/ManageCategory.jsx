@@ -207,7 +207,6 @@ const slugify = (s = "") =>
         }
       );
 
-      console.log("Updated category response:", res.data);
       // Update frontend state
       setCategories((prev) => {
         const next = [...prev];

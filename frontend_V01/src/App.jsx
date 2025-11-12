@@ -159,7 +159,7 @@ function AppContent() {
   const hideLayout = hideLayoutPaths.includes(location.pathname);
 
   return (
-    <>
+    <> 
       {!hideLayout && <Navbar />}
 
       <main className="flex-grow">
