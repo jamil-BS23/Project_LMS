@@ -10,7 +10,7 @@ cryptography==42.0.8
 dnspython==2.6.1
 ecdsa==0.19.0
 email-validator==2.2.0
-fastapi==0.115.2
+fastapi
 fastapi-cli==0.0.5
 h11==0.14.0
 httpcore==1.0.5
@@ -52,3 +52,5 @@ urllib3==2.2.2
 uvicorn[standard]==0.30.1
 wheel==0.44.0
 fastapi-pagination
+greenlet>=3.0.3,<4.0
+
