@@ -66,8 +66,8 @@ export default function Dashboard() {
           returned_copies: returnedRes.data.count || 0,
           pending_copies: pendingRes.data.count || 0,
           overdued_copies: overdueRes.data.count || 0,
-          total_copies: total,
-          available_copies: total - (borrowed+ (pendingRes.data.count || 0) + (overdueRes.data.count||0)),
+          total_copies: total + (borrowed+ (pendingRes.data.count || 0) + (overdueRes.data.count||0)),
+          available_copies: total,
         });
       } catch (err) {
         console.error("Error fetching stats:", err.response?.data || err);

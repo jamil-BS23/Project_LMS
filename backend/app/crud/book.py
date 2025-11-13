@@ -49,7 +49,7 @@ class BookCRUD:
         """
         Return total number of books in the library.
         """
-        result = await db.execute(select(func.count()).select_from(Book))
+        result = await db.execute(select(func.sum(Book.available_copies)))
         return result.scalar_one()
 
     async def get_by_id(self, db: AsyncSession, book_id: int) -> Optional[Book]:

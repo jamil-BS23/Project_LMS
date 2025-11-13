@@ -8,7 +8,7 @@ from app.schemas.borrow import BorrowCreate, BorrowStatusUpdate, BorrowDetailRes
 from fastapi import HTTPException, status
 from datetime import date, timedelta, datetime
 from app.crud.settings import SettingsCRUD  
-from sqlalchemy import func
+from sqlalchemy import func, update
 from datetime import datetime, date
 
 
@@ -39,6 +39,19 @@ class BorrowCRUD:
         """
         Count number of borrows by borrow_status.
         """
+        now = datetime.utcnow().date()
+        await db.execute(
+            update(BorrowRecord)
+            .where(
+                BorrowRecord.borrow_status != "returned",
+                BorrowRecord.borrow_status!= "pdf-viewed",
+                BorrowRecord.borrow_status!="rejected",
+                BorrowRecord.borrow_status!="pending",
+                BorrowRecord.return_date < now
+            )
+            .values(borrow_status="overdue")
+        )
+        await db.commit()
         result = await db.execute(
             select(func.count()).select_from(BorrowRecord).where(BorrowRecord.borrow_status == status)
         )
@@ -329,7 +342,10 @@ class BorrowCRUD:
         result = await db.execute(
             select(BorrowRecord).where(
                 BorrowRecord.user_id == user_id,
-                BorrowRecord.borrow_status != "returned"
+                BorrowRecord.borrow_status != "returned",
+                BorrowRecord.borrow_status!= "pdf-viewed",
+                BorrowRecord.borrow_status!="rejected",
+                BorrowRecord.borrow_status!="pending"
             )
         )
         user_borrows = result.scalars().all()
