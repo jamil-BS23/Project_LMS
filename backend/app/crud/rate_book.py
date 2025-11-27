@@ -22,7 +22,7 @@ class RateBookCRUD:
         if not book:
             return None
 
-        # 2️⃣ Try to find existing rating
+        # Try to find existing rating
         result = await db.execute(
             select(UserRating).filter(
                 UserRating.user_id == user_id,
@@ -42,14 +42,14 @@ class RateBookCRUD:
 
         await db.commit()
 
-        # 3️⃣ Recalculate average rating for this book
+        # Recalculate average rating for this book
         avg_result = await db.execute(
             select(func.avg(UserRating.rating))
             .filter(UserRating.book_id == book_id)
         )
         avg_rating = float(avg_result.scalar() or 0)
 
-        # 4️⃣ Update book table
+        #  Update book table
         book.book_rating = avg_rating
         await db.commit()
         await db.refresh(book)
@@ -87,7 +87,7 @@ class RateBookCRUD:
         )
         reviews = reviews_result.scalars().all()
 
-        # ✅ Convert ORM → dict via Pydantic
+        # Convert ORM → dict via Pydantic
         enriched_reviews = []
         for r in reviews:
             user_res = await get_user_from_api(r.user_id, db)

@@ -25,7 +25,7 @@ class BookCRUD:
     ) -> List[Book]:
         query = select(Book)
 
-        # ✅ Add optimized search filters
+        #Add optimized search filters
         if search:
             like_pattern = f"%{search.lower()}%"
             query = query.filter(
@@ -36,11 +36,11 @@ class BookCRUD:
                 )
             )
 
-        # ✅ Filter by category
+        # Filter by category
         if category:
             query = query.filter(Book.book_category == category)
 
-        # ✅ Execute efficiently
+        # Execute efficiently
         result = await db.execute(query)
         return result.scalars().unique().all()
     
@@ -109,7 +109,7 @@ class BookCRUD:
         if not book:
             return None
 
-        # 2️⃣ Try to find existing rating
+        #  Try to find existing rating
         result = await db.execute(
             select(UserRating).filter(
                 UserRating.user_id == user_id,
@@ -129,14 +129,14 @@ class BookCRUD:
 
         await db.commit()
 
-        # 3️⃣ Recalculate average rating for this book
+        # Recalculate average rating for this book
         avg_result = await db.execute(
             select(func.avg(UserRating.rating))
             .filter(UserRating.book_id == book_id)
         )
         avg_rating = float(avg_result.scalar() or 0)
 
-        # 4️⃣ Update book table
+        #  Update book table
         book.book_rating = avg_rating
         await db.commit()
         await db.refresh(book)

@@ -77,7 +77,7 @@ class BorrowCRUD:
         if existing_borrow:
             return existing_borrow
 
-        # 2️⃣ Create Borrow record
+        #  Create Borrow record
         today = date.today()
         db_borrow = BorrowRecord(
             user_id=user.user_id,
@@ -95,24 +95,24 @@ class BorrowCRUD:
 
     @staticmethod
     async def create_borrow(db: AsyncSession, borrow: "BorrowCreate", user: User):
-        # 1️⃣ Get the book
+        # Get the book
         book = await db.get(Book, borrow.book_id)
         if not book:
             raise HTTPException(status_code=404, detail="BOOK_NOT_FOUND")
 
-        # 2️⃣ Check book availability
+        #  Check book availability
         if not book.book_availabity or (book.available_copies is not None and book.available_copies < 1):
             raise HTTPException(status_code=409, detail="BOOK_UNAVAILABLE")
 
-        # 3️⃣ Fetch borrow_day_limit from settings
+        # Fetch borrow_day_limit from settings
         borrow_day_limit = await SettingsCRUD.get_borrow_day_limit(db)
         if borrow_day_limit is None:
             raise HTTPException(status_code=500, detail="BORROW_LIMIT_NOT_SET")
 
-        # 4️⃣ Borrow max limit (can later come from Settings)
+        #  Borrow max limit (can later come from Settings)
         borrow_max_limit = await SettingsCRUD.get_borrow_max_limit(db)
 
-        # 5️⃣ Check if user already borrowed this book without returning it
+        #  Check if user already borrowed this book without returning it
         existing_borrow = await db.execute(
             select(BorrowRecord)
             .where(BorrowRecord.user_id == user.user_id)
@@ -125,7 +125,7 @@ class BorrowCRUD:
         if existing_borrow:
             raise HTTPException(status_code=409, detail="USER_ALREADY_BORROWED_THIS_BOOK")
 
-        # 6️⃣ Check total borrowed books for user
+        # Check total borrowed books for user
         total_active_borrows = await db.execute(
             select(func.count())
             .select_from(BorrowRecord)
@@ -175,13 +175,13 @@ class BorrowCRUD:
       
         db.add(db_borrow)
 
-        # 9️⃣ Update book availability
+        #  Update book availability
         if book.available_copies is not None and book.available_copies > 0:
             book.available_copies -= 1
         book.book_availabity = book.available_copies > 0
         db.add(book)
 
-        # 🔟 Commit transaction
+        # Commit transaction
         await db.commit()
         await db.refresh(db_borrow)
 
@@ -353,7 +353,7 @@ class BorrowCRUD:
     # Update overdue borrows
         updated = False
         for borrow in user_borrows:
-        # ✅ Ensure both are date objects for safe comparison
+        #Ensure both are date objects for safe comparison
             if borrow.return_date and borrow.return_date < now and borrow.borrow_status != "overdue":
                 borrow.borrow_status = "overdue"
                 db.add(borrow)
@@ -404,50 +404,58 @@ class BorrowCRUD:
 
     @staticmethod
     async def update_borrow_status(db: AsyncSession, borrow_id: int, status: str):
-        # Fetch the borrow record
-        db_borrow = await db.get(BorrowRecord, borrow_id)
-        if not db_borrow:
-            raise HTTPException(status_code=404, detail="BORROW_NOT_FOUND")
+        try:
+            async with db.begin():
+           
+                db_borrow = await db.get(BorrowRecord, borrow_id)
+                if not db_borrow:
+                    raise HTTPException(status_code=404, detail="BORROW_NOT_FOUND")
 
-        # Update the status
-        db_borrow.borrow_status = status
+              
+                db_borrow.borrow_status = status
 
-        # ✅ If returned, set returned_at to today's date and update book availability
-        if status == "returned":
-            db_borrow.returned_at = datetime.utcnow().date()  # set today's date
+                
+                book = await db.execute(
+                    select(Book).where(Book.book_id == db_borrow.book_id).with_for_update()
+                )
+                book = book.scalar_one_or_none()
 
-            # Update the book's available copies
+                if book:
+                    if status in ["returned", "rejected"]:
+                        book.book_availabity = True
+                        book.available_copies = (book.available_copies or 0) + 1
+
+            
+                if status == "returned":
+                    db_borrow.returned_at = datetime.utcnow().date()
+
+               
+                db.add(db_borrow)
+                if book:
+                    db.add(book)
+
+            
+            await db.refresh(db_borrow)
+
+            
+            user = await db.get(User, db_borrow.user_id)
             book = await db.get(Book, db_borrow.book_id)
-            if book:
-                book.available_copies = (book.available_copies or 0) + 1
-                db.add(book)
 
-        if status == "rejected":
-            # Update the book's available copies
-            book = await db.get(Book, db_borrow.book_id)
-            if book:
-                book.book_availabity = True
-                book.available_copies = (book.available_copies or 0) + 1
-                db.add(book)
-        db.add(db_borrow)
-        await db.commit()
-        await db.refresh(db_borrow)
+            return BorrowDetailResponse(
+                borrow_id=db_borrow.borrow_id,
+                user_id=db_borrow.user_id,
+                user_name=user.user_name if user else None,
+                book_id=db_borrow.book_id,
+                book_title=book.book_title if book else None,
+                borrow_date=db_borrow.borrow_date,
+                return_date=db_borrow.return_date,
+                borrow_status=db_borrow.borrow_status,
+                returned_at=db_borrow.returned_at if hasattr(db_borrow, "returned_at") else None
+            )
 
-        # Fetch related user and book for response
-        user = await db.get(User, db_borrow.user_id)
-        book = await db.get(Book, db_borrow.book_id)
-
-        return BorrowDetailResponse(
-            borrow_id=db_borrow.borrow_id,
-            user_id=db_borrow.user_id,
-            user_name=user.user_name if user else None,
-            book_id=db_borrow.book_id,
-            book_title=book.book_title if book else None,
-            borrow_date=db_borrow.borrow_date,
-            return_date=db_borrow.return_date,
-            borrow_status=db_borrow.borrow_status,
-            returned_at=db_borrow.returned_at if hasattr(db_borrow, "returned_at") else None
-        )
+        except Exception as e:
+            await db.rollback()
+            raise HTTPException(status_code=500, detail=str(e))
 
 
     # @staticmethod
